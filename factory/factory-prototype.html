@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="./auth.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GPM‑e Factory OS — Prototype</title>
+  <style>
+    :root{
+      --bg:#0b1020;--panel:#0f1730;--panel2:#0c1328;--border:#1e2a52;--text:#e7edf7;--muted:#9aa7c3;
+      --brand:#6ee7ff;--brand2:#a78bfa;--good:#4ade80;--warn:#fbbf24;--bad:#fb7185;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Inter,Roboto,Helvetica,Arial; background:radial-gradient(1200px 600px at 20% -10%, rgba(110,231,255,.18), transparent 60%), radial-gradient(900px 500px at 90% 0%, rgba(167,139,250,.14), transparent 55%), var(--bg); color:var(--text)}
+    a{color:inherit}
+
+    .app{display:grid; grid-template-columns: 280px 1fr; min-height:100vh}
+    .sidebar{background:linear-gradient(180deg, rgba(15,23,48,.95), rgba(12,19,40,.92)); border-right:1px solid var(--border); padding:18px 16px; position:sticky; top:0; height:100vh}
+    .brand{display:flex; align-items:center; gap:10px; padding:10px 10px; border:1px solid rgba(30,42,82,.6); border-radius:14px; background:rgba(255,255,255,.03)}
+    .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand2)); box-shadow:0 12px 40px rgba(110,231,255,.18)}
+    .brand h1{font-size:14px; letter-spacing:.06em; margin:0}
+    .brand span{display:block; font-size:12px; color:var(--muted); letter-spacing:0; margin-top:2px}
+
+    .nav{margin-top:16px; display:flex; flex-direction:column; gap:6px}
+    .nav a{display:flex; gap:10px; align-items:center; padding:10px 12px; border-radius:12px; text-decoration:none; color:var(--muted); border:1px solid transparent}
+    .nav a.active{background:rgba(110,231,255,.07); color:var(--text); border-color:rgba(110,231,255,.15)}
+    .nav a:hover{background:rgba(255,255,255,.04); color:var(--text)}
+    .pill{font-size:11px; padding:2px 8px; border-radius:999px; border:1px solid rgba(30,42,82,.8); color:var(--muted)}
+
+    .main{padding:22px 22px 34px}
+    .topbar{display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px}
+    .title{display:flex; flex-direction:column; gap:4px}
+    .title h2{margin:0; font-size:18px; letter-spacing:-.02em}
+    .title p{margin:0; color:var(--muted); font-size:12.5px}
+
+    .actions{display:flex; gap:10px; align-items:center}
+    .btn{background:rgba(255,255,255,.04); border:1px solid rgba(30,42,82,.9); color:var(--text); padding:10px 12px; border-radius:12px; font-size:12.5px; cursor:pointer}
+    .btn.primary{background:linear-gradient(135deg, rgba(110,231,255,.22), rgba(167,139,250,.16)); border-color:rgba(110,231,255,.22)}
+    .btn:hover{filter:brightness(1.05)}
+
+    .grid{display:grid; grid-template-columns:repeat(12, 1fr); gap:14px}
+    .card{background:linear-gradient(180deg, rgba(15,23,48,.84), rgba(12,19,40,.82)); border:1px solid rgba(30,42,82,.8); border-radius:16px; padding:14px; box-shadow:0 18px 70px rgba(0,0,0,.28)}
+    .kpi{grid-column: span 3}
+    .kpi .label{color:var(--muted); font-size:12px}
+    .kpi .value{font-size:22px; margin-top:6px; font-weight:800; letter-spacing:-.04em}
+    .kpi .sub{margin-top:6px; font-size:12px; color:var(--muted)}
+
+    .panel{grid-column: span 8}
+    .panel2{grid-column: span 4}
+
+    .table{width:100%; border-collapse:collapse; font-size:12.5px}
+    .table th{color:var(--muted); text-align:left; font-weight:600; padding:10px 10px; border-bottom:1px solid rgba(30,42,82,.7)}
+    .table td{padding:12px 10px; border-bottom:1px solid rgba(30,42,82,.45); vertical-align:top}
+    .row:hover{background:rgba(255,255,255,.03)}
+
+    .badge{font-size:11px; padding:3px 10px; border-radius:999px; border:1px solid rgba(30,42,82,.9); color:var(--muted); display:inline-flex; gap:6px; align-items:center}
+    .dot{width:7px;height:7px;border-radius:999px; display:inline-block}
+    .good{background:rgba(74,222,128,.12); color:#bff7d2; border-color:rgba(74,222,128,.28)}
+    .warn{background:rgba(251,191,36,.10); color:#ffe1a3; border-color:rgba(251,191,36,.22)}
+    .bad{background:rgba(251,113,133,.10); color:#ffd1d8; border-color:rgba(251,113,133,.22)}
+
+    .station{display:flex; flex-direction:column; gap:10px}
+    .station .item{display:flex; justify-content:space-between; gap:12px; padding:10px 12px; border-radius:14px; border:1px solid rgba(30,42,82,.65); background:rgba(255,255,255,.02)}
+    .station .name{font-weight:700; font-size:12.5px}
+    .station .meta{color:var(--muted); font-size:12px; margin-top:2px}
+
+    .drawer{margin-top:14px; border-radius:16px; border:1px solid rgba(30,42,82,.8); overflow:hidden}
+    .drawer-head{padding:12px 14px; display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,.02)}
+    .drawer-head b{font-size:12.5px}
+    .drawer-body{padding:12px 14px; background:rgba(0,0,0,.16)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; font-size:11.5px; color:#cfe3ff}
+
+    .split{display:grid; grid-template-columns:1fr; gap:12px}
+    .hint{color:var(--muted); font-size:12px; line-height:1.4}
+
+    @media (max-width: 980px){
+      .app{grid-template-columns:1fr}
+      .sidebar{position:relative; height:auto}
+      .kpi{grid-column: span 6}
+      .panel{grid-column: span 12}
+      .panel2{grid-column: span 12}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <h1>GPM‑e Factory OS</h1>
+          <span>Enterprise agent stack</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a class="active" href="#"><span>🏭</span> Factory Ops <span class="pill" style="margin-left:auto">MVP</span></a>
+        <a href="#"><span>🧾</span> Work Orders</a>
+        <a href="#"><span>✅</span> QC / Compliance</a>
+        <a href="#"><span>💸</span> Cost & Efficiency</a>
+        <a href="#"><span>⚙️</span> Integrations</a>
+      </nav>
+
+      <div style="margin-top:18px" class="hint">
+        <b>Principle:</b> Q is the foreman. Specialists do the work. Every output passes QC before it can ship.
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="title">
+          <h2>Factory Ops</h2>
+          <p>Work orders flowing through stations. Draft‑only by default. Nothing publishes without approval.</p>
+        </div>
+        <div class="actions">
+          <button class="btn">Export</button>
+          <button class="btn primary">+ New Work Order</button>
+        </div>
+      </div>
+
+      <section class="grid">
+        <div class="card kpi">
+          <div class="label">Open work orders</div>
+          <div class="value">7</div>
+          <div class="sub">2 high priority</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">In review (QC)</div>
+          <div class="value">2</div>
+          <div class="sub">avg QC time: 18m</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">Shipped today</div>
+          <div class="value">3</div>
+          <div class="sub">LinkedIn packs + 1 landing draft</div>
+        </div>
+        <div class="card kpi">
+          <div class="label">Cost today</div>
+          <div class="value">€4.12</div>
+          <div class="sub">models + tools</div>
+        </div>
+
+        <div class="card panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+            <b style="font-size:13px">Work Orders (latest)</b>
+            <span class="pill">Voltenum • Ops • RL</span>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Brand</th>
+                <th>Station</th>
+                <th>Status</th>
+                <th>Owner</th>
+                <th>Age</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row">
+                <td class="mono">WO‑VOLT‑0142</td>
+                <td>content_pack</td>
+                <td>Voltenum</td>
+                <td>Compliance QC</td>
+                <td><span class="badge warn"><span class="dot" style="background:var(--warn)"></span>Yellow</span></td>
+                <td>Compliance Reviewer</td>
+                <td>34m</td>
+              </tr>
+              <tr class="row">
+                <td class="mono">WO‑VOLT‑0141</td>
+                <td>content_pack</td>
+                <td>Voltenum</td>
+                <td>Packaging</td>
+                <td><span class="badge good"><span class="dot" style="background:var(--good)"></span>Ready</span></td>
+                <td>Q (Foreman)</td>
+                <td>58m</td>
+              </tr>
+              <tr class="row">
+                <td class="mono">WO‑OPS‑0031</td>
+                <td>ops_check</td>
+                <td>GPM‑e</td>
+                <td>Ops Sentinel</td>
+                <td><span class="badge good"><span class="dot" style="background:var(--good)"></span>OK</span></td>
+                <td>Ops Sentinel</td>
+                <td>2h</td>
+              </tr>
+              <tr class="row">
+                <td class="mono">WO‑RL‑0007</td>
+                <td>research_report</td>
+                <td>Revenue Lab</td>
+                <td>Research</td>
+                <td><span class="badge warn"><span class="dot" style="background:var(--warn)"></span>Running</span></td>
+                <td>Research Agent</td>
+                <td>12m</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="drawer">
+            <div class="drawer-head">
+              <b>Selected: WO‑VOLT‑0142</b>
+              <span class="badge warn"><span class="dot" style="background:var(--warn)"></span>Yellow — needs edits</span>
+            </div>
+            <div class="drawer-body">
+              <div class="split">
+                <div>
+                  <div class="hint"><b>QC findings</b>: 2 claims need softening; add disclaimer; remove ROI implication.</div>
+                  <div style="margin-top:10px" class="mono">Required edits:
+- Replace “guarantees” → “can help”
+- Add: “sizing depends on load profile + grid constraints”
+- Keep CTA to /netcongestie once (not 3x)
+</div>
+                </div>
+                <div>
+                  <div class="hint"><b>Approve/Reject</b>: external output requires D. approval.</div>
+                  <div style="display:flex; gap:10px; margin-top:10px">
+                    <button class="btn">Reject</button>
+                    <button class="btn primary">Approve to ship</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card panel2">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+            <b style="font-size:13px">Stations</b>
+            <span class="pill">Assembly line</span>
+          </div>
+          <div class="station">
+            <div class="item">
+              <div>
+                <div class="name">Intake</div>
+                <div class="meta">confirm funnel + pillar + CTA</div>
+              </div>
+              <span class="badge good"><span class="dot" style="background:var(--good)"></span>fast</span>
+            </div>
+            <div class="item">
+              <div>
+                <div class="name">Extractor</div>
+                <div class="meta">facts + claims from source</div>
+              </div>
+              <span class="badge good"><span class="dot" style="background:var(--good)"></span>stable</span>
+            </div>
+            <div class="item">
+              <div>
+                <div class="name">Copywriter</div>
+                <div class="meta">3 hooks + platform variants</div>
+              </div>
+              <span class="badge warn"><span class="dot" style="background:var(--warn)"></span>tune</span>
+            </div>
+            <div class="item">
+              <div>
+                <div class="name">Creative</div>
+                <div class="meta">image brief / generation</div>
+              </div>
+              <span class="badge warn"><span class="dot" style="background:var(--warn)"></span>tune</span>
+            </div>
+            <div class="item">
+              <div>
+                <div class="name">Compliance QC</div>
+                <div class="meta">Red/Yellow/Green + edits</div>
+              </div>
+              <span class="badge good"><span class="dot" style="background:var(--good)"></span>hard‑gate</span>
+            </div>
+            <div class="item">
+              <div>
+                <div class="name">Packaging</div>
+                <div class="meta">ready‑to‑paste pack</div>
+              </div>
+              <span class="badge good"><span class="dot" style="background:var(--good)"></span>ship</span>
+            </div>
+          </div>
+
+          <div style="margin-top:12px" class="hint">
+            Next: connect scheduler + UTM tracking + lead attribution (Odoo).
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</body>
+</html>
