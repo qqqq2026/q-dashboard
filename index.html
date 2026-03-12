@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q-Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d0f14; color: #e2e8f0; font-family: 'Inter', 'Segoe UI', sans-serif; padding: 28px; min-height: 100vh; }
+
+  /* Header */
+  .header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  h1 { font-size: 1.5rem; font-weight: 800; color: #f8fafc; letter-spacing: -0.03em; }
+  .version { font-size: 0.7rem; color: #334155; background: #161b26; border: 1px solid #1e2736; border-radius: 4px; padding: 2px 7px; }
+  .subtitle { font-size: 0.75rem; color: #475569; margin-bottom: 20px; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; margin-bottom: 28px; border-bottom: 1px solid #1e2736; padding-bottom: 0; }
+  .tab { padding: 8px 18px; font-size: 0.78rem; font-weight: 600; color: #475569; cursor: pointer; border-radius: 7px 7px 0 0; border: 1px solid transparent; border-bottom: none; transition: all 0.15s; }
+  .tab:hover { color: #94a3b8; background: #161b26; }
+  .tab.active { color: #f8fafc; background: #161b26; border-color: #1e2736; border-bottom-color: #161b26; margin-bottom: -1px; }
+
+  /* Tab content */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Stats row */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 32px; }
+  .stat { background: #161b26; border: 1px solid #1e2736; border-radius: 10px; padding: 16px; }
+  .stat-label { font-size: 0.68rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .stat-value { font-size: 1.7rem; font-weight: 700; color: #f8fafc; }
+  .stat-sub { font-size: 0.68rem; color: #334155; margin-top: 2px; }
+
+  /* Finance stats */
+  .fin-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 32px; }
+
+  /* Section headers */
+  .section { margin-bottom: 32px; }
+  .section-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .section-title .pill { font-size: 0.65rem; background: #1e2736; color: #64748b; border-radius: 10px; padding: 2px 8px; font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+  /* Tables */
+  .table-wrap { background: #0d0f14; border: 1px solid #1e2736; border-radius: 12px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { text-align: left; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: #334155; padding: 10px 14px; border-bottom: 1px solid #1e2736; }
+  tbody tr { border-bottom: 1px solid #0d0f14; transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #161b26; }
+  td { padding: 12px 14px; font-size: 0.81rem; vertical-align: top; }
+
+  /* Badges */
+  .company-tag { display: inline-block; background: #1e2736; color: #94a3b8; border-radius: 4px; padding: 2px 7px; font-size: 0.68rem; font-weight: 500; }
+  .badge { display: inline-block; border-radius: 5px; padding: 3px 9px; font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .s-active    { background: #052e16; color: #4ade80; border: 1px solid #166534; }
+  .s-todo      { background: #1e1b4b; color: #a78bfa; border: 1px solid #3730a3; }
+  .s-paused    { background: #1c1107; color: #fb923c; border: 1px solid #7c2d12; }
+  .s-done      { background: #0c1a2e; color: #38bdf8; border: 1px solid #075985; }
+  .s-killed    { background: #1c0a0a; color: #f87171; border: 1px solid #7f1d1d; }
+  .s-scoping   { background: #1a1207; color: #fbbf24; border: 1px solid #78350f; }
+  .s-proposed  { background: #0f1a2e; color: #60a5fa; border: 1px solid #1d4ed8; }
+  .s-viable    { background: #052e16; color: #4ade80; border: 1px solid #166534; }
+  .s-tbd       { background: #1a1a1a; color: #475569; border: 1px solid #334155; }
+
+  .priority-high   { color: #f87171; font-weight: 600; }
+  .priority-medium { color: #fb923c; }
+  .priority-low    { color: #64748b; }
+  .rev { color: #fbbf24; font-weight: 700; letter-spacing: 0.05em; }
+  .owner { color: #818cf8; font-weight: 700; }
+  .task-title { font-weight: 500; color: #e2e8f0; }
+  .notes { color: #64748b; font-size: 0.73rem; max-width: 260px; line-height: 1.5; }
+  .date { color: #475569; font-size: 0.68rem; }
+  .promo-note { font-size: 0.72rem; color: #334155; font-style: italic; margin-top: 8px; padding: 8px 14px; border-left: 2px solid #1e2736; }
+
+  /* Finance-specific */
+  .num { font-variant-numeric: tabular-nums; }
+  .num-pos { color: #4ade80; font-weight: 600; }
+  .num-neg { color: #f87171; font-weight: 600; }
+  .num-zero { color: #475569; }
+  .num-tbd { color: #334155; font-style: italic; }
+  .budget-bar-wrap { background: #0d0f14; border-radius: 4px; height: 6px; width: 120px; overflow: hidden; margin-top: 4px; }
+  .budget-bar { height: 100%; background: #818cf8; border-radius: 4px; transition: width 0.3s; }
+  .budget-bar.over { background: #f87171; }
+  .alloc-model { display: flex; gap: 8px; align-items: center; font-size: 0.72rem; }
+  .alloc-infra { background: #1e1b4b; color: #a78bfa; border-radius: 4px; padding: 2px 8px; font-weight: 600; }
+  .alloc-mkt   { background: #052e16; color: #4ade80; border-radius: 4px; padding: 2px 8px; font-weight: 600; }
+  .entity-section { margin-bottom: 28px; }
+  .entity-header { font-size: 0.85rem; font-weight: 700; color: #f8fafc; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+  .entity-header .dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; }
+  .entity-header .dot.dormant { background: #334155; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .card { background: #161b26; border: 1px solid #1e2736; border-radius: 10px; padding: 16px; }
+  .card-title { font-size: 0.66rem; color: #475569; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+  .card-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; padding: 4px 0; border-bottom: 1px solid #0d0f14; }
+  .card-row:last-child { border-bottom: none; }
+  .card-row .label { color: #64748b; }
+  .divider { height: 1px; background: #1e2736; margin: 24px 0; }
+  .reinvest-tag { display: inline-block; background: #1a1207; color: #fbbf24; border: 1px solid #78350f; border-radius: 4px; padding: 2px 7px; font-size: 0.65rem; font-weight: 600; }
+  .budget-policy { background: #161b26; border: 1px solid #1e2736; border-radius: 10px; padding: 18px; margin-bottom: 28px; }
+  .budget-policy-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 12px; }
+  .policy-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; font-size: 0.8rem; }
+  .policy-pct { font-size: 1.3rem; font-weight: 800; min-width: 52px; }
+  .policy-pct.infra { color: #a78bfa; }
+  .policy-pct.mkt { color: #4ade80; }
+  .policy-desc { color: #64748b; font-size: 0.75rem; }
+  .floor-note { font-size: 0.7rem; color: #fbbf24; background: #1a1207; border: 1px solid #78350f; border-radius: 5px; padding: 6px 12px; margin-top: 10px; display: inline-block; }
+
+  .footer { margin-top: 24px; font-size: 0.66rem; color: #1e2736; text-align: right; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🧭 Q-Dashboard</h1>
+  <span class="version">v1.1</span>
+</div>
+<p class="subtitle">Last updated: 2026-03-12 · Maintained by Q · Minimal human touchpoints · Target: €1M+ MRR</p>
+
+<!-- Tab Nav -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('overview')">📋 Overview</div>
+  <div class="tab" onclick="showTab('finance')">💶 Finance</div>
+  <div class="tab" onclick="showTab('revenue-lab')">🧪 Revenue Lab</div>
+</div>
+
+<!-- ===== TAB: OVERVIEW ===== -->
+<div id="tab-overview" class="tab-content active">
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Portfolio Tasks</div>
+      <div class="stat-value">7</div>
+      <div class="stat-sub">across all companies</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Active</div>
+      <div class="stat-value" style="color:#4ade80">2</div>
+      <div class="stat-sub">in progress</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Revenue Lab</div>
+      <div class="stat-value" style="color:#fbbf24">3</div>
+      <div class="stat-sub">experiments proposed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Portfolio MRR</div>
+      <div class="stat-value" style="color:#f87171">€0</div>
+      <div class="stat-sub">target: €1M+</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Portfolio Tasks <span class="pill">7 items</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Task</th><th>Company</th><th>Status</th><th>Priority</th><th>Rev</th><th>Owner</th><th>Notes</th><th>Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td><td class="task-title">Navexela landing stack + GTM assets</td>
+            <td><span class="company-tag">Navexela</span></td>
+            <td><span class="badge s-todo">Todo</span></td>
+            <td class="priority-high">High</td><td class="rev">€€€</td><td class="owner">Q</td>
+            <td class="notes">Landing page, lead gen, CRM sheet. Needs D. to confirm positioning.</td>
+            <td class="date">2026-03-12</td>
+          </tr>
+          <tr>
+            <td>2</td><td class="task-title">DID Services sales activation</td>
+            <td><span class="company-tag">DID Services</span></td>
+            <td><span class="badge s-todo">Todo</span></td>
+            <td class="priority-high">High</td><td class="rev">€€€</td><td class="owner">Q</td>
+            <td class="notes">Identify leads, outreach templates, pipeline setup.</td>
+            <td class="date">2026-03-12</td>
+          </tr>
+          <tr>
+            <td>3</td><td class="task-title">Voltenum sales activation</td>
+            <td><span class="company-tag">Voltenum</span></td>
+            <td><span class="badge s-todo">Todo</span></td>
+            <td class="priority-high">High</td><td class="rev">€€€</td><td class="owner">Q</td>
+            <td class="notes">Odoo CRM active. Define offer, ICP, outreach sequence.</td>
+            <td class="date">2026-03-12</td>
+          </tr>
+          <tr>
+            <td>4</td><td class="task-title">Wickey PM automation</td>
+            <td><span class="company-tag">Wickey</span></td>
+            <td><span class="badge s-todo">Todo</span></td>
+            <td class="priority-medium">Medium</td><td class="rev">€€</td><td class="owner">Q</td>
+            <td class="notes">Document + automate recurring PM workflows.</td>
+            <td class="date">2026-03-12</td>
+          </tr>
+          <tr>
+            <td>5</td><td class="task-title">Nightly restic backups</td>
+            <td><span class="company-tag">Ops</span></td>
+            <td><span class="badge s-todo">Todo</span></td>
+            <td class="priority-medium">Medium</td><td class="rev">—</td><td class="owner">Q</td>
+            <td class="notes">Configure + document restore steps.</td>
+            <td class="date">2026-03-12</td>
+          </tr>
+          <tr>
+            <td>6</td><td class="task-title">Q-Dashboard build</td>
+            <td><span class="company-tag">Portfolio</span></td>
+            <td><span class="badge s-active">Active</span></td>
+            <td class="priority-high">High</td><td class="rev">€€</td><td class="owner">Q</td>
+            <td class="notes">Revenue targets, pipelines, autonomy KPIs. This dashboard.</td>
+            <td class="date">2026-03-12</td>
+          </tr>
+          <tr>
+            <td>7</td><td class="task-title">Grachten Holding — Revenue Lab entity setup</td>
+            <td><span class="company-tag" style="background:#1a1207;color:#fbbf24;">Grachten</span></td>
+            <td><span class="badge s-active">Active</span></td>
+            <td class="priority-high">High</td><td class="rev">€€€€</td><td class="owner">Q</td>
+            <td class="notes">Holding vehicle for all Revenue Lab projects. Viable POCs move here.</td>
+            <td class="date">2026-03-12</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== TAB: FINANCE ===== -->
+<div id="tab-finance" class="tab-content">
+
+  <!-- Portfolio Totals -->
+  <div class="fin-stats">
+    <div class="stat">
+      <div class="stat-label">Portfolio MRR</div>
+      <div class="stat-value num-zero">€0</div>
+      <div class="stat-sub">target: €1M+</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total OpEx / mo</div>
+      <div class="stat-value num-zero">€0</div>
+      <div class="stat-sub">recurring costs</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total CapEx</div>
+      <div class="stat-value num-zero">€0</div>
+      <div class="stat-sub">one-time builds</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Net Margin</div>
+      <div class="stat-value num-zero">—</div>
+      <div class="stat-sub">revenue - costs</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Infra Budget Used</div>
+      <div class="stat-value num-zero">€0</div>
+      <div class="stat-sub">5% floor: €100/mo</div>
+    </div>
+  </div>
+
+  <!-- Budget Policy -->
+  <div class="budget-policy">
+    <div class="budget-policy-title">📐 Group Budget Allocation Policy</div>
+    <div class="policy-row">
+      <div class="policy-pct infra">5%</div>
+      <div>
+        <div style="color:#a78bfa;font-weight:600;font-size:0.8rem;">Infrastructure &amp; Agent CapEx/OpEx</div>
+        <div class="policy-desc">Q agents, tokens, APIs, hosting, automation builds. Reinvested to compound autonomy. Shared cost allocated pro-rata by entity revenue share.</div>
+      </div>
+    </div>
+    <div class="policy-row">
+      <div class="policy-pct mkt">95%</div>
+      <div>
+        <div style="color:#4ade80;font-weight:600;font-size:0.8rem;">Marketing &amp; Distribution</div>
+        <div class="policy-desc">Paid ads, outreach tooling, content tokens, virality, lead gen. Per-entity. Tracked as frontend (customer-facing) vs backend (tooling).</div>
+      </div>
+    </div>
+    <div class="floor-note">⚠️ CFO Override — Infrastructure floor: €100/mo minimum regardless of revenue. Prevents zero-budget lockout at early stage. Adjust upward as MRR scales.</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Per-Entity Finance -->
+
+  <!-- NAVEXELA -->
+  <div class="entity-section">
+    <div class="entity-header"><div class="dot dormant"></div> Navexela UK <span class="badge s-todo">Pre-revenue</span></div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">💰 Revenue</div>
+        <div class="card-row"><span class="label">MRR</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">One-off</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Pipeline</span><span class="num-tbd">TBD</span></div>
+        <div class="card-row"><span class="label">Target MRR</span><span class="num-tbd">TBD</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Costs</div>
+        <div class="card-row"><span class="label">CapEx (builds)</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">OpEx/mo (infra)</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Frontend mkt</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Backend tooling</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Net margin</span><span class="num-zero">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VOLTENUM -->
+  <div class="entity-section">
+    <div class="entity-header"><div class="dot dormant"></div> Voltenum <span class="badge s-todo">Pre-revenue</span></div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">💰 Revenue</div>
+        <div class="card-row"><span class="label">MRR</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">One-off</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Pipeline</span><span class="num-tbd">TBD</span></div>
+        <div class="card-row"><span class="label">Target MRR</span><span class="num-tbd">TBD</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Costs</div>
+        <div class="card-row"><span class="label">CapEx (builds)</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">OpEx/mo — Odoo</span><span class="num-tbd">TBD</span></div>
+        <div class="card-row"><span class="label">Frontend mkt</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Backend tooling</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Net margin</span><span class="num-zero">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DID SERVICES -->
+  <div class="entity-section">
+    <div class="entity-header"><div class="dot dormant"></div> DID Services <span class="badge s-todo">Pre-revenue</span></div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">💰 Revenue</div>
+        <div class="card-row"><span class="label">MRR</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">One-off</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Pipeline</span><span class="num-tbd">TBD</span></div>
+        <div class="card-row"><span class="label">Target MRR</span><span class="num-tbd">TBD</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Costs</div>
+        <div class="card-row"><span class="label">CapEx (builds)</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">OpEx/mo (infra)</span><span class="num-tbd">TBD</span></div>
+        <div class="card-row"><span class="label">Frontend mkt</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Backend tooling</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Net margin</span><span class="num-zero">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WICKEY -->
+  <div class="entity-section">
+    <div class="entity-header"><div class="dot dormant"></div> Wickey Consulting <span class="badge s-todo">Pre-revenue tracked</span></div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">💰 Revenue</div>
+        <div class="card-row"><span class="label">MRR</span><span class="num-tbd">TBD</span></div>
+        <div class="card-row"><span class="label">One-off</span><span class="num-tbd">TBD</span></div>
+        <div class="card-row"><span class="label">Pipeline</span><span class="num-tbd">TBD</span></div>
+        <div class="card-row"><span class="label">Target MRR</span><span class="num-tbd">TBD</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Costs</div>
+        <div class="card-row"><span class="label">CapEx (builds)</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">OpEx/mo</span><span class="num-tbd">TBD</span></div>
+        <div class="card-row"><span class="label">Frontend mkt</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Backend tooling</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Net margin</span><span class="num-tbd">TBD</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRACHTEN HOLDING / REVENUE LAB -->
+  <div class="entity-section">
+    <div class="entity-header"><div class="dot"></div> Grachten Holding (Revenue Lab) <span class="badge s-active">Active</span></div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">💰 Revenue</div>
+        <div class="card-row"><span class="label">MRR</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">One-off</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Pipeline (RL-002–004)</span><span class="num-tbd">Proposed</span></div>
+        <div class="card-row"><span class="label">Target MRR</span><span class="num-tbd">TBD after POC</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Costs</div>
+        <div class="card-row"><span class="label">CapEx (builds)</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">OpEx/mo</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Frontend mkt</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Backend tooling</span><span class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Net margin</span><span class="num-zero">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Intercompany Allocation -->
+  <div class="section">
+    <div class="section-title">🔁 Intercompany Allocation — Q Infrastructure <span class="pill">Shared costs split pro-rata by revenue</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Entity</th><th>Revenue Share</th><th>Q Infra Allocation</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Navexela UK</td><td class="num-tbd">TBD</td><td class="num-tbd">TBD</td><td class="notes">Equal split until revenue data available</td></tr>
+          <tr><td>Voltenum</td><td class="num-tbd">TBD</td><td class="num-tbd">TBD</td><td class="notes">Odoo costs are standalone; only Q agent time shared</td></tr>
+          <tr><td>DID Services</td><td class="num-tbd">TBD</td><td class="num-tbd">TBD</td><td class="notes">DID infra costs are standalone</td></tr>
+          <tr><td>Wickey Consulting</td><td class="num-tbd">TBD</td><td class="num-tbd">TBD</td><td class="notes">—</td></tr>
+          <tr><td>Grachten / Rev Lab</td><td class="num-tbd">TBD</td><td class="num-tbd">TBD</td><td class="notes">—</td></tr>
+          <tr style="border-top:1px solid #1e2736;">
+            <td><strong>Total Q Infra</strong></td>
+            <td>100%</td>
+            <td class="num-tbd">Floor: €100/mo</td>
+            <td class="notes">Scales to 5% of group revenue above floor</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Reinvestment Log -->
+  <div class="section">
+    <div class="section-title">♻️ Reinvestment Log — Q / Agent Upgrades <span class="pill">CapEx for autonomy</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Date</th><th>Item</th><th>Cost</th><th>Type</th><th>ROI Rationale</th><th>Outcome</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="date">2026-03-12</td>
+            <td class="task-title">Q-Dashboard v1.1</td>
+            <td class="num-zero">€0</td>
+            <td><span class="reinvest-tag">CapEx</span></td>
+            <td class="notes">CEO-level visibility across all entities. Reduces manual reporting time.</td>
+            <td class="notes">Built ✅</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="promo-note">💡 Every infrastructure spend logged here with ROI rationale. Cumulative reinvestment tracked against time saved and revenue unlocked.</p>
+  </div>
+
+</div>
+
+<!-- ===== TAB: REVENUE LAB ===== -->
+<div id="tab-revenue-lab" class="tab-content">
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Proposed</div>
+      <div class="stat-value" style="color:#60a5fa">3</div>
+      <div class="stat-sub">awaiting green light</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Active POC</div>
+      <div class="stat-value" style="color:#fbbf24">0</div>
+      <div class="stat-sub">in testing</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Promoted</div>
+      <div class="stat-value" style="color:#38bdf8">0</div>
+      <div class="stat-sub">POC → portfolio</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Fastest to Cash</div>
+      <div class="stat-value" style="color:#4ade80;font-size:1rem;padding-top:8px">RL-003</div>
+      <div class="stat-sub">1–2 weeks</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🧪 Experiment Pipeline <span class="pill">Standalone entities — no shared infra</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Experiment</th><th>Stage</th><th>Price Point</th><th>Margin</th><th>Time to Cash</th><th>Why Strong</th><th>Next Action</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="date">RL-002</td>
+            <td class="task-title">AI Voice Receptionist</td>
+            <td><span class="badge s-proposed">Proposed</span></td>
+            <td>€99–299/mo</td>
+            <td class="num-pos">85–90%</td>
+            <td>2–3 wks</td>
+            <td class="notes">D. owns DID infra — no cold start. SMB demand proven.</td>
+            <td class="notes">Awaiting D. green light</td>
+          </tr>
+          <tr>
+            <td class="date">RL-003</td>
+            <td class="task-title" style="color:#4ade80">⚡ Productized AI Automation Agency</td>
+            <td><span class="badge s-proposed">Proposed</span></td>
+            <td>€500–1,500/mo</td>
+            <td class="num-pos">90%+</td>
+            <td style="color:#4ade80;font-weight:700">1–2 wks</td>
+            <td class="notes">Zero product build. Q delivers. Warm pipeline from consulting network.</td>
+            <td class="notes">Awaiting D. green light</td>
+          </tr>
+          <tr>
+            <td class="date">RL-004</td>
+            <td class="task-title">Niche AI SaaS Micro-tool</td>
+            <td><span class="badge s-proposed">Proposed</span></td>
+            <td>€29–99/mo</td>
+            <td class="num-pos">95%+</td>
+            <td>3–4 wks</td>
+            <td class="notes">Compounds over time, low churn, no sales calls at scale.</td>
+            <td class="notes">D. to pick vertical/niche</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📐 Isolation Rules <span class="pill">Each experiment = own entity, own marketing, own everything</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Rule</th><th>Detail</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="task-title">Own Legal Entity</td><td class="notes">Each promoted experiment operates under its own company or Grachten subsidiary. No cross-liability.</td></tr>
+          <tr><td class="task-title">Own Brand + Domain</td><td class="notes">Separate brand identity, domain, email, and social presence per experiment.</td></tr>
+          <tr><td class="task-title">Own Marketing Stack</td><td class="notes">Separate ad accounts, landing pages, email sequences, CRM pipeline. No cross-contamination.</td></tr>
+          <tr><td class="task-title">Own Revenue Stream</td><td class="notes">Revenue tracked independently. No revenue pooling until holding-level rollup.</td></tr>
+          <tr><td class="task-title">Shared Infra — Ask First</td><td class="notes">Q infrastructure (APIs, agents) is shared but allocated. Only flag interdependency when operationally relevant.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="promo-note">💡 Viable experiments are promoted to the Finance tab as live entities under Grachten Holding.</p>
+
+</div>
+
+<div class="footer">Q-Dashboard v1.1 · /data/.openclaw/workspace/revenue-lab/ · Target: €1M+ MRR · 2026-03-12</div>
+
+<script>
+  function showTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
