@@ -626,7 +626,7 @@
         </div>`;
       window.checkPw = function() {
         const v = document.getElementById('pw').value;
-        if (v === PASS) { localStorage.setItem('${KEY}', PASS); location.reload(); }
+        if (v === PASS) { localStorage.setItem(KEY, PASS); location.reload(); }
         else { document.getElementById('pw-err').style.display='block'; }
       };
     }
