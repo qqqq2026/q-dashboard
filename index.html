@@ -8,8 +8,39 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #0d0f14; color: #e2e8f0; font-family: 'Inter', 'Segoe UI', sans-serif; padding: 28px; min-height: 100vh; }
 
+  /* Theme */
+  body.light { background: #f8fafc; color: #1e293b; }
+  body.light .stat, body.light .table-wrap, body.light .card, body.light .budget-policy { background: #fff; border-color: #e2e8f0; }
+  body.light .stat-label, body.light .muted, body.light .notes, body.light .date { color: #64748b; }
+  body.light .stat-value, body.light h1, body.light .task-title { color: #1e293b; }
+  body.light .section-title { color: #475569; }
+  body.light .tab { color: #64748b; }
+  body.light .tab.active { background: #fff; border-color: #e2e8f0; color: #1e293b; }
+  body.light .tab:hover { background: #f1f5f9; }
+  body.light thead th { color: #94a3b8; border-color: #e2e8f0; }
+  body.light tbody tr { border-color: #f8fafc; }
+  body.light tbody tr:hover { background: #f1f5f9; }
+  body.light td { color: #334155; }
+  body.light .tabs { border-color: #e2e8f0; }
+  body.light .entity-section .card { background: #f8fafc; border-color: #e2e8f0; }
+  body.light .card-row { border-color: #f1f5f9; }
+  body.light .card-title { color: #94a3b8; }
+  body.light .budget-policy-title { color: #475569; }
+  body.light .policy-desc { color: #64748b; }
+  body.light .footer { color: #cbd5e1; }
+
+  /* Theme toggle */
+  .theme-toggle { display: flex; gap: 4px; align-items: center; }
+  .theme-btn { font-size: 0.68rem; font-weight: 600; padding: 4px 10px; border-radius: 5px; border: 1px solid #1e2736; background: transparent; color: #475569; cursor: pointer; transition: all 0.15s; }
+  .theme-btn:hover { border-color: #475569; color: #94a3b8; }
+  .theme-btn.active { background: #1e2736; color: #f8fafc; border-color: #334155; }
+  body.light .theme-btn { border-color: #e2e8f0; color: #94a3b8; }
+  body.light .theme-btn:hover { border-color: #94a3b8; color: #475569; }
+  body.light .theme-btn.active { background: #e2e8f0; color: #1e293b; border-color: #cbd5e1; }
+
   /* Header */
   .header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   h1 { font-size: 1.5rem; font-weight: 800; color: #f8fafc; letter-spacing: -0.03em; }
   .version { font-size: 0.7rem; color: #334155; background: #161b26; border: 1px solid #1e2736; border-radius: 4px; padding: 2px 7px; }
   .subtitle { font-size: 0.75rem; color: #475569; margin-bottom: 20px; }
@@ -109,9 +140,16 @@
 </head>
 <body>
 
-<div class="header">
-  <h1>🧭 Q-Dashboard</h1>
-  <span class="version">v1.1</span>
+<div class="header-row">
+  <div class="header">
+    <h1>🧭 Q-Dashboard</h1>
+    <span class="version">v1.2</span>
+  </div>
+  <div class="theme-toggle">
+    <button class="theme-btn" onclick="setTheme('system')" id="btn-system">System</button>
+    <button class="theme-btn" onclick="setTheme('dark')" id="btn-dark">⚫ Dark</button>
+    <button class="theme-btn active" onclick="setTheme('light')" id="btn-light">⚪ Light</button>
+  </div>
 </div>
 <p class="subtitle">Last updated: 2026-03-12 · Maintained by Q · Minimal human touchpoints · Target: €1M+ MRR</p>
 
@@ -539,6 +577,25 @@
     document.getElementById('tab-' + name).classList.add('active');
     event.target.classList.add('active');
   }
+
+  function setTheme(t) {
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-' + t).classList.add('active');
+    if (t === 'dark') {
+      document.body.classList.remove('light');
+    } else if (t === 'light') {
+      document.body.classList.add('light');
+    } else {
+      // system
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.body.classList.toggle('light', !prefersDark);
+    }
+    localStorage.setItem('q-theme', t);
+  }
+
+  // Restore on load
+  const saved = localStorage.getItem('q-theme') || 'dark';
+  setTheme(saved);
 </script>
 
 </body>
