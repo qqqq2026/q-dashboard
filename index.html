@@ -143,7 +143,7 @@
 <div class="header-row">
   <div class="header">
     <h1>🧭 Q-Dashboard</h1>
-    <span class="version">v1.2</span>
+    <span class="version">v1.3</span>
   </div>
   <div class="theme-toggle">
     <button class="theme-btn" onclick="setTheme('system')" id="btn-system">System</button>
@@ -151,7 +151,7 @@
     <button class="theme-btn active" onclick="setTheme('light')" id="btn-light">⚪ Light</button>
   </div>
 </div>
-<p class="subtitle">Last updated: 2026-03-12 · Maintained by Q · Minimal human touchpoints · Target: €1M+ MRR</p>
+<p class="subtitle">Last updated: 2026-03-13 · Maintained by Q · Minimal human touchpoints · Target: €1M+ MRR</p>
 
 <div class="card" style="margin:-6px 0 22px 0;">
   <div class="card-title">Factory OS</div>
@@ -175,12 +175,12 @@
   <div class="stats">
     <div class="stat">
       <div class="stat-label">Portfolio Tasks</div>
-      <div class="stat-value">12</div>
+      <div class="stat-value">13</div>
       <div class="stat-sub">across all companies</div>
     </div>
     <div class="stat">
       <div class="stat-label">Active</div>
-      <div class="stat-value" style="color:#4ade80">2</div>
+      <div class="stat-value" style="color:#4ade80">3</div>
       <div class="stat-sub">in progress</div>
     </div>
     <div class="stat">
@@ -196,7 +196,7 @@
   </div>
 
   <div class="section">
-    <div class="section-title">Portfolio Tasks <span class="pill">12 items</span></div>
+    <div class="section-title">Portfolio Tasks <span class="pill">13 items</span></div>
     <div class="table-wrap">
       <table>
         <thead>
@@ -204,72 +204,79 @@
             <th>#</th><th>Task</th><th>Company</th><th>Status</th><th>Priority</th><th>Rev</th><th>Owner</th><th>Notes</th><th>Updated</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>1</td><td class="task-title">Navexela landing stack + GTM assets</td>
+        <tbody><tr>
+            <td>1</td><td class="task-title">Token + memory efficiency (P0)</td>
+            <td><span class="company-tag">Ops</span></td>
+            <td><span class="badge s-active">Active</span></td>
+            <td class="priority-high">High</td><td class="rev">—</td><td class="owner">Q</td>
+            <td class="notes">Hard cap replies (default ≤6 lines). Dashboard-first answers. Compress memory logs. No tool-output dumps.</td>
+            <td class="date">2026-03-13</td>
+          </tr>
+<tr>
+            <td>2</td><td class="task-title">Navexela landing stack + GTM assets</td>
             <td><span class="company-tag">Navexela</span></td>
             <td><span class="badge s-todo">Todo</span></td>
             <td class="priority-high">High</td><td class="rev">€€€</td><td class="owner">Q</td>
             <td class="notes">Landing page, lead gen, CRM sheet. Needs D. to confirm positioning.</td>
             <td class="date">2026-03-12</td>
           </tr>
-          <tr>
-            <td>2</td><td class="task-title">DID Services sales activation</td>
+<tr>
+            <td>3</td><td class="task-title">DID Services sales activation</td>
             <td><span class="company-tag">DID Services</span></td>
             <td><span class="badge s-todo">Todo</span></td>
             <td class="priority-high">High</td><td class="rev">€€€</td><td class="owner">Q</td>
             <td class="notes">Identify leads, outreach templates, pipeline setup.</td>
             <td class="date">2026-03-12</td>
           </tr>
-          <tr>
-            <td>3</td><td class="task-title">Voltenum sales activation</td>
+<tr>
+            <td>4</td><td class="task-title">Voltenum sales activation</td>
             <td><span class="company-tag">Voltenum</span></td>
             <td><span class="badge s-todo">Todo</span></td>
             <td class="priority-high">High</td><td class="rev">€€€</td><td class="owner">Q</td>
             <td class="notes">Odoo CRM active. Define offer, ICP, outreach sequence.</td>
             <td class="date">2026-03-12</td>
           </tr>
-          <tr>
-            <td>4</td><td class="task-title">Wickey PM automation</td>
+<tr>
+            <td>5</td><td class="task-title">Wickey PM automation</td>
             <td><span class="company-tag">Wickey</span></td>
             <td><span class="badge s-todo">Todo</span></td>
             <td class="priority-medium">Medium</td><td class="rev">€€</td><td class="owner">Q</td>
             <td class="notes">Document + automate recurring PM workflows.</td>
             <td class="date">2026-03-12</td>
           </tr>
-          <tr>
-            <td>5</td><td class="task-title">Nightly restic backups</td>
+<tr>
+            <td>6</td><td class="task-title">Nightly restic backups</td>
             <td><span class="company-tag">Ops</span></td>
             <td><span class="badge s-todo">Todo</span></td>
             <td class="priority-medium">Medium</td><td class="rev">—</td><td class="owner">Q</td>
-            <td class="notes">Configure + document restore steps.</td>
+            <td class="notes">Backups run nightly. Open issues: workspace partial copy warn + hardcoded GitHub token + redaction counter bug.</td>
             <td class="date">2026-03-12</td>
           </tr>
-          <tr>
-            <td>6</td><td class="task-title">Q-Dashboard build</td>
+<tr>
+            <td>7</td><td class="task-title">Q-Dashboard build</td>
             <td><span class="company-tag">Portfolio</span></td>
             <td><span class="badge s-active">Active</span></td>
             <td class="priority-high">High</td><td class="rev">€€</td><td class="owner">Q</td>
-            <td class="notes">Revenue targets, pipelines, autonomy KPIs. This dashboard.</td>
+            <td class="notes">Single source of truth. Chat stays short; details live here.</td>
             <td class="date">2026-03-12</td>
           </tr>
-          <tr>
-            <td>11</td><td class="task-title">Rompelberg follow-up (Voltenum)</td>
+<tr>
+            <td>8</td><td class="task-title">Rompelberg follow-up (Voltenum)</td>
             <td><span class="company-tag">Voltenum</span></td>
             <td><span class="badge s-todo">Parked</span></td>
             <td class="priority-high">High</td><td class="rev">€€€</td><td class="owner">D./Q</td>
             <td class="notes">Follow up on this week’s Rompelberg customer conversation. Not attached to a formal project yet. Next: confirm CSV data delivery + next meeting + proposal/rapport timeline.</td>
             <td class="date">2026-03-12</td>
           </tr>
-          <tr>
-            <td>12</td><td class="task-title">Odoo API integration (Voltenum)</td>
+<tr>
+            <td>9</td><td class="task-title">Odoo API integration (Voltenum)</td>
             <td><span class="company-tag">Voltenum</span></td>
             <td><span class="badge s-todo">Parked</span></td>
             <td class="priority-medium">Medium</td><td class="rev">€€</td><td class="owner">Q</td>
             <td class="notes">Estimate: 1–2h for lead creation from landing → Odoo CRM once URL + API key exist. 0.5–1 day for content queue + approval. 1–3 days if Social Marketing posting is included (depends on module + permissions). Parked pending decision + credentials.</td>
             <td class="date">2026-03-12</td>
           </tr>
-          <tr>
+<tr>
             <td>10</td><td class="task-title">Obsidian vault semantic search</td>
             <td><span class="company-tag">Ops</span></td>
             <td><span class="badge s-todo">Parked</span></td>
@@ -277,31 +284,30 @@
             <td class="notes">Index 2,800+ vault notes with OpenAI embeddings + SQLite vector store. Nightly rebuild at 3am. Needs: Mac + vault path. Unlocks full second-brain access for Q across all sessions.</td>
             <td class="date">2026-03-12</td>
           </tr>
-          <tr>
-            <td>9</td><td class="task-title">WhatsApp channel link</td>
+<tr>
+            <td>11</td><td class="task-title">WhatsApp channel link</td>
             <td><span class="company-tag">Ops</span></td>
             <td><span class="badge s-todo">Parked</span></td>
             <td class="priority-medium">Medium</td><td class="rev">—</td><td class="owner">Q</td>
             <td class="notes">Needs Mac + phone. Run: openclaw channels login --channel whatsapp → scan QR in WhatsApp Linked Devices. Rule: delegates only — Q does not live in WhatsApp.</td>
             <td class="date">2026-03-12</td>
           </tr>
-          <tr>
-            <td>8</td><td class="task-title">Coolify setup on VPS</td>
+<tr>
+            <td>12</td><td class="task-title">Coolify setup on VPS</td>
             <td><span class="company-tag">Ops</span></td>
             <td><span class="badge s-todo">Parked</span></td>
             <td class="priority-medium">Medium</td><td class="rev">—</td><td class="owner">Q</td>
             <td class="notes">Self-hosted PaaS for GPM-e stack. Needs: open ports 80+443 in Hostinger hPanel → Q installs. Domain gpm-e.com TBD. Q has SSH + will have Coolify API access. Ops rules: monitoring/logs = do freely; destructive actions = ask first; migrations = plan → approve → execute.</td>
             <td class="date">2026-03-12</td>
           </tr>
-          <tr>
-            <td>7</td><td class="task-title">Grachten Holding — Revenue Lab entity setup</td>
+<tr>
+            <td>13</td><td class="task-title">Grachten Holding — Revenue Lab entity setup</td>
             <td><span class="company-tag" style="background:#1a1207;color:#fbbf24;">Grachten</span></td>
             <td><span class="badge s-active">Active</span></td>
             <td class="priority-high">High</td><td class="rev">€€€€</td><td class="owner">Q</td>
             <td class="notes">Holding vehicle for all Revenue Lab projects. Viable POCs move here.</td>
             <td class="date">2026-03-12</td>
-          </tr>
-        </tbody>
+          </tr></tbody>
       </table>
     </div>
   </div>
