@@ -143,7 +143,7 @@
 <div class="header-row">
   <div class="header">
     <h1>🧭 Q-Dashboard</h1>
-    <span class="version">v1.3</span>
+    <span class="version">v1.5</span>
   </div>
   <div class="theme-toggle">
     <button class="theme-btn" onclick="setTheme('system')" id="btn-system">System</button>
@@ -167,6 +167,7 @@
   <div class="tab active" onclick="showTab('overview')">📋 Overview</div>
   <div class="tab" onclick="showTab('finance')">💶 Finance</div>
   <div class="tab" onclick="showTab('revenue-lab')">🧪 Revenue Lab</div>
+  <div class="tab" onclick="showTab('factory-os')">🏭 Factory OS</div>
 </div>
 
 <!-- ===== TAB: OVERVIEW ===== -->
@@ -629,7 +630,224 @@
 
 </div>
 
-<div class="footer">Q-Dashboard v1.4 · /data/.openclaw/workspace/revenue-lab/ · Target: €1M+ MRR · 2026-03-12</div>
+
+<!-- ===== TAB: FACTORY OS ===== -->
+<div id="tab-factory-os" class="tab-content">
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Active Initiatives</div>
+      <div class="stat-value">4</div>
+      <div class="stat-sub">projects running through factories</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Factories</div>
+      <div class="stat-value" style="color:#60a5fa">6</div>
+      <div class="stat-sub">catalog items (v0)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">HITL Queue</div>
+      <div class="stat-value" style="color:#fb923c">3</div>
+      <div class="stat-sub">decisions needed from D.</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Goal</div>
+      <div class="stat-value" style="color:#4ade80">Ship → Sell</div>
+      <div class="stat-sub">white-label everything</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Active Initiatives <span class="pill">phase + handover visibility</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Initiative</th><th>Company</th><th>Program</th><th>Phase</th><th>Factories Used</th><th>Next Handover</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="task-title">Navexela — Lead Gen Engine</td>
+            <td><span class="company-tag">Navexela</span></td>
+            <td>Acquire Logos (30d)</td>
+            <td><span class="badge s-scoping">Scoping</span></td>
+            <td>Website Factory → Outbound → Proposal</td>
+            <td class="notes">D. confirms positioning + offer one‑liner</td>
+            <td><span class="badge s-active">Active</span></td>
+          </tr>
+          <tr>
+            <td class="task-title">DID Services — Sales Activation</td>
+            <td><span class="company-tag">DID Services</span></td>
+            <td>Acquire Logos (30d)</td>
+            <td><span class="badge s-todo">Todo</span></td>
+            <td>Outbound → CRM Hygiene → Proposal</td>
+            <td class="notes">Pick ICP + lead source constraints</td>
+            <td><span class="badge s-todo">Todo</span></td>
+          </tr>
+          <tr>
+            <td class="task-title">Voltenum — Netcongestie Funnel</td>
+            <td><span class="company-tag">Voltenum</span></td>
+            <td>Acquire Leads (14d)</td>
+            <td><span class="badge s-todo">Todo</span></td>
+            <td>Landing/Tracking → Outbound</td>
+            <td class="notes">Confirm offer + CTA + lead capture</td>
+            <td><span class="badge s-todo">Todo</span></td>
+          </tr>
+          <tr>
+            <td class="task-title">Revenue Lab — RL-004 Website Roaster</td>
+            <td><span class="company-tag">Revenue Lab</span></td>
+            <td>Ship MVP (14d)</td>
+            <td><span class="badge s-proposed">Proposed</span></td>
+            <td>MVP Factory → GTM Factory</td>
+            <td class="notes">D. greenlights experiment + success metric</td>
+            <td><span class="badge s-proposed">Proposed</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Human-in-the-loop (HITL) Queue <span class="pill">keep decisions explicit</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th><th>Decision Needed</th><th>Options</th><th>Owner</th><th>Due</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="task-title">Navexela positioning</td>
+            <td class="notes">Pick 1 ICP + 1 headline promise</td>
+            <td class="notes">A) Procurement savings B) Supply chain execution C) GTM enablement</td>
+            <td class="owner">D.</td>
+            <td class="date">Today</td>
+            <td><span class="badge s-active">Active</span></td>
+          </tr>
+          <tr>
+            <td class="task-title">Next build priority</td>
+            <td class="notes">Choose which Program to run first</td>
+            <td class="notes">Acquire Logos (30d) / Ship MVP (14d) / Website-in-a-day</td>
+            <td class="owner">D.</td>
+            <td class="date">Today</td>
+            <td><span class="badge s-active">Active</span></td>
+          </tr>
+          <tr>
+            <td class="task-title">Outbound constraints</td>
+            <td class="notes">Define lead sources + compliance boundaries</td>
+            <td class="notes">LinkedIn / Apollo / manual list / partner intros</td>
+            <td class="owner">D.</td>
+            <td class="date">This week</td>
+            <td><span class="badge s-todo">Todo</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Factory Catalog <span class="pill">clean handover contracts</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Factory</th><th>Output</th><th>Cadence</th><th>Agents</th><th>Maturity</th><th>White-label</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="task-title">Outbound → Booked Calls</td>
+            <td class="notes">Leads → sequences → booked calls + CRM enriched</td>
+            <td class="date">Daily</td>
+            <td class="notes">SDR agent + list builder + CRM agent</td>
+            <td><span class="badge s-viable">v0</span></td>
+            <td><span class="badge s-tbd">TBD</span></td>
+          </tr>
+          <tr>
+            <td class="task-title">Offer/Proposal</td>
+            <td class="notes">Call notes → proposal + objections + follow-up plan</td>
+            <td class="date">Weekly</td>
+            <td class="notes">Writer + QA + follow-up agent</td>
+            <td><span class="badge s-viable">v0</span></td>
+            <td><span class="badge s-tbd">TBD</span></td>
+          </tr>
+          <tr>
+            <td class="task-title">Website Factory</td>
+            <td class="notes">Base44 UI template → branded site → deploy</td>
+            <td class="date">On-demand</td>
+            <td class="notes">UI kit + deploy agent + QA agent</td>
+            <td><span class="badge s-active">v1</span></td>
+            <td><span class="badge s-viable">Yes</span></td>
+          </tr>
+          <tr>
+            <td class="task-title">Capability Sheet Factory</td>
+            <td class="notes">One-page capability sheet → Base44 style → publish</td>
+            <td class="date">On-demand</td>
+            <td class="notes">Copy agent + layout agent + reviewer</td>
+            <td><span class="badge s-active">v1</span></td>
+            <td><span class="badge s-viable">Yes</span></td>
+          </tr>
+          <tr>
+            <td class="task-title">MVP (SaaS/App) Factory</td>
+            <td class="notes">Spec → UI → MVP → deploy + analytics</td>
+            <td class="date">2–6 wks</td>
+            <td class="notes">PM agent + builder + test + deploy</td>
+            <td><span class="badge s-proposed">v0</span></td>
+            <td><span class="badge s-tbd">TBD</span></td>
+          </tr>
+          <tr>
+            <td class="task-title">GTM Content/SEO Factory</td>
+            <td class="notes">Topic map → assets → distribution → leads</td>
+            <td class="date">Weekly</td>
+            <td class="notes">Researcher + writer + distributor</td>
+            <td><span class="badge s-proposed">v0</span></td>
+            <td><span class="badge s-tbd">TBD</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Programs (factory chains) <span class="pill">goal-driven orchestration</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Program</th><th>Goal</th><th>Phases</th><th>Gates</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="task-title">Acquire Logos (30d)</td>
+            <td class="notes">Turn strangers into signed deals</td>
+            <td class="notes">Assets → Outbound → Calls → Proposal → Follow-up</td>
+            <td class="notes">If calls/week < target → iterate list + offer</td>
+          </tr>
+          <tr>
+            <td class="task-title">Ship MVP (14d)</td>
+            <td class="notes">Launch a sellable v0 with analytics</td>
+            <td class="notes">Spec → UI → Build → Deploy → GTM</td>
+            <td class="notes">If activation < target → fix onboarding</td>
+          </tr>
+          <tr>
+            <td class="task-title">Website-in-a-day</td>
+            <td class="notes">Deploy a credible site fast</td>
+            <td class="notes">Template → Copy → Deploy → QA</td>
+            <td class="notes">If bounce high → tighten hero + CTA</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="promo-note">Design rules: (1) Every factory produces named artifacts (links/files). (2) Handover is explicit (input → output). (3) Every HITL decision is queued with options. (4) Everything ships in a white-labelable folder/kit.</p>
+
+</div>
+
+<div class="footer">Q-Dashboard v1.5 · Factory OS added · Target: €1M+ MRR · 2026-03-13</div>
 
 <script>
   function showTab(name) {
