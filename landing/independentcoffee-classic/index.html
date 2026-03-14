@@ -180,9 +180,6 @@
           <a class="btn secondary" href="https://wa.me/31610023982" target="_blank" rel="noopener">Vraag advies via WhatsApp</a>
         </div>
 
-        <p class="fine" style="margin-top:10px">
-          Payment link: vervang in de HTML <code>PAYMENT_URL</code> met je checkout/Stripe link om de gele knop “Betaal nu” te maken.
-        </p>
       </aside>
     </div>
   </main>
@@ -216,12 +213,15 @@
   </div>
 
   <script>
-    // Replace with your real payment/checkout URL.
+    // Optional: set your real payment/checkout URL here.
+    // If empty, the payment button is hidden (keeps the page clean).
     const PAYMENT_URL = ""; // e.g. "https://checkout..." or product checkout url
+    const payBtn = document.getElementById('paylink');
     if (PAYMENT_URL) {
-      const a = document.getElementById('paylink');
-      a.href = PAYMENT_URL;
-      a.textContent = "Betaal nu";
+      payBtn.href = PAYMENT_URL;
+      payBtn.textContent = "Betaal nu";
+    } else {
+      payBtn.style.display = "none";
     }
   </script>
 </body>
