@@ -4,203 +4,217 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Classic Espresso Blend — Independent Coffee Roasters</title>
-  <meta name="description" content="Milde, toegankelijke espresso blend (Colombia x Brazilië) met nootjes, karamel en cacao. Vers gebrand. Bestel de Classic Espresso Blend." />
+  <meta name="description" content="Classic Espresso Blend: milde, toegankelijke espresso (Colombia x Brazilië) met nootjes, karamel en cacao. Vers gebrand. Bestel direct." />
 
   <meta property="og:title" content="Classic Espresso Blend — Independent Coffee Roasters" />
-  <meta property="og:description" content="Onze bestseller: mild, vol en klassiek. Nootjes, karamel, cacao. Vers gebrand." />
+  <meta property="og:description" content="Onze bestseller: mild & klassiek. Nootjes, karamel, cacao. Vers gebrand." />
   <meta property="og:type" content="website" />
 
   <style>
     :root{
-      --bg:#0b0b0c;
-      --card:#141416;
-      --text:#f4f4f5;
-      --muted:#b7b7bd;
-      --brand:#d7b06a; /* coffee-gold */
-      --brand2:#7a4b2a; /* roast */
-      --line:rgba(255,255,255,.10);
-      --shadow: 0 12px 30px rgba(0,0,0,.35);
-      --radius:18px;
+      --navy:#0b3a52;         /* close to site header/footer */
+      --navy-2:#082d40;
+      --gold:#f2d679;
+      --text:#1a1a1a;
+      --muted:#5a6670;
+      --bg:#f6f6f4;
+      --card:#ffffff;
+      --line:#e7e7e4;
+      --shadow:0 10px 24px rgba(16,24,40,.10);
+      --radius:10px;
       --max:1100px;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:radial-gradient(1200px 800px at 15% 0%, rgba(215,176,106,.18), transparent 55%), radial-gradient(1000px 600px at 90% 10%, rgba(122,75,42,.18), transparent 55%), var(--bg); color:var(--text)}
+    body{margin:0;font-family:Arial, Helvetica, sans-serif;background:var(--bg);color:var(--text)}
     a{color:inherit}
-    .wrap{max-width:var(--max);margin:0 auto;padding:28px 18px 70px}
-    .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}
-    .badge{display:inline-flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(20,20,22,.6);backdrop-filter: blur(8px)}
-    .badge b{color:var(--brand)}
 
-    .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:stretch}
-    @media (max-width: 900px){.hero{grid-template-columns:1fr;}}
+    .topbar{background:var(--gold);height:44px;}
+    .nav{background:var(--navy);color:#fff}
+    .nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px}
+    .brand{display:flex;flex-direction:column;line-height:1.1}
+    .brand b{font-size:16px;letter-spacing:.2px}
+    .brand small{opacity:.85}
+    .nav a{color:#fff;text-decoration:none}
+    .navlinks{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;opacity:.95}
 
-    .card{background:linear-gradient(180deg, rgba(20,20,22,.92), rgba(20,20,22,.72)); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow)}
-    .hero-left{padding:26px}
-    h1{font-size:44px;line-height:1.05;margin:0 0 12px}
-    @media (max-width: 900px){h1{font-size:38px}}
-    p{color:var(--muted);margin:0 0 14px;font-size:16px;line-height:1.55}
+    .wrap{max-width:var(--max);margin:0 auto;padding:24px 18px 64px}
 
-    .kpis{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 18px}
-    .kpi{padding:10px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(0,0,0,.20);font-size:13px;color:#eaeaec}
-    .kpi span{color:var(--brand);font-weight:700}
+    .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:start}
+    @media (max-width: 920px){.hero{grid-template-columns:1fr;}}
 
-    .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 16px;border-radius:12px;border:1px solid var(--line);text-decoration:none;font-weight:700}
-    .btn.primary{background:linear-gradient(135deg, var(--brand), #f1d49a); color:#1a140a; border:none}
-    .btn.ghost{background:transparent}
-    .btn.small{padding:10px 12px;font-size:13px;border-radius:999px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
 
-    .fine{font-size:13px;color:var(--muted);margin-top:10px}
-    .fine a{color:#eaeaec}
+    h1{font-size:36px;margin:0 0 10px;line-height:1.15}
+    p{margin:0 0 12px;color:var(--muted);line-height:1.55}
 
-    .hero-right{padding:18px;display:flex;flex-direction:column;gap:12px}
-    .product{
-      border-radius:16px;overflow:hidden;border:1px solid var(--line);
-      background:#0f0f10;flex:1;display:flex;flex-direction:column
-    }
-    .product img{width:100%;height:330px;object-fit:cover;display:block}
-    .product .meta{padding:14px 14px 16px}
-    .price{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-    .price b{font-size:22px}
+    .badges{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 14px}
+    .badge{font-size:13px;border:1px solid var(--line);padding:8px 10px;border-radius:999px;background:#fbfbfa}
+    .badge b{color:var(--navy)}
+
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 14px;border-radius:6px;text-decoration:none;font-weight:700;border:1px solid transparent;cursor:pointer}
+    .btn.primary{background:var(--navy);color:#fff}
+    .btn.secondary{background:#fff;color:var(--navy);border-color:var(--navy)}
+    .btn.gold{background:var(--gold);color:#1a1a1a}
+
+    .fine{font-size:12px;color:var(--muted)}
+
+    .left{padding:18px}
+
+    .points{display:grid;gap:10px;margin-top:14px}
+    .point{border:1px solid var(--line);border-radius:8px;padding:12px;background:#fff}
+    .point b{display:block;margin-bottom:4px;color:var(--navy)}
+
+    .buy{padding:16px}
+    .buy h2{font-size:18px;margin:0 0 8px}
+    .price{display:flex;align-items:baseline;gap:10px;margin:6px 0 10px}
+    .price b{font-size:26px;color:var(--navy)}
     .price small{color:var(--muted)}
-    .bul{margin:10px 0 0;padding:0;list-style:none;display:grid;gap:8px}
-    .bul li{display:flex;gap:10px;color:#eaeaec}
-    .dot{width:10px;height:10px;border-radius:50%;background:var(--brand);margin-top:6px;flex:0 0 10px}
 
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
-    @media (max-width: 900px){.grid{grid-template-columns:1fr;}}
-    .tile{padding:18px}
-    .tile h3{margin:0 0 8px;font-size:16px}
-    .tile p{margin:0;font-size:14px}
+    .productimg{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+    .productimg img{display:block;width:100%;height:280px;object-fit:cover}
 
-    .section{margin-top:22px}
-    .section h2{font-size:22px;margin:0 0 10px}
+    .cta{display:grid;gap:10px;margin-top:12px}
 
-    .staffel{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-    @media (max-width: 900px){.staffel{grid-template-columns:1fr}}
-    .staffel .box{padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.18)}
-    .staffel .box b{color:var(--brand)}
+    .staffel{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+    @media (max-width: 920px){.staffel{grid-template-columns:1fr}}
+    .sbox{border:1px solid var(--line);border-radius:8px;padding:12px;background:#fbfbfa}
+    .sbox b{color:var(--navy)}
 
-    details{border:1px solid var(--line);border-radius:14px;padding:14px;background:rgba(0,0,0,.15)}
+    .section{margin-top:18px;padding:16px}
+    .section h3{margin:0 0 10px;font-size:18px;color:var(--navy)}
+
+    details{border:1px solid var(--line);border-radius:8px;padding:12px;background:#fff}
     details+details{margin-top:10px}
-    summary{cursor:pointer;font-weight:700}
-    .footer{margin-top:26px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px}
-    .footer a{color:#eaeaec}
+    summary{cursor:pointer;font-weight:700;color:var(--navy)}
+
+    .footer{background:var(--navy);color:#fff}
+    .footer .wrap{padding:24px 18px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:14px}
+    @media (max-width: 920px){.footer .wrap{grid-template-columns:1fr}}
+    .footer h4{margin:0 0 8px;font-size:14px;color:var(--gold)}
+    .footer a{color:#fff;opacity:.9;text-decoration:none}
+
+    /* optional: small sticky order button on mobile */
+    .sticky{display:none}
+    @media (max-width: 920px){
+      .sticky{display:block;position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:10px 12px;z-index:50}
+      .sticky .inner{max-width:var(--max);margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between}
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="top">
-      <div class="badge"><b>Independent</b> Specialty Coffee Roasters</div>
-      <a class="btn small ghost" href="https://www.independentcoffee.nl/" target="_blank" rel="noopener">Bekijk webshop →</a>
+  <div class="topbar"></div>
+  <header class="nav">
+    <div class="wrap">
+      <div class="brand">
+        <b>Independent Coffee Roasters</b>
+        <small>Specialty coffee — Sittard</small>
+      </div>
+      <nav class="navlinks" aria-label="Primary">
+        <a href="https://www.independentcoffee.nl/c-5090498/specialty-coffee/" target="_blank" rel="noopener">Specialty Coffee</a>
+        <a href="https://www.independentcoffee.nl/c-5325843/nieuws/" target="_blank" rel="noopener">Nieuws</a>
+        <a href="https://wa.me/31610023982" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="https://www.independentcoffee.nl/" target="_blank" rel="noopener">Webshop</a>
+      </nav>
     </div>
+  </header>
 
+  <main class="wrap">
     <div class="hero">
-      <div class="card hero-left">
-        <h1>Classic Espresso Blend.<br>Intens, toegankelijk, klassiek.</h1>
+      <section class="card left">
+        <h1>Classic Espresso Blend</h1>
         <p>
-          Een milde blend van <b>Colombia</b> en <b>Brazilië</b> met hints van <b>nootjes</b>, <b>karamel</b> en <b>cacao</b>.
-          Dit is de blend die je elke dag wilt: voor espresso, cappuccino én volautomaten.
+          Een milde en toegankelijke blend van <b>Colombia</b> en <b>Brazilië</b> met hints van <b>nootjes</b>, <b>karamel</b> en <b>cacao</b>.
+          De <b>meest verkochte</b> koffie voor wie houdt van die herkenbare, klassieke espresso-smaak.
         </p>
 
-        <div class="kpis">
-          <div class="kpi"><span>Bestseller</span> • meest verkocht</div>
-          <div class="kpi"><span>Vers gebrand</span> op bestelling</div>
-          <div class="kpi"><span>Gratis verzending</span> vanaf €75</div>
+        <div class="badges">
+          <div class="badge"><b>Bestseller</b> • meest verkocht</div>
+          <div class="badge"><b>Vers gebrand</b> op bestelling</div>
+          <div class="badge"><b>Gratis verzending</b> vanaf €75</div>
         </div>
 
-        <div class="cta-row">
-          <a class="btn primary" href="https://www.independentcoffee.nl/a-60624399/home/classic-espresso-blend/" target="_blank" rel="noopener">Bestel Classic Blend</a>
-          <a class="btn ghost" id="paylink" href="#" title="Voeg hier je betaal-/checkoutlink toe">+ Payment link toevoegen</a>
-        </div>
-        <div class="fine">
-          Tip: koppel de knop “Payment link toevoegen” aan je checkout / betaal-link (Stripe/Shopify/Mijnwebwinkel).
+        <div class="points">
+          <div class="point"><b>Smaakprofiel</b> Nootjes • karamel • cacao — rond en toegankelijk.</div>
+          <div class="point"><b>Perfect voor</b> Espresso, cappuccino, flat white, mokapot en volautomaten.</div>
+          <div class="point"><b>Snelle levering</b> Wekelijks branden & verzenden — check de webshop voor actuele roaster-dagen.</div>
         </div>
 
-        <div class="grid">
-          <div class="card tile">
-            <h3>Smaakprofiel</h3>
-            <p>Nootjes • karamel • cacao — klassiek, rond, geen overdreven zuren.</p>
-          </div>
-          <div class="card tile">
-            <h3>Gebruik</h3>
-            <p>Perfect voor espresso, melkdranken, mokapot en volautomaten.</p>
-          </div>
-          <div class="card tile">
-            <h3>Versheid</h3>
-            <p>Wekelijks branden & verzenden — snel van brander naar kop.</p>
-          </div>
-        </div>
-
-        <div class="section">
-          <h2>Horeca / kantoor? Staffelvoordeel</h2>
-          <p>Voor grotere orders: vanaf <b>5 kg</b> 15% korting, vanaf <b>10 kg</b> 20% korting.</p>
+        <div class="section card" style="margin-top:16px;box-shadow:none">
+          <h3>Horeca / kantoor? Staffelvoordeel</h3>
+          <p>Vanaf <b>5 kg</b> 15% korting, vanaf <b>10 kg</b> 20% korting.</p>
           <div class="staffel">
-            <div class="box"><b>5 kg+</b><br><span style="color:var(--muted)">15% korting</span></div>
-            <div class="box"><b>10 kg+</b><br><span style="color:var(--muted)">20% korting</span></div>
-            <div class="box"><b>Consistent profiel</b><br><span style="color:var(--muted)">ideaal voor vaste espresso</span></div>
+            <div class="sbox"><b>5 kg+</b><br><span class="fine">15% korting</span></div>
+            <div class="sbox"><b>10 kg+</b><br><span class="fine">20% korting</span></div>
+            <div class="sbox"><b>Consistent profiel</b><br><span class="fine">ideaal als vaste huis-espresso</span></div>
           </div>
         </div>
 
-        <div class="section">
-          <h2>FAQ</h2>
+        <div class="section card" style="margin-top:16px;box-shadow:none">
+          <h3>FAQ</h3>
           <details>
             <summary>Wanneer wordt er gebrand en verzonden?</summary>
-            <p>Independent roast en verstuurt wekelijks (o.a. op maandag) op basis van openstaande bestellingen. Check de webshop voor actuele meldingen.</p>
+            <p>Independent brandt en verstuurt wekelijks op basis van bestellingen (o.a. maandag). De branderij is op zaterdag open in Sittard.</p>
           </details>
           <details>
-            <summary>Hoe blijft koffie het langst vers?</summary>
-            <p>Bewaar donker, droog en luchtdicht. Vermijd de koelkast. Gebruik bij voorkeur binnen enkele weken na openen voor maximale smaak.</p>
+            <summary>Welke maling is ideaal?</summary>
+            <p>Voor espresso: fijn. Voor volautomaten: medium-fijn. Twijfel je? Bestel bonen en maal vers.</p>
           </details>
           <details>
-            <summary>Welke maling/instelling is ideaal?</summary>
-            <p>Voor espresso: fijn (maar niet verstikkend). Voor volautomaten: medium-fijn. Twijfel je? Bestel heel (bonen) en maal vers.</p>
-          </details>
-          <details>
-            <summary>Kan ik afhalen?</summary>
-            <p>Ja, de branderij is op zaterdagen open voor bezoekers (Sittard). Zie de webshop voor tijden en details.</p>
+            <summary>Kan ik ook afhalen?</summary>
+            <p>Ja, afhalen kan op zaterdag. Zie de webshop voor openingstijden en details.</p>
           </details>
         </div>
-      </div>
+      </section>
 
-      <div class="card hero-right">
-        <div class="product">
+      <aside class="card buy">
+        <div class="productimg">
           <img alt="Classic Espresso Blend" src="https://cdn.myonlinestore.eu/953b1e1c-6be1-11e9-a722-44a8421b9960/image/cache/full/01e6d22ce0b8ab33b6f57373dfe933271c5c1387.jpg?20260311114641" />
-          <div class="meta">
-            <div class="price">
-              <b>€ 13,99</b>
-              <small>incl. btw</small>
-            </div>
-            <ul class="bul">
-              <li><span class="dot"></span><span>Blend: Colombia × Brazilië</span></li>
-              <li><span class="dot"></span><span>Noten, karamel, cacao</span></li>
-              <li><span class="dot"></span><span>“Typische klassieke smaak”</span></li>
-            </ul>
-          </div>
         </div>
 
-        <div class="card" style="padding:16px">
-          <div style="font-weight:800;margin-bottom:8px">Snelle CTA’s</div>
-          <div class="cta-row" style="margin-top:0">
-            <a class="btn primary" href="https://www.independentcoffee.nl/a-60624399/home/classic-espresso-blend/" target="_blank" rel="noopener">Naar product</a>
-            <a class="btn ghost" href="https://wa.me/31610023982" target="_blank" rel="noopener">WhatsApp</a>
-          </div>
-          <div class="fine">Tip: gebruik WhatsApp voor snelle B2B/horeca orders.</div>
+        <h2 style="margin-top:12px">Bestel direct</h2>
+        <div class="price"><b>€ 13,99</b><small>incl. btw</small></div>
+
+        <div class="cta">
+          <a class="btn primary" href="https://www.independentcoffee.nl/a-60624399/home/classic-espresso-blend/" target="_blank" rel="noopener">Naar productpagina (roast/gewicht)</a>
+          <a class="btn gold" id="paylink" href="#" title="Voeg hier je betaal-/checkoutlink toe">Payment link toevoegen</a>
+          <a class="btn secondary" href="https://wa.me/31610023982" target="_blank" rel="noopener">Vraag advies via WhatsApp</a>
         </div>
+
+        <p class="fine" style="margin-top:10px">
+          Payment link: vervang in de HTML <code>PAYMENT_URL</code> met je checkout/Stripe link om de gele knop “Betaal nu” te maken.
+        </p>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div>
+        <h4>Independent Coffee Roasters</h4>
+        <div style="opacity:.9">Steenweg 53, Sittard (NL) • Open zaterdag 10:00–16:00</div>
+      </div>
+      <div>
+        <h4>Links</h4>
+        <div><a href="https://www.independentcoffee.nl/" target="_blank" rel="noopener">Webshop</a></div>
+        <div><a href="https://www.independentcoffee.nl/c-4787890/contact/" target="_blank" rel="noopener">Contact</a></div>
+        <div><a href="https://www.independentcoffee.nl/c-4917115/over-ons/" target="_blank" rel="noopener">Over ons</a></div>
+      </div>
+      <div>
+        <h4>Social</h4>
+        <div><a href="https://wa.me/31610023982" target="_blank" rel="noopener">WhatsApp</a></div>
+        <div><a href="https://www.instagram.com/independentcoffeeroasters/" target="_blank" rel="noopener">Instagram</a></div>
+        <div><a href="https://www.facebook.com/independentcoffeeroaster/" target="_blank" rel="noopener">Facebook</a></div>
       </div>
     </div>
+  </footer>
 
-    <div class="footer">
-      <div>Landing page test build • <a href="https://www.independentcoffee.nl/" target="_blank" rel="noopener">independentcoffee.nl</a></div>
-      <div>
-        <a href="#" onclick="alert('Vervang de # in de HTML door je echte betaal-/checkoutlink.');return false;">Payment link toevoegen</a>
-        &nbsp;•&nbsp;
-        <a href="https://www.independentcoffee.nl/a-60624399/home/classic-espresso-blend/" target="_blank" rel="noopener">Product</a>
-      </div>
+  <div class="sticky" role="region" aria-label="Bestelbalk">
+    <div class="inner">
+      <div><b>Classic Blend</b> <span class="fine">€13,99</span></div>
+      <a class="btn primary" href="https://www.independentcoffee.nl/a-60624399/home/classic-espresso-blend/" target="_blank" rel="noopener">Bestel</a>
     </div>
   </div>
 
-  <!-- QUICK EDIT: set payment link here -->
   <script>
     // Replace with your real payment/checkout URL.
     const PAYMENT_URL = ""; // e.g. "https://checkout..." or product checkout url
@@ -208,8 +222,6 @@
       const a = document.getElementById('paylink');
       a.href = PAYMENT_URL;
       a.textContent = "Betaal nu";
-      a.classList.add('primary');
-      a.classList.remove('ghost');
     }
   </script>
 </body>
