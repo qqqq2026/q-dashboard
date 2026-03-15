@@ -81,6 +81,10 @@
   .empty-icon { font-size:40px; margin-bottom:12px; }
   .empty-text { font-size:14px; }
 
+  /* Test data ribbon */
+  .test-ribbon { position:absolute; top:0; right:0; background:var(--yellow); color:#000; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; padding:2px 6px; border-radius:0 6px 0 4px; z-index:2; }
+  .content-card { position:relative; overflow:hidden; }
+
   /* Performance mini-charts */
   .perf-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
   .perf-item { background:var(--bg); border-radius:6px; padding:10px; text-align:center; }
@@ -238,24 +242,27 @@
 // ── Data Model ──────────────────────────────────────────────────
 const CONTENT = [
   // Ideas
-  { id:1, stage:'ideas', type:'reel', title:'5 AI tools that write emails for you (free)', script:'Hook: "I haven\'t written an email in 3 months." Demo Jasper, Copy.ai, etc. CTA: link in bio.', priority:'hot', estimated:'2 min', tags:['ai-tools','email'] },
-  { id:2, stage:'ideas', type:'carousel', title:'ChatGPT vs Jasper vs Copy.ai — honest comparison', script:'Side-by-side output comparison. Which is best for: blog, email, social, ads. 7 slides.', priority:'hot', estimated:'30 min build', tags:['comparison','seo'] },
-  { id:3, stage:'ideas', type:'reel', title:'This AI replaced my accountant (not clickbait)', script:'Show tax prep tool, show savings calculator. Genuine demo. CTA: try free.', priority:'med', estimated:'2 min', tags:['finance','ai'] },
-  { id:4, stage:'ideas', type:'video', title:'Complete Jasper AI tutorial for beginners (5 min)', script:'Full walkthrough: signup → first project → templates → output quality → pricing. Affiliate link in description.', priority:'med', estimated:'5 min video', tags:['tutorial','jasper'] },
-  { id:5, stage:'ideas', type:'reel', title:'"Show me your workflow and I\'ll find 3 AI tools to replace it"', script:'Engagement hook. Viewers comment → Q creates personalized content. Viral loop.', priority:'hot', estimated:'1 min', tags:['engagement','viral'] },
+  { id:1, stage:'ideas', type:'reel', title:'5 AI tools that write emails for you (free)', script:'Hook: "I haven\'t written an email in 3 months." Demo Jasper, Copy.ai, etc. CTA: link in bio.', priority:'hot', estimated:'2 min', tags:['ai-tools','email'], testData:true },
+  { id:2, stage:'ideas', type:'carousel', title:'ChatGPT vs Jasper vs Copy.ai — honest comparison', script:'Side-by-side output comparison. Which is best for: blog, email, social, ads. 7 slides.', priority:'hot', estimated:'30 min build', tags:['comparison','seo'], testData:true },
+  { id:3, stage:'ideas', type:'reel', title:'This AI replaced my accountant (not clickbait)', script:'Show tax prep tool, show savings calculator. Genuine demo. CTA: try free.', priority:'med', estimated:'2 min', tags:['finance','ai'], testData:true },
+  { id:4, stage:'ideas', type:'video', title:'Complete Jasper AI tutorial for beginners (5 min)', script:'Full walkthrough: signup → first project → templates → output quality → pricing. Affiliate link in description.', priority:'med', estimated:'5 min video', tags:['tutorial','jasper'], testData:true },
+  { id:5, stage:'ideas', type:'reel', title:'"Show me your workflow and I\'ll find 3 AI tools to replace it"', script:'Engagement hook. Viewers comment → Q creates personalized content. Viral loop.', priority:'hot', estimated:'1 min', tags:['engagement','viral'], testData:true },
 
   // Drafting
-  { id:6, stage:'drafting', type:'reel', title:'Top 3 AI writing tools in 2026 (no BS review)', script:'Hook done, recording in progress. Testing outputs live on camera.', priority:'hot', estimated:'70%', tags:['ai-tools','review'] },
+  { id:6, stage:'drafting', type:'reel', title:'Top 3 AI writing tools in 2026 (no BS review)', script:'Hook done, recording in progress. Testing outputs live on camera.', priority:'hot', estimated:'70%', tags:['ai-tools','review'], testData:true },
 
   // For Approval
-  { id:7, stage:'review', type:'reel', title:'I built this entire landing page in 2 minutes with AI', script:'Screen recording: AI website builder → full landing page. Shows before/after. "Link in bio to try it." [APPROVE to schedule]', priority:'hot', estimated:'Ready', tags:['demo','website-builder'] },
-  { id:8, stage:'review', type:'carousel', title:'7 free AI tools you\'re sleeping on', script:'Slide format: Tool name → what it does → free tier details. Includes Jasper free trial, Canva AI, etc. [APPROVE to schedule]', priority:'med', estimated:'Ready', tags:['listicle','free-tools'] },
+  { id:7, stage:'review', type:'reel', title:'I built this entire landing page in 2 minutes with AI', script:'Screen recording: AI website builder → full landing page. Shows before/after. "Link in bio to try it." [APPROVE to schedule]', priority:'hot', estimated:'Ready', tags:['demo','website-builder'], testData:true },
+  { id:8, stage:'review', type:'carousel', title:'7 free AI tools you\'re sleeping on', script:'Slide format: Tool name → what it does → free tier details. Includes Jasper free trial, Canva AI, etc. [APPROVE to schedule]', priority:'med', estimated:'Ready', tags:['listicle','free-tools'], testData:true },
 
   // Scheduled
-  { id:9, stage:'scheduled', type:'reel', title:'Watch me write a blog post in 45 seconds', script:'Scheduled: Tomorrow 9:00 AM. Jasper demo. High viral potential on Reels.', priority:'hot', estimated:'Tomorrow 9AM', tags:['demo','jasper'] },
+  { id:9, stage:'scheduled', type:'reel', title:'Watch me write a blog post in 45 seconds', script:'Scheduled: Tomorrow 9:00 AM. Jasper demo. High viral potential on Reels.', priority:'hot', estimated:'Tomorrow 9AM', tags:['demo','jasper'], testData:true },
 
   // Live
-  { id:10, stage:'live', type:'reel', title:'"This AI tool just saved me 10 hours this week"', script:'Published 2 days ago. 2.3K views, 847 reach, 12 affiliate clicks.', priority:'low', estimated:'2.3K views', tags:['published','performing'], costs:{ hosting:0, api:0.08, tools:0, total:0.08 }, revenue:0 },
+  { id:10, stage:'live', type:'reel', title:'"This AI tool just saved me 10 hours this week"', script:'Published 2 days ago. 2.3K views, 847 reach, 12 affiliate clicks.', priority:'low', estimated:'2.3K views', tags:['published','performing'], costs:{ hosting:0, api:0.08, tools:0, total:0.08 }, revenue:0, testData:true },
+
+  // ── REAL CONTENT ──────────────────────────────────────────────
+  { id:101, stage:'ideas', type:'reel', title:'I wrote 50 emails in 3 minutes — here\'s the AI I used', script:'Hook: "I used to spend 2 hours on emails every morning. Now it takes 3 minutes." Screen-record Jasper AI email template → paste client context → generate 5 variants. Show quality. CTA: "Free trial link in bio." Target audience: freelancers, consultants, small business owners. Facebook-native, no watermark. 30-45 seconds.', priority:'hot', estimated:'2 min', tags:['jasper','email','ai-tools','facebook-native'], testData:false, costs:{ hosting:0, api:0.12, tools:0, total:0.12 } },
 ];
 
 // ── Cost Engine ─────────────────────────────────────────────────
@@ -308,6 +315,7 @@ function renderPipeline() {
       card.className = 'content-card' + (selectedId === item.id ? ' selected' : '');
       card.onclick = () => selectCard(item.id);
       card.innerHTML = `
+        ${item.testData ? '<span class="test-ribbon">test data</span>' : ''}
         <div class="card-type"><span class="tag tag-${item.type}">${item.type}</span></div>
         <div class="card-title">${item.title}</div>
         <div class="card-meta">
