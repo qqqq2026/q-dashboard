@@ -540,6 +540,55 @@
     <p class="promo-note">💡 Every infrastructure spend logged here with ROI rationale. Cumulative reinvestment tracked against time saved and revenue unlocked.</p>
   </div>
 
+  <div class="divider"></div>
+
+  <!-- Content Factory Costs -->
+  <div class="section">
+    <div class="section-title">📺 Content Factory — Cost & Revenue Tracker <span class="pill">synced from Content Factory OS</span></div>
+
+    <div class="fin-stats" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat">
+        <div class="stat-label">Total Posts</div>
+        <div class="stat-value" id="cf-posts" style="color:var(--accent)">0</div>
+        <div class="stat-sub">published live</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total Spend</div>
+        <div class="stat-value" id="cf-spend" class="num-neg">€0.00</div>
+        <div class="stat-sub">all-in cost</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Affiliate Revenue</div>
+        <div class="stat-value" id="cf-revenue" style="color:var(--green)">€0.00</div>
+        <div class="stat-sub">from affiliate clicks</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Net P&L</div>
+        <div class="stat-value" id="cf-pnl">—</div>
+        <div class="stat-sub" id="cf-pnl-sub">awaiting data</div>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top:0">
+      <div class="card">
+        <div class="card-title">📊 Cost Breakdown</div>
+        <div class="card-row"><span class="label">Hosting</span><span id="cf-hosting" class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">API (AI)</span><span id="cf-api" class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Tools</span><span id="cf-tools" class="num-zero">€0</span></div>
+        <div class="card-row"><span class="label">Ad Spend</span><span id="cf-ads" class="num-zero">€0</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📈 By Platform</div>
+        <div class="card-row"><span class="label">Facebook Reels</span><span id="cf-reels">0 posts · €0</span></div>
+        <div class="card-row"><span class="label">Facebook Carousel</span><span id="cf-carousel">0 posts · €0</span></div>
+        <div class="card-row"><span class="label">Facebook Video</span><span id="cf-video">0 posts · €0</span></div>
+        <div class="card-row"><span class="label">Cost / Post</span><span id="cf-cpp" style="color:var(--accent);font-weight:600">€0.00</span></div>
+      </div>
+    </div>
+
+    <p class="promo-note" style="margin-top:4px"><a href="/content-factory/" style="color:var(--accent)">→ Open Content Factory OS</a> for approval workflow, scheduling, and performance tracking per post.</p>
+  </div>
+
 </div>
 
 <!-- ===== TAB: REVENUE LAB ===== -->
@@ -639,7 +688,7 @@
 
 </div>
 
-<div class="footer">Q-Dashboard v1.5 · /data/.openclaw/workspace/revenue-lab/ · Autonomy: 30% target · MRR: €1M+ target · 2026-03-15</div>
+<div class="footer">Q-Dashboard v1.6 · /data/.openclaw/workspace/revenue-lab/ · Autonomy: 30% target · MRR: €1M+ target · Content Factory integrated · 2026-03-15</div>
 
 <script>
   function showTab(name) {
@@ -667,6 +716,34 @@
   // Restore on load
   const saved = localStorage.getItem('q-theme') || 'dark';
   setTheme(saved);
+
+  // Load Content Factory data into Finance tab
+  fetch('/content-factory/data.json')
+    .then(r => r.json())
+    .then(d => {
+      const s = d.summary;
+      document.getElementById('cf-posts').textContent = s.totalPosts;
+      document.getElementById('cf-spend').textContent = '€' + s.totalCost.toFixed(2);
+      document.getElementById('cf-revenue').textContent = '€' + s.totalRevenue.toFixed(2);
+      const pnl = s.netPnL;
+      document.getElementById('cf-pnl').textContent = (pnl >= 0 ? '+' : '') + '€' + pnl.toFixed(2);
+      document.getElementById('cf-pnl').style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+      document.getElementById('cf-pnl-sub').textContent = pnl >= 0 ? 'profitable' : 'building phase';
+
+      const ct = d.byCostType;
+      document.getElementById('cf-hosting').textContent = '€' + (ct.hosting||0).toFixed(2);
+      document.getElementById('cf-api').textContent = '€' + (ct.api_ai||0).toFixed(2);
+      document.getElementById('cf-tools').textContent = '€' + (ct.tools||0).toFixed(2);
+      document.getElementById('cf-ads').textContent = '€' + (ct.ad_spend||0).toFixed(2);
+
+      const bp = d.byPlatform;
+      const fmt = (k) => { const v = bp[k] || {posts:0,cost:0}; return v.posts + ' posts · €' + v.cost.toFixed(2); };
+      document.getElementById('cf-reels').textContent = fmt('facebook_reels');
+      document.getElementById('cf-carousel').textContent = fmt('facebook_carousel');
+      document.getElementById('cf-video').textContent = fmt('facebook_video');
+      document.getElementById('cf-cpp').textContent = '€' + (s.totalPosts > 0 ? (s.totalCost/s.totalPosts).toFixed(2) : '0.00');
+    })
+    .catch(() => { /* Content Factory data not available */ });
 
   // Password protection
   (function() {

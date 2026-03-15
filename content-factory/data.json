@@ -1,0 +1,25 @@
+{
+  "lastUpdated": "2026-03-15T13:23:00Z",
+  "period": "2026-03",
+  "summary": {
+    "totalPosts": 10,
+    "totalCost": 0.08,
+    "totalRevenue": 0,
+    "netPnL": -0.08,
+    "avgCostPerPost": 0.008
+  },
+  "byPlatform": {
+    "facebook_reels": { "posts": 6, "cost": 0.05, "revenue": 0 },
+    "facebook_carousel": { "posts": 2, "cost": 0.02, "revenue": 0 },
+    "facebook_video": { "posts": 1, "cost": 0.01, "revenue": 0 }
+  },
+  "byCostType": {
+    "hosting": 0,
+    "api_ai": 0.06,
+    "tools": 0,
+    "ad_spend": 0
+  },
+  "posts": [
+    { "id": 10, "title": "AI tool saved me 10 hours", "type": "reel", "cost": 0.08, "revenue": 0, "status": "live", "date": "2026-03-13" }
+  ]
+}
