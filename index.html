@@ -586,7 +586,7 @@
       </div>
     </div>
 
-    <p class="promo-note" style="margin-top:4px"><a href="/q-dashboard/content-factory/" style="color:var(--accent)">→ Open Content Factory OS</a> for approval workflow, scheduling, and performance tracking per post.</p>
+    <p class="promo-note" style="margin-top:4px"><a href="content-factory/" style="color:var(--accent)">→ Open Content Factory OS</a> for approval workflow, scheduling, and performance tracking per post.</p>
   </div>
 
 </div>
@@ -718,7 +718,7 @@
   setTheme(saved);
 
   // Load Content Factory data into Finance tab
-  fetch('/q-dashboard/content-factory/data.json')
+  fetch('content-factory/data.json')
     .then(r => r.json())
     .then(d => {
       const s = d.summary;
