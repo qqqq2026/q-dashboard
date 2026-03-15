@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meeting Output Engine — Visual Draft v1</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121933;
+      --panel-2: #182243;
+      --text: #eef2ff;
+      --muted: #aab4d6;
+      --line: rgba(255,255,255,0.08);
+      --accent: #7cc4ff;
+      --good: #3ddc97;
+      --warn: #ffcc66;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: linear-gradient(180deg, #09101d 0%, #0e1630 100%);
+      color: var(--text);
+      line-height: 1.45;
+    }
+    .wrap { max-width: 1220px; margin: 0 auto; padding: 32px 20px 80px; }
+    .top {
+      display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .eyebrow { color: var(--accent); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 6px 0 10px; font-size: clamp(32px, 4vw, 52px); line-height: 1.02; }
+    .sub { max-width: 780px; color: var(--muted); font-size: 18px; }
+    .pillbar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .pill {
+      border: 1px solid var(--line); background: rgba(255,255,255,0.04); color: var(--text);
+      padding: 8px 12px; border-radius: 999px; font-size: 13px;
+    }
+    .grid { display: grid; gap: 18px; }
+    .hero { grid-template-columns: 1.4fr .8fr; margin: 28px 0; }
+    .panel {
+      background: rgba(18,25,51,0.92); border: 1px solid var(--line); border-radius: 22px; padding: 22px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+    }
+    .heroAction {
+      display: flex; flex-direction: column; justify-content: space-between; min-height: 250px;
+      background: linear-gradient(135deg, rgba(124,196,255,.14), rgba(61,220,151,.08));
+    }
+    .primaryBtn {
+      display: inline-block; padding: 14px 18px; background: var(--text); color: #0b1020; border-radius: 14px;
+      font-weight: 700; text-decoration: none; margin-right: 10px;
+    }
+    .ghostBtn {
+      display: inline-block; padding: 14px 18px; border: 1px solid var(--line); color: var(--text); border-radius: 14px;
+      text-decoration: none;
+    }
+    .miniStat { font-size: 14px; color: var(--muted); margin-top: 12px; }
+    .sectionTitle { margin: 0 0 14px; font-size: 20px; }
+    .cards3 { grid-template-columns: repeat(3, 1fr); }
+    .cards2 { grid-template-columns: repeat(2, 1fr); }
+    .card {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--line); border-radius: 18px; padding: 18px;
+    }
+    .tag { display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 12px; margin-bottom: 10px; }
+    .tag.good { background: rgba(61,220,151,.12); color: #a8f3d0; }
+    .tag.warn { background: rgba(255,204,102,.12); color: #ffe2a4; }
+    .wire {
+      margin-top: 10px; border: 1px dashed rgba(255,255,255,0.18); border-radius: 16px; padding: 14px;
+      background: rgba(255,255,255,0.02);
+    }
+    .wire .row { display: grid; gap: 10px; margin-bottom: 10px; }
+    .wire .row.two { grid-template-columns: 1.4fr .8fr; }
+    .wire .row.three { grid-template-columns: repeat(3, 1fr); }
+    .blk {
+      border-radius: 12px; min-height: 56px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
+      padding: 12px; color: #dbe4ff; font-size: 13px;
+    }
+    .blk.big { min-height: 120px; }
+    .list { padding-left: 18px; color: var(--muted); }
+    .footer { margin-top: 32px; color: var(--muted); font-size: 14px; }
+    a.inline { color: var(--accent); text-decoration: none; }
+    @media (max-width: 920px) {
+      .hero, .cards3, .cards2, .wire .row.two, .wire .row.three { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <div class="eyebrow">Revenue Lab · Visual Draft</div>
+        <h1>Meeting Output Engine</h1>
+        <div class="sub">Not a meeting recorder. A post-meeting execution system. Record once, then route polished output to calendar, email, tasks, CRM, and searchable memory.</div>
+        <div class="pillbar">
+          <span class="pill">Autopilot Mode</span>
+          <span class="pill">Operator Mode</span>
+          <span class="pill">Local-first</span>
+          <span class="pill">Apple-clean</span>
+          <span class="pill">Finance-grade trust</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid hero">
+      <div class="panel heroAction">
+        <div>
+          <div class="tag good">Primary flow</div>
+          <h2 class="sectionTitle">Start meeting capture</h2>
+          <p class="sub" style="font-size:16px;max-width:none;">One-button entry into the whole system. Fast install. No fuss. Output should look human, not AI-generated.</p>
+        </div>
+        <div>
+          <a class="primaryBtn" href="#home">Start capture</a>
+          <a class="ghostBtn" href="#result">See result screen</a>
+          <div class="miniStat">Status: Local processing active · Calendar connected · Last output 18 min ago</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="tag warn">Product truth</div>
+        <h3 class="sectionTitle">Magic moments</h3>
+        <ul class="list">
+          <li>Quick install, already feels operational</li>
+          <li>Polished summary lands where work already happens</li>
+          <li>Zero-touch by default, deep control underneath</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="home" class="grid cards3">
+      <div class="panel">
+        <h3 class="sectionTitle">1. Home / Control Surface</h3>
+        <p class="sub" style="font-size:15px;">Calm command center with one obvious action and clear system trust.</p>
+        <div class="wire">
+          <div class="row two">
+            <div class="blk big">Hero action block<br>Start capture / Upload recording / Connect calendar</div>
+            <div class="blk big">System state<br>Mode toggle · integrations · last output</div>
+          </div>
+          <div class="row three">
+            <div class="blk">Upcoming meetings</div>
+            <div class="blk">Recent outputs</div>
+            <div class="blk">Exceptions / review</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3 class="sectionTitle">2. Capture Screen</h3>
+        <p class="sub" style="font-size:15px;">Zero-friction entry. Giant button. Compact controls only.</p>
+        <div class="wire">
+          <div class="row">
+            <div class="blk big">Capture state<br>Ready → Capturing → Processing → Complete</div>
+          </div>
+          <div class="row two">
+            <div class="blk">Context detected<br>meeting title · time · participants</div>
+            <div class="blk">Compact controls<br>language · source · style · route</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3 class="sectionTitle">3. Processing Screen</h3>
+        <p class="sub" style="font-size:15px;">Reassuring progress, not technical noise.</p>
+        <div class="wire">
+          <div class="row two">
+            <div class="blk big">Stage timeline<br>capture → transcribe → structure → summary → route</div>
+            <div class="blk big">Live info<br>duration · language · confidence · ETA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="result" class="grid cards2" style="margin-top:18px;">
+      <div class="panel">
+        <h3 class="sectionTitle">4. Result Screen</h3>
+        <p class="sub" style="font-size:15px;">This is the real product. Output first. Human-looking summary. Actionable everywhere.</p>
+        <div class="wire">
+          <div class="row two">
+            <div class="blk big">Polished summary<br>Context · decisions · points · open issues · next actions</div>
+            <div class="blk big">Action rail<br>Email draft · calendar note · CRM · tasks · save style</div>
+          </div>
+          <div class="row three">
+            <div class="blk">Summary tab</div>
+            <div class="blk">Email draft tab</div>
+            <div class="blk">Calendar note tab</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3 class="sectionTitle">5. Search / Transcript</h3>
+        <p class="sub" style="font-size:15px;">Raw material is powerful, but hidden until needed.</p>
+        <div class="wire">
+          <div class="row">
+            <div class="blk">Search bar + filters<br>person · company · date · language · actions</div>
+          </div>
+          <div class="row two">
+            <div class="blk big">Search results list</div>
+            <div class="blk big">Transcript view<br>timestamps and speaker labels optional</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid cards2" style="margin-top:18px;">
+      <div class="panel">
+        <h3 class="sectionTitle">6. Autopilot Mode</h3>
+        <p class="sub" style="font-size:15px;">One switch. No babysitting.</p>
+        <div class="wire">
+          <div class="row">
+            <div class="blk big">Autopilot ON/OFF<br>Detect calendar → capture → transcribe → summarize → route</div>
+          </div>
+          <div class="row two">
+            <div class="blk">Safety controls<br>review external emails · local-only mode</div>
+            <div class="blk">Default destinations<br>calendar · email · CRM · memory</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3 class="sectionTitle">7. Operator Mode</h3>
+        <p class="sub" style="font-size:15px;">Deep control tucked underneath the calm shell.</p>
+        <div class="wire">
+          <div class="row three">
+            <div class="blk">Prompt/style rules</div>
+            <div class="blk">Routing logic</div>
+            <div class="blk">Failed jobs / logs</div>
+          </div>
+          <div class="row three">
+            <div class="blk">Regenerate summary</div>
+            <div class="blk">Reroute output</div>
+            <div class="blk">Compare versions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid cards2" style="margin-top:18px;">
+      <div class="panel">
+        <h3 class="sectionTitle">8. Integrations</h3>
+        <div class="wire">
+          <div class="row three">
+            <div class="blk">Calendar</div>
+            <div class="blk">Email</div>
+            <div class="blk">Tasks / CRM</div>
+          </div>
+          <div class="row">
+            <div class="blk big">Routing rules builder<br>internal meeting → calendar note · sales call → email draft + CRM note</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3 class="sectionTitle">9. Settings</h3>
+        <div class="wire">
+          <div class="row three">
+            <div class="blk">Languages</div>
+            <div class="blk">Privacy / retention</div>
+            <div class="blk">Capture devices</div>
+          </div>
+          <div class="row two">
+            <div class="blk">Default summary style</div>
+            <div class="blk">Automation defaults</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:18px;">
+      <h3 class="sectionTitle">Why this beats generic AI meeting tools</h3>
+      <div class="pillbar">
+        <span class="pill">Output-first, not transcript vanity</span>
+        <span class="pill">No visible AI sludge</span>
+        <span class="pill">Dual-mode control</span>
+        <span class="pill">Routing built in</span>
+        <span class="pill">Local-first trust</span>
+      </div>
+      <div class="footer">
+        Source draft: <a class="inline" href="https://github.com/qqqq2026/q-dashboard">qqqq2026/q-dashboard</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
