@@ -1,7 +1,7 @@
 // Q-Dashboard simple client-side gate (GitHub Pages)
 // NOTE: This is not real security. It keeps casual visitors out.
 (function () {
-  const PASS = 'Grachten2026';
+  const PASS = 'Q2026';
   const KEY = 'q-auth';
 
   try {
