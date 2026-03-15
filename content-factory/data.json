@@ -1,6 +1,8 @@
 {
-  "lastUpdated": "2026-03-15T13:23:00Z",
+  "lastUpdated": "2026-03-15T14:17:00Z",
   "period": "2026-03",
+  "page": "AI Tools That Work",
+  "pageCreated": "2026-03-15",
   "summary": {
     "totalPosts": 10,
     "totalCost": 0.08,
@@ -21,5 +23,12 @@
   },
   "posts": [
     { "id": 10, "title": "AI tool saved me 10 hours", "type": "reel", "cost": 0.08, "revenue": 0, "status": "live", "date": "2026-03-13" }
+  ],
+  "contentQueue": [
+    { "id": 101, "title": "50 emails in 3 minutes — Jasper demo", "type": "reel", "cost": 0.12, "stage": "ideas" },
+    { "id": 102, "title": "ChatGPT vs Gemini vs Claude comparison", "type": "reel", "cost": 0.15, "stage": "ideas" },
+    { "id": 103, "title": "5 free AI tools that feel illegal", "type": "carousel", "cost": 0.08, "stage": "ideas" },
+    { "id": 104, "title": "AI built my website in 90 seconds", "type": "reel", "cost": 0.10, "stage": "ideas" },
+    { "id": 105, "title": "My daily AI tool stack breakdown", "type": "reel", "cost": 0.12, "stage": "ideas" }
   ]
 }
