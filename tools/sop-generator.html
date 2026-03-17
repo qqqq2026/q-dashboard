@@ -23,10 +23,11 @@
   label { display:block; font-size:0.72rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:7px; }
   input, textarea, select { width:100%; background:#0d0f14; border:1px solid #1e2736; color:#e2e8f0; border-radius:10px; padding:12px 14px; font-size:0.84rem; }
   textarea { min-height: 84px; resize: vertical; }
-  .notes { color:#64748b; font-size:0.74rem; line-height:1.5; }
   .output { min-height: 760px; white-space: pre-wrap; line-height: 1.6; font-size: 0.82rem; overflow:auto; }
   .step-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-  .tiny { font-size:0.7rem; color:#64748b; margin-top:4px; }
+  .tiny { font-size:0.7rem; color:#64748b; margin-top:4px; line-height: 1.5; }
+  .import-grid { display:grid; grid-template-columns: 1.1fr 0.9fr; gap:16px; margin-bottom:16px; }
+  .status { margin-top:10px; font-size:0.75rem; color:#4ade80; }
 </style>
 </head>
 <body>
@@ -36,13 +37,41 @@
       <div class="icon">🧾</div>
       <div>
         <h1>SOP Wizard</h1>
-        <div class="sub">Instant UI for turning meeting notes into a usable SOP</div>
+        <div class="sub">Turn meeting notes or approved draw.io XML into a usable SOP</div>
       </div>
     </div>
     <div class="actions">
       <a class="btn" href="../dashboard.html">← Back to dashboard</a>
       <button class="btn primary" onclick="generateSOP()">Generate SOP</button>
       <button class="btn" onclick="copyOutput()">Copy output</button>
+    </div>
+  </div>
+
+  <div class="import-grid">
+    <div class="card">
+      <h2>Approved Diagram Import</h2>
+      <div class="field">
+        <label for="drawioXml">Draw.io XML</label>
+        <textarea id="drawioXml" placeholder="Paste approved .drawio / .mxfile XML here"></textarea>
+        <div class="tiny">Use this after the diagram is reviewed. The wizard extracts title, steps, decisions, notes, and end state to auto-fill the SOP.</div>
+      </div>
+      <div class="actions">
+        <input type="file" id="drawioFile" accept=".drawio,.xml,.txt" onchange="loadDrawioFile(event)" style="max-width:280px; padding:8px 10px;">
+        <button class="btn primary" onclick="importDrawio()">Import approved diagram</button>
+      </div>
+      <div id="importStatus" class="status"></div>
+    </div>
+
+    <div class="card">
+      <h2>What it extracts</h2>
+      <div class="tiny">From the draw.io structure it will try to infer:</div>
+      <div class="tiny" style="margin-top:10px;">
+        • process title from `title` or diagram name<br>
+        • ordered steps from `step-*` nodes and edge flow<br>
+        • decisions from rhombus / `decision-*` nodes<br>
+        • outputs from `end`, `step-ready`, `step-complete`, or last flow node<br>
+        • notes/exceptions from note shapes and note IDs
+      </div>
     </div>
   </div>
 
@@ -60,7 +89,7 @@
         <div class="field"><label for="frequency">Frequency</label><input id="frequency" placeholder="Per order / daily / weekly"></div>
       </div>
       <div class="field"><label for="inputs">Inputs</label><textarea id="inputs" placeholder="One per line"></textarea></div>
-      <div class="field"><label for="steps">Steps</label><textarea id="steps" placeholder="One step per line. Keep them action-led."></textarea><div class="tiny">Tip: paste raw notes; this works best if each line is one action.</div></div>
+      <div class="field"><label for="steps">Steps</label><textarea id="steps" placeholder="One step per line. Keep them action-led."></textarea><div class="tiny">Tip: paste raw notes or import approved draw.io XML.</div></div>
       <div class="field"><label for="decisions">Decisions / branches</label><textarea id="decisions" placeholder="Example: If stock missing -> manual exception"></textarea></div>
       <div class="field"><label for="exceptions">Exceptions / failure cases</label><textarea id="exceptions" placeholder="What breaks, stalls, or needs escalation?"></textarea></div>
       <div class="field"><label for="outputs">Outputs</label><textarea id="outputs" placeholder="What is produced at the end?"></textarea></div>
@@ -72,7 +101,7 @@
       <h2>Generated SOP</h2>
       <div id="output" class="output"># SOP: Untitled
 
-Fill the wizard on the left, then click Generate SOP.
+Import an approved draw.io XML file or fill the wizard manually, then click Generate SOP.
 
 This outputs a clean operating procedure you can paste into docs, tickets, or feed back into the Diagrams tool.</div>
     </div>
@@ -87,12 +116,155 @@ function lines(id) {
     .filter(Boolean);
 }
 
+function setLines(id, items) {
+  document.getElementById(id).value = (items || []).filter(Boolean).join('\n');
+}
+
 function bulletize(items) {
   return items.length ? items.map(i => `- ${i}`).join('\n') : '- TBD';
 }
 
 function numbered(items) {
   return items.length ? items.map((i, idx) => `${idx + 1}. ${i}`).join('\n') : '1. TBD';
+}
+
+function decodeValue(value) {
+  const div = document.createElement('div');
+  div.innerHTML = (value || '').replace(/&#xa;/g, '\n');
+  return div.textContent.replace(/\s*\n\s*/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function parseStyle(style) {
+  const map = {};
+  (style || '').split(';').forEach(part => {
+    const [k, v] = part.split('=');
+    if (k) map[k] = v || true;
+  });
+  return map;
+}
+
+function loadDrawioFile(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('drawioXml').value = e.target.result;
+    document.getElementById('importStatus').textContent = `Loaded ${file.name}. Ready to import.`;
+  };
+  reader.readAsText(file);
+}
+
+function importDrawio() {
+  const xmlText = document.getElementById('drawioXml').value.trim();
+  if (!xmlText) {
+    alert('Paste the approved draw.io XML first.');
+    return;
+  }
+
+  try {
+    const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
+    if (xml.querySelector('parsererror')) throw new Error('Invalid XML');
+
+    const diagram = xml.querySelector('diagram');
+    const cells = Array.from(xml.querySelectorAll('mxCell[vertex="1"], mxCell[edge="1"]'));
+    const vertices = cells.filter(c => c.getAttribute('vertex') === '1');
+    const edges = cells.filter(c => c.getAttribute('edge') === '1');
+
+    const byId = {};
+    vertices.forEach(cell => { byId[cell.getAttribute('id')] = cell; });
+
+    const laneLabels = vertices
+      .filter(cell => (cell.getAttribute('id') || '').startsWith('label-'))
+      .map(cell => decodeValue(cell.getAttribute('value')))
+      .filter(Boolean);
+
+    const titleCell = byId.title;
+    const processName = decodeValue(titleCell ? titleCell.getAttribute('value') : '') || (diagram && diagram.getAttribute('name')) || 'Untitled';
+    const startCell = byId.start;
+    const endCell = byId.end;
+
+    const edgeMap = {};
+    edges.forEach(edge => {
+      const src = edge.getAttribute('source');
+      const tgt = edge.getAttribute('target');
+      if (!src || !tgt) return;
+      if (!edgeMap[src]) edgeMap[src] = [];
+      edgeMap[src].push(tgt);
+    });
+
+    const skipPrefixes = ['strip-', 'body-', 'label-', 'title', 'start', 'end', 'note'];
+    const stepNodes = vertices.filter(cell => {
+      const id = cell.getAttribute('id') || '';
+      return !skipPrefixes.some(prefix => id === prefix || id.startsWith(prefix));
+    });
+
+    const stepLabel = cell => decodeValue(cell.getAttribute('value')) || (cell.getAttribute('id') || '');
+
+    const ordered = [];
+    const seen = new Set();
+    const walk = (id) => {
+      (edgeMap[id] || []).forEach(nextId => {
+        const next = byId[nextId];
+        if (!next || seen.has(nextId)) return;
+        const nextStyle = parseStyle(next.getAttribute('style'));
+        const nextLabel = stepLabel(next);
+        if ((nextId || '').startsWith('note-')) return;
+        if (nextId !== 'end') {
+          ordered.push({ id: nextId, label: nextLabel, style: nextStyle });
+          seen.add(nextId);
+          walk(nextId);
+        }
+      });
+    };
+    if (startCell) walk('start');
+
+    stepNodes.forEach(cell => {
+      const id = cell.getAttribute('id') || '';
+      if (!seen.has(id) && id !== 'end') ordered.push({ id, label: stepLabel(cell), style: parseStyle(cell.getAttribute('style')) });
+    });
+
+    const decisions = ordered
+      .filter(n => n.id.startsWith('decision-') || n.style.shape === 'rhombus')
+      .map(n => n.label);
+
+    const procedure = ordered
+      .filter(n => !(n.id.startsWith('decision-') || n.style.shape === 'rhombus'))
+      .map(n => n.label)
+      .filter(Boolean);
+
+    const noteNodes = vertices
+      .filter(cell => (cell.getAttribute('id') || '').startsWith('note-') || (parseStyle(cell.getAttribute('style')).shape === 'note'))
+      .map(cell => decodeValue(cell.getAttribute('value')))
+      .filter(Boolean);
+
+    const outputCandidates = [];
+    if (endCell) outputCandidates.push(decodeValue(endCell.getAttribute('value')) || 'Process complete');
+    const readyNode = ordered.find(n => /ready|complete|shipp|finish|close/i.test(n.id + ' ' + n.label));
+    if (readyNode) outputCandidates.unshift(readyNode.label);
+    if (!outputCandidates.length && procedure.length) outputCandidates.push(procedure[procedure.length - 1]);
+
+    document.getElementById('processName').value = processName;
+    if (!document.getElementById('goal').value.trim()) document.getElementById('goal').value = `Standardize and execute ${processName.toLowerCase()}.`;
+    if (!document.getElementById('trigger').value.trim()) document.getElementById('trigger').value = startCell ? decodeValue(startCell.getAttribute('value')) || 'Process starts' : 'Process starts';
+    if (!document.getElementById('owner').value.trim() && laneLabels.length) document.getElementById('owner').value = laneLabels.join(' | ');
+    setLines('steps', procedure);
+    setLines('decisions', decisions);
+    setLines('exceptions', noteNodes);
+    setLines('outputs', [...new Set(outputCandidates)]);
+
+    const noteText = [
+      laneLabels.length ? `Imported lanes: ${laneLabels.join(' / ')}` : '',
+      diagram && diagram.getAttribute('name') ? `Diagram source: ${diagram.getAttribute('name')}` : '',
+      noteNodes.length ? `Imported notes: ${noteNodes.join(' | ')}` : ''
+    ].filter(Boolean).join('\n');
+    document.getElementById('notes').value = noteText;
+
+    document.getElementById('importStatus').textContent = `Imported approved diagram: ${processName}`;
+    generateSOP();
+  } catch (err) {
+    document.getElementById('importStatus').textContent = 'Import failed. Check the XML format.';
+    alert('Could not parse the draw.io XML.');
+  }
 }
 
 function generateSOP() {
