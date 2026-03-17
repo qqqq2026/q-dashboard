@@ -7,7 +7,7 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #0d0f14; color: #e2e8f0; font-family: 'Inter', 'Segoe UI', sans-serif; padding: 32px; }
-  .wrap { max-width: 1280px; margin: 0 auto; }
+  .wrap { max-width: 1320px; margin: 0 auto; }
   .top { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:24px; }
   .title { display:flex; align-items:center; gap:14px; }
   .icon { width:52px; height:52px; border-radius:14px; background:#1e2736; display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
@@ -21,14 +21,15 @@
   .card h2 { font-size:0.84rem; text-transform:uppercase; letter-spacing:0.08em; color:#94a3b8; margin-bottom:14px; }
   .field { margin-bottom:14px; }
   label { display:block; font-size:0.72rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:7px; }
-  input, textarea, select { width:100%; background:#0d0f14; border:1px solid #1e2736; color:#e2e8f0; border-radius:10px; padding:12px 14px; font-size:0.84rem; }
+  input, textarea { width:100%; background:#0d0f14; border:1px solid #1e2736; color:#e2e8f0; border-radius:10px; padding:12px 14px; font-size:0.84rem; }
   textarea { min-height: 84px; resize: vertical; }
-  .output { min-height: 760px; white-space: pre-wrap; line-height: 1.6; font-size: 0.82rem; overflow:auto; }
+  .output { min-height: 860px; white-space: pre-wrap; line-height: 1.6; font-size: 0.82rem; overflow:auto; }
   .step-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
   .tiny { font-size:0.7rem; color:#64748b; margin-top:4px; line-height: 1.5; }
   .import-grid { display:grid; grid-template-columns: 1.1fr 0.9fr; gap:16px; margin-bottom:16px; }
   .status { margin-top:10px; font-size:0.75rem; color:#4ade80; }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -37,13 +38,16 @@
       <div class="icon">🧾</div>
       <div>
         <h1>SOP Wizard</h1>
-        <div class="sub">Turn meeting notes or approved draw.io XML into a usable SOP</div>
+        <div class="sub">Turn an approved draw.io diagram into a clean SOP, text download, PDF, or share link</div>
       </div>
     </div>
     <div class="actions">
       <a class="btn" href="../dashboard.html">← Back to dashboard</a>
       <button class="btn primary" onclick="generateSOP()">Generate SOP</button>
-      <button class="btn" onclick="copyOutput()">Copy output</button>
+      <button class="btn" onclick="copyOutput()">Copy text</button>
+      <button class="btn" onclick="downloadTXT()">Download TXT</button>
+      <button class="btn" onclick="downloadPDF()">Download PDF</button>
+      <button class="btn" onclick="copyShareLink()">Copy share link</button>
     </div>
   </div>
 
@@ -53,7 +57,7 @@
       <div class="field">
         <label for="drawioXml">Draw.io XML</label>
         <textarea id="drawioXml" placeholder="Paste approved .drawio / .mxfile XML here"></textarea>
-        <div class="tiny">Use this after the diagram is reviewed. The wizard extracts title, steps, decisions, notes, and end state to auto-fill the SOP.</div>
+        <div class="tiny">The parser uses only diagram text, connections, and lane/layer layout. Ordering preference: edge flow first, then left-to-right, then top-down.</div>
       </div>
       <div class="actions">
         <input type="file" id="drawioFile" accept=".drawio,.xml,.txt" onchange="loadDrawioFile(event)" style="max-width:280px; padding:8px 10px;">
@@ -63,14 +67,20 @@
     </div>
 
     <div class="card">
-      <h2>What it extracts</h2>
-      <div class="tiny">From the draw.io structure it will try to infer:</div>
-      <div class="tiny" style="margin-top:10px;">
-        • process title from `title` or diagram name<br>
-        • ordered steps from `step-*` nodes and edge flow<br>
-        • decisions from rhombus / `decision-*` nodes<br>
-        • outputs from `end`, `step-ready`, `step-complete`, or last flow node<br>
-        • notes/exceptions from note shapes and note IDs
+      <h2>High-quality SOP shape</h2>
+      <div class="tiny">Pattern informed by common SOP guidance: step-by-step consistency, clear ownership, inputs, exceptions, outputs, and quality checks. This aligns with guidance from Smartsheet on step-by-step consistency and TechTarget on clear roles, risks, and troubleshooting; Process Street examples also emphasize explicit approvals and checkpoints.</div>
+      <div class="tiny" style="margin-top:12px;">Output sections:</div>
+      <div class="tiny" style="margin-top:8px;">
+        • Purpose / outcome<br>
+        • Trigger and scope<br>
+        • Roles / lanes<br>
+        • Inputs / preconditions<br>
+        • Procedure steps<br>
+        • Decisions and branches<br>
+        • Exceptions / troubleshooting<br>
+        • Outputs / end state<br>
+        • Quality checks / approvals<br>
+        • Source diagram trace
       </div>
     </div>
   </div>
@@ -81,20 +91,20 @@
 
       <div class="field"><label for="processName">Process name</label><input id="processName" placeholder="Example: Wickey order release to picking"></div>
       <div class="step-grid">
-        <div class="field"><label for="goal">Goal</label><input id="goal" placeholder="What this process achieves"></div>
+        <div class="field"><label for="goal">Goal / outcome</label><input id="goal" placeholder="What this process achieves"></div>
         <div class="field"><label for="trigger">Trigger</label><input id="trigger" placeholder="What starts the process"></div>
       </div>
       <div class="step-grid">
-        <div class="field"><label for="owner">Owner</label><input id="owner" placeholder="Primary owner/team"></div>
+        <div class="field"><label for="owner">Primary owner / roles</label><input id="owner" placeholder="Primary owner/team"></div>
         <div class="field"><label for="frequency">Frequency</label><input id="frequency" placeholder="Per order / daily / weekly"></div>
       </div>
-      <div class="field"><label for="inputs">Inputs</label><textarea id="inputs" placeholder="One per line"></textarea></div>
-      <div class="field"><label for="steps">Steps</label><textarea id="steps" placeholder="One step per line. Keep them action-led."></textarea><div class="tiny">Tip: paste raw notes or import approved draw.io XML.</div></div>
+      <div class="field"><label for="inputs">Inputs / preconditions</label><textarea id="inputs" placeholder="One per line"></textarea></div>
+      <div class="field"><label for="steps">Procedure steps</label><textarea id="steps" placeholder="One step per line. Keep them action-led."></textarea><div class="tiny">Imported from approved diagram or edited manually.</div></div>
       <div class="field"><label for="decisions">Decisions / branches</label><textarea id="decisions" placeholder="Example: If stock missing -> manual exception"></textarea></div>
-      <div class="field"><label for="exceptions">Exceptions / failure cases</label><textarea id="exceptions" placeholder="What breaks, stalls, or needs escalation?"></textarea></div>
-      <div class="field"><label for="outputs">Outputs</label><textarea id="outputs" placeholder="What is produced at the end?"></textarea></div>
-      <div class="field"><label for="qa">QA / checkpoints</label><textarea id="qa" placeholder="Checks before handoff or completion"></textarea></div>
-      <div class="field"><label for="notes">Meeting notes / context</label><textarea id="notes" placeholder="Paste rough meeting notes here if useful"></textarea></div>
+      <div class="field"><label for="exceptions">Exceptions / troubleshooting</label><textarea id="exceptions" placeholder="What breaks, stalls, or needs escalation?"></textarea></div>
+      <div class="field"><label for="outputs">Outputs / end state</label><textarea id="outputs" placeholder="What is produced at the end?"></textarea></div>
+      <div class="field"><label for="qa">Quality checks / approvals</label><textarea id="qa" placeholder="Checks before handoff or completion"></textarea></div>
+      <div class="field"><label for="notes">Context / source notes</label><textarea id="notes" placeholder="Imported notes or meeting context"></textarea></div>
     </div>
 
     <div class="card">
@@ -103,7 +113,10 @@
 
 Import an approved draw.io XML file or fill the wizard manually, then click Generate SOP.
 
-This outputs a clean operating procedure you can paste into docs, tickets, or feed back into the Diagrams tool.</div>
+Downloads available:
+- TXT
+- PDF
+- share link with embedded text payload</div>
     </div>
   </div>
 </div>
@@ -131,7 +144,7 @@ function numbered(items) {
 function decodeValue(value) {
   const div = document.createElement('div');
   div.innerHTML = (value || '').replace(/&#xa;/g, '\n');
-  return div.textContent.replace(/\s*\n\s*/g, ' ').replace(/\s+/g, ' ').trim();
+  return div.textContent.replace(/\r/g, '').replace(/\s*\n\s*/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function parseStyle(style) {
@@ -141,6 +154,20 @@ function parseStyle(style) {
     if (k) map[k] = v || true;
   });
   return map;
+}
+
+function getGeometry(cell) {
+  const geo = cell.querySelector('mxGeometry');
+  return {
+    x: Number(geo?.getAttribute('x') || 0),
+    y: Number(geo?.getAttribute('y') || 0),
+    width: Number(geo?.getAttribute('width') || 0),
+    height: Number(geo?.getAttribute('height') || 0)
+  };
+}
+
+function normalizeId(id) {
+  return (id || '').toLowerCase();
 }
 
 function loadDrawioFile(event) {
@@ -166,98 +193,136 @@ function importDrawio() {
     if (xml.querySelector('parsererror')) throw new Error('Invalid XML');
 
     const diagram = xml.querySelector('diagram');
-    const cells = Array.from(xml.querySelectorAll('mxCell[vertex="1"], mxCell[edge="1"]'));
-    const vertices = cells.filter(c => c.getAttribute('vertex') === '1');
-    const edges = cells.filter(c => c.getAttribute('edge') === '1');
-
+    const vertices = Array.from(xml.querySelectorAll('mxCell[vertex="1"]'));
+    const edges = Array.from(xml.querySelectorAll('mxCell[edge="1"]'));
     const byId = {};
-    vertices.forEach(cell => { byId[cell.getAttribute('id')] = cell; });
 
-    const laneLabels = vertices
-      .filter(cell => (cell.getAttribute('id') || '').startsWith('label-'))
-      .map(cell => decodeValue(cell.getAttribute('value')))
-      .filter(Boolean);
+    vertices.forEach(cell => {
+      byId[cell.getAttribute('id')] = {
+        el: cell,
+        id: cell.getAttribute('id') || '',
+        value: decodeValue(cell.getAttribute('value')),
+        style: parseStyle(cell.getAttribute('style')),
+        geo: getGeometry(cell)
+      };
+    });
 
-    const titleCell = byId.title;
-    const processName = decodeValue(titleCell ? titleCell.getAttribute('value') : '') || (diagram && diagram.getAttribute('name')) || 'Untitled';
-    const startCell = byId.start;
-    const endCell = byId.end;
+    const lanes = vertices
+      .map(cell => ({
+        id: cell.getAttribute('id') || '',
+        value: decodeValue(cell.getAttribute('value')),
+        geo: getGeometry(cell)
+      }))
+      .filter(c => c.id.startsWith('label-') && c.value)
+      .sort((a, b) => a.geo.y - b.geo.y);
+
+    const laneOf = (node) => {
+      const candidate = lanes.find(l => node.geo.y >= l.geo.y - 10 && node.geo.y <= l.geo.y + Math.max(l.geo.height, 140));
+      return candidate ? candidate.value : '';
+    };
 
     const edgeMap = {};
+    const incomingCount = {};
     edges.forEach(edge => {
       const src = edge.getAttribute('source');
       const tgt = edge.getAttribute('target');
       if (!src || !tgt) return;
       if (!edgeMap[src]) edgeMap[src] = [];
       edgeMap[src].push(tgt);
+      incomingCount[tgt] = (incomingCount[tgt] || 0) + 1;
     });
 
-    const skipPrefixes = ['strip-', 'body-', 'label-', 'title', 'start', 'end', 'note'];
-    const stepNodes = vertices.filter(cell => {
-      const id = cell.getAttribute('id') || '';
-      return !skipPrefixes.some(prefix => id === prefix || id.startsWith(prefix));
-    });
+    const nodes = Object.values(byId)
+      .filter(node => {
+        const id = normalizeId(node.id);
+        if (!node.value) return false;
+        if (['0','1','start','end','title'].includes(id)) return id === 'start' || id === 'end' || id === 'title';
+        if (id.startsWith('strip-') || id.startsWith('body-') || id.startsWith('label-')) return false;
+        return true;
+      })
+      .sort((a, b) => a.geo.x - b.geo.x || a.geo.y - b.geo.y);
 
-    const stepLabel = cell => decodeValue(cell.getAttribute('value')) || (cell.getAttribute('id') || '');
+    const titleNode = byId.title;
+    const startNode = byId.start;
+    const endNode = byId.end;
 
+    const orderRank = (node) => `${String(Math.round(node.geo.x)).padStart(6,'0')}-${String(Math.round(node.geo.y)).padStart(6,'0')}`;
+    const sortFlow = (ids) => ids
+      .map(id => byId[id])
+      .filter(Boolean)
+      .sort((a, b) => a.geo.x - b.geo.x || a.geo.y - b.geo.y)
+      .map(n => n.id);
+
+    Object.keys(edgeMap).forEach(k => edgeMap[k] = sortFlow(edgeMap[k]));
+
+    const visited = new Set();
     const ordered = [];
-    const seen = new Set();
-    const walk = (id) => {
+    function walk(id) {
       (edgeMap[id] || []).forEach(nextId => {
         const next = byId[nextId];
-        if (!next || seen.has(nextId)) return;
-        const nextStyle = parseStyle(next.getAttribute('style'));
-        const nextLabel = stepLabel(next);
-        if ((nextId || '').startsWith('note-')) return;
-        if (nextId !== 'end') {
-          ordered.push({ id: nextId, label: nextLabel, style: nextStyle });
-          seen.add(nextId);
-          walk(nextId);
-        }
+        if (!next || visited.has(nextId) || nextId === 'end') return;
+        const nid = normalizeId(next.id);
+        if (nid.startsWith('note-')) return;
+        visited.add(nextId);
+        ordered.push(next);
+        walk(nextId);
       });
-    };
-    if (startCell) walk('start');
+    }
 
-    stepNodes.forEach(cell => {
-      const id = cell.getAttribute('id') || '';
-      if (!seen.has(id) && id !== 'end') ordered.push({ id, label: stepLabel(cell), style: parseStyle(cell.getAttribute('style')) });
+    if (startNode) walk('start');
+
+    nodes.forEach(node => {
+      const id = normalizeId(node.id);
+      if (['start','end','title'].includes(id)) return;
+      if (id.startsWith('note-')) return;
+      if (!visited.has(node.id)) ordered.push(node);
+    });
+
+    ordered.sort((a, b) => {
+      const aInFlow = visited.has(a.id) ? 0 : 1;
+      const bInFlow = visited.has(b.id) ? 0 : 1;
+      return aInFlow - bInFlow || a.geo.x - b.geo.x || a.geo.y - b.geo.y;
     });
 
     const decisions = ordered
-      .filter(n => n.id.startsWith('decision-') || n.style.shape === 'rhombus')
-      .map(n => n.label);
+      .filter(n => normalizeId(n.id).startsWith('decision-') || n.style.shape === 'rhombus')
+      .map(n => n.value);
 
-    const procedure = ordered
-      .filter(n => !(n.id.startsWith('decision-') || n.style.shape === 'rhombus'))
-      .map(n => n.label)
+    const steps = ordered
+      .filter(n => !(normalizeId(n.id).startsWith('decision-') || n.style.shape === 'rhombus'))
+      .map(n => laneOf(n) ? `[${laneOf(n)}] ${n.value}` : n.value)
       .filter(Boolean);
 
-    const noteNodes = vertices
-      .filter(cell => (cell.getAttribute('id') || '').startsWith('note-') || (parseStyle(cell.getAttribute('style')).shape === 'note'))
-      .map(cell => decodeValue(cell.getAttribute('value')))
+    const noteNodes = nodes
+      .filter(n => normalizeId(n.id).startsWith('note-') || n.style.shape === 'note')
+      .map(n => n.value)
       .filter(Boolean);
 
-    const outputCandidates = [];
-    if (endCell) outputCandidates.push(decodeValue(endCell.getAttribute('value')) || 'Process complete');
-    const readyNode = ordered.find(n => /ready|complete|shipp|finish|close/i.test(n.id + ' ' + n.label));
-    if (readyNode) outputCandidates.unshift(readyNode.label);
-    if (!outputCandidates.length && procedure.length) outputCandidates.push(procedure[procedure.length - 1]);
+    const outputs = [];
+    if (endNode?.value) outputs.push(endNode.value);
+    const readyNode = [...ordered].reverse().find(n => /ready|complete|ship|handoff|close|end/i.test(`${n.id} ${n.value}`));
+    if (readyNode) outputs.unshift(readyNode.value);
+    if (!outputs.length && steps.length) outputs.push(steps[steps.length - 1]);
+
+    const processName = titleNode?.value || diagram?.getAttribute('name') || 'Untitled';
+    const owners = lanes.map(l => l.value).filter(Boolean);
 
     document.getElementById('processName').value = processName;
-    if (!document.getElementById('goal').value.trim()) document.getElementById('goal').value = `Standardize and execute ${processName.toLowerCase()}.`;
-    if (!document.getElementById('trigger').value.trim()) document.getElementById('trigger').value = startCell ? decodeValue(startCell.getAttribute('value')) || 'Process starts' : 'Process starts';
-    if (!document.getElementById('owner').value.trim() && laneLabels.length) document.getElementById('owner').value = laneLabels.join(' | ');
-    setLines('steps', procedure);
+    document.getElementById('goal').value = document.getElementById('goal').value.trim() || `Execute ${processName.toLowerCase()} consistently with minimal variation.`;
+    document.getElementById('trigger').value = document.getElementById('trigger').value.trim() || (startNode?.value || 'Process start');
+    document.getElementById('owner').value = owners.join(' | ') || document.getElementById('owner').value;
+    setLines('inputs', []);
+    setLines('steps', steps);
     setLines('decisions', decisions);
     setLines('exceptions', noteNodes);
-    setLines('outputs', [...new Set(outputCandidates)]);
-
-    const noteText = [
-      laneLabels.length ? `Imported lanes: ${laneLabels.join(' / ')}` : '',
-      diagram && diagram.getAttribute('name') ? `Diagram source: ${diagram.getAttribute('name')}` : '',
+    setLines('outputs', [...new Set(outputs)]);
+    setLines('qa', []);
+    document.getElementById('notes').value = [
+      `Source diagram: ${diagram?.getAttribute('name') || 'Unnamed diagram'}`,
+      owners.length ? `Detected lanes: ${owners.join(' / ')}` : '',
+      'Ordering logic: edge flow first, then left-to-right, then top-down.',
       noteNodes.length ? `Imported notes: ${noteNodes.join(' | ')}` : ''
     ].filter(Boolean).join('\n');
-    document.getElementById('notes').value = noteText;
 
     document.getElementById('importStatus').textContent = `Imported approved diagram: ${processName}`;
     generateSOP();
@@ -267,7 +332,7 @@ function importDrawio() {
   }
 }
 
-function generateSOP() {
+function buildSOPText() {
   const processName = document.getElementById('processName').value.trim() || 'Untitled';
   const goal = document.getElementById('goal').value.trim() || 'TBD';
   const trigger = document.getElementById('trigger').value.trim() || 'TBD';
@@ -282,21 +347,21 @@ function generateSOP() {
   const outputs = lines('outputs');
   const qa = lines('qa');
 
-  const sop = `# SOP: ${processName}
+  return `# SOP: ${processName}
 
-## 1. Purpose
+## 1. Purpose / Outcome
 ${goal}
 
-## 2. Trigger
+## 2. Trigger / Scope
 ${trigger}
 
-## 3. Owner
+## 3. Roles / Ownership
 ${owner}
 
 ## 4. Frequency
 ${frequency}
 
-## 5. Inputs
+## 5. Inputs / Preconditions
 ${bulletize(inputs)}
 
 ## 6. Procedure
@@ -305,22 +370,21 @@ ${numbered(steps)}
 ## 7. Decisions / Branches
 ${bulletize(decisions)}
 
-## 8. Exceptions / Escalation
+## 8. Exceptions / Troubleshooting
 ${bulletize(exceptions)}
 
-## 9. Outputs
+## 9. Outputs / End State
 ${bulletize(outputs)}
 
-## 10. Quality Checks
+## 10. Quality Checks / Approvals
 ${bulletize(qa)}
 
-## 11. Notes
+## 11. Source / Notes
 ${notes || 'None captured.'}
 
-## 12. Diagram Extraction
-Goal: ${goal}
-Owner lane: ${owner}
-Trigger: ${trigger}
+## 12. Trace From Diagram
+Ordering logic: edge flow first, then left-to-right, then top-down.
+Primary trigger: ${trigger}
 End state: ${outputs[0] || 'TBD'}
 Main steps:
 ${numbered(steps)}
@@ -328,14 +392,71 @@ Decisions:
 ${bulletize(decisions)}
 Exceptions:
 ${bulletize(exceptions)}`;
+}
 
-  document.getElementById('output').textContent = sop;
+function generateSOP() {
+  document.getElementById('output').textContent = buildSOPText();
 }
 
 function copyOutput() {
-  const text = document.getElementById('output').textContent;
-  navigator.clipboard.writeText(text).then(() => alert('SOP copied.'));
+  const text = buildSOPText();
+  navigator.clipboard.writeText(text).then(() => alert('SOP text copied.'));
 }
+
+function slugify(text) {
+  return (text || 'sop').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'sop';
+}
+
+function downloadTXT() {
+  const text = buildSOPText();
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${slugify(document.getElementById('processName').value)}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function downloadPDF() {
+  const text = buildSOPText();
+  if (!window.jspdf?.jsPDF) {
+    alert('PDF library not loaded yet. Try again in a second.');
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const margin = 42;
+  const pageWidth = doc.internal.pageSize.getWidth() - margin * 2;
+  const lines = doc.splitTextToSize(text, pageWidth);
+  let y = margin;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  lines.forEach(line => {
+    if (y > 800) {
+      doc.addPage();
+      y = margin;
+    }
+    doc.text(line, margin, y);
+    y += 16;
+  });
+  doc.save(`${slugify(document.getElementById('processName').value)}.pdf`);
+}
+
+function copyShareLink() {
+  const text = buildSOPText();
+  const encoded = btoa(unescape(encodeURIComponent(text)));
+  const url = `${location.origin}${location.pathname}#sop=${encoded}`;
+  navigator.clipboard.writeText(url).then(() => alert('Share link copied.'));
+}
+
+(function restoreFromLink() {
+  const hash = location.hash || '';
+  if (!hash.startsWith('#sop=')) return;
+  try {
+    const text = decodeURIComponent(escape(atob(hash.slice(5))));
+    document.getElementById('output').textContent = text;
+  } catch (e) {}
+})();
 </script>
 </body>
 </html>
