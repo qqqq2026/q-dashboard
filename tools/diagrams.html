@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q-Dashboard · Diagrams Tool</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d0f14; color: #e2e8f0; font-family: 'Inter', 'Segoe UI', sans-serif; padding: 32px; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  .top { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:24px; }
+  .title { display:flex; align-items:center; gap:14px; }
+  .icon { width:52px; height:52px; border-radius:14px; background:#1e2736; display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
+  h1 { font-size:1.5rem; font-weight:800; letter-spacing:-0.03em; }
+  .sub { color:#64748b; font-size:0.8rem; margin-top:4px; }
+  .actions { display:flex; gap:10px; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:9px; border:1px solid #1e2736; background:#161b26; color:#e2e8f0; text-decoration:none; font-weight:700; font-size:0.78rem; cursor:pointer; }
+  .btn.primary { background:#818cf8; border-color:#818cf8; color:#fff; }
+  .grid { display:grid; grid-template-columns: 1.2fr 0.8fr; gap:16px; }
+  .card { background:#161b26; border:1px solid #1e2736; border-radius:14px; padding:18px; }
+  .card h2 { font-size:0.84rem; text-transform:uppercase; letter-spacing:0.08em; color:#94a3b8; margin-bottom:12px; }
+  .lead { color:#cbd5e1; line-height:1.6; font-size:0.9rem; }
+  .list { padding-left:18px; color:#94a3b8; line-height:1.8; font-size:0.82rem; }
+  textarea, pre { width:100%; background:#0d0f14; border:1px solid #1e2736; color:#e2e8f0; border-radius:10px; padding:14px; font-size:0.8rem; }
+  textarea { min-height: 270px; resize: vertical; }
+  pre { overflow:auto; line-height:1.6; white-space:pre-wrap; }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .chip { display:inline-block; border-radius:999px; padding:4px 9px; font-size:0.64rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; background:#0f172a; color:#93c5fd; border:1px solid #1e3a8a; }
+  .section-gap { margin-top:16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="title">
+      <div class="icon">📐</div>
+      <div>
+        <h1>Diagrams Tool</h1>
+        <div class="sub">Wickey process diagrams · swimlanes · draw.io `design` output</div>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn" href="../dashboard.html">← Back to dashboard</a>
+      <a class="btn primary" href="https://app.diagrams.net/" target="_blank" rel="noopener noreferrer">Open draw.io ↗</a>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Intake Prompt</h2>
+      <textarea id="intake">Diagram request
+Goal:
+Lanes:
+Start:
+End:
+Main steps:
+Decisions:
+Exceptions:
+Notes:
+Output mode: design</textarea>
+      <div class="actions section-gap">
+        <button class="btn primary" onclick="copyText('intake')">Copy intake</button>
+      </div>
+      <div class="chips">
+        <span class="chip">Swimlanes</span>
+        <span class="chip">Readable IDs</span>
+        <span class="chip">Orthogonal connectors</span>
+        <span class="chip">Wickey standard</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Rules</h2>
+      <ul class="list">
+        <li>Use swimlanes by actor, system, machine, or team.</li>
+        <li>Keep boxes short and verb-led.</li>
+        <li>Use diamonds only for real branching decisions.</li>
+        <li>Show handoffs explicitly.</li>
+        <li>Default output is draw.io-ready `design` XML.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card section-gap">
+    <h2>Design Format Notes</h2>
+    <pre id="design-notes">- Root: mxfile > diagram > mxGraphModel > root
+- Per lane: strip-*, body-*, label-*
+- Nodes: start, end, step-*, decision-*, note-*
+- Edges: edge-start, edge-approve-yes, edge-end
+- Connector style: orthogonalEdgeStyle + endArrow=block
+- Layout: title, lanes, labels, start/end, steps, edges, notes</pre>
+    <div class="actions section-gap">
+      <button class="btn" onclick="copyText('design-notes')">Copy format notes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyText(id) {
+  const el = document.getElementById(id);
+  const text = el.value || el.textContent;
+  navigator.clipboard.writeText(text).then(() => alert('Copied.'));
+}
+</script>
+</body>
+</html>
