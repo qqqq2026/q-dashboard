@@ -46,9 +46,6 @@
   .subtitle { font-size: 0.75rem; color: #475569; margin-bottom: 20px; }
 
   /* Tabs */
-  .top-links { display: flex; gap: 10px; margin: 18px 0 14px; }
-  .top-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 10px; text-decoration: none; font-size: 0.82rem; font-weight: 700; border: 1px solid #1e2736; background: #111827; color: #f8fafc; }
-  .top-link:hover { background: #161f31; }
   .tabs { display: flex; gap: 4px; margin-bottom: 28px; border-bottom: 1px solid #1e2736; padding-bottom: 0; }
   .tab { padding: 8px 18px; font-size: 0.78rem; font-weight: 600; color: #475569; cursor: pointer; border-radius: 7px 7px 0 0; border: 1px solid transparent; border-bottom: none; transition: all 0.15s; }
   .tab:hover { color: #94a3b8; background: #161b26; }
@@ -144,15 +141,39 @@
   .stat-bar.yellow { background: #fbbf24; }
   .stat-bar.green { background: #4ade80; }
   .footer { margin-top: 24px; font-size: 0.66rem; color: #1e2736; text-align: right; }
+
+  /* Tools */
+  .tools-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .tool-card { background: #161b26; border: 1px solid #1e2736; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .tool-head { display: flex; align-items: center; gap: 12px; }
+  .tool-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #1e2736; font-size: 1.3rem; }
+  .tool-name { font-size: 0.92rem; font-weight: 700; color: #f8fafc; }
+  .tool-desc { color: #64748b; font-size: 0.76rem; line-height: 1.55; }
+  .tool-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tool-chip { display: inline-block; border-radius: 999px; padding: 3px 8px; font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: #0f172a; color: #93c5fd; border: 1px solid #1e3a8a; }
+  .tool-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+  .tool-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 8px; border: 1px solid #1e2736; background: #0d0f14; color: #e2e8f0; text-decoration: none; font-size: 0.76rem; font-weight: 700; cursor: pointer; }
+  .tool-btn:hover { background: #1e2736; }
+  .tool-btn.primary { background: #818cf8; border-color: #818cf8; color: #fff; }
+  .tool-btn.primary:hover { background: #6366f1; }
+  .tool-box { background: #161b26; border: 1px solid #1e2736; border-radius: 12px; padding: 18px; }
+  .tool-list { margin-top: 10px; padding-left: 18px; color: #94a3b8; font-size: 0.78rem; line-height: 1.7; }
+
+  body.light .tool-card, body.light .tool-box { background: #fff; border-color: #e2e8f0; }
+  body.light .tool-icon { background: #f1f5f9; }
+  body.light .tool-name { color: #1e293b; }
+  body.light .tool-btn { background: #fff; border-color: #e2e8f0; color: #1e293b; }
+  body.light .tool-btn:hover { background: #f8fafc; }
+  body.light .tool-btn.primary { background: #818cf8; border-color: #818cf8; color: #fff; }
+  body.light .tool-chip { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
 </style>
-  <script src="/q-dashboard/auth.js"></script>
 </head>
 <body>
 
 <div class="header-row">
   <div class="header">
     <h1>🧭 Q-Dashboard</h1>
-    <span class="version">v1.2</span>
+    <span class="version">v1.7</span>
   </div>
   <div class="theme-toggle">
     <button class="theme-btn" onclick="setTheme('system')" id="btn-system">System</button>
@@ -160,17 +181,14 @@
     <button class="theme-btn active" onclick="setTheme('light')" id="btn-light">⚪ Light</button>
   </div>
 </div>
-<p class="subtitle">Last updated: 2026-03-15 · Maintained by Q · Autonomy target: 30% · MRR target: €1M+</p>
-
-<div class="top-links">
-  <a class="top-link" href="mission-control/">🚀 Open Mission Control</a>
-</div>
+<p class="subtitle">Last updated: 2026-03-17 · Maintained by Q · Autonomy target: 30% · MRR target: €1M+</p>
 
 <!-- Tab Nav -->
 <div class="tabs">
-  <div class="tab active" onclick="showTab('overview')">📋 Overview</div>
-  <div class="tab" onclick="showTab('finance')">💶 Finance</div>
-  <div class="tab" onclick="showTab('revenue-lab')">🧪 Revenue Lab</div>
+  <div class="tab active" onclick="showTab('overview', this)">📋 Overview</div>
+  <div class="tab" onclick="showTab('finance', this)">💶 Finance</div>
+  <div class="tab" onclick="showTab('revenue-lab', this)">🧪 Revenue Lab</div>
+  <div class="tab" onclick="showTab('tools', this)">🧰 Tools</div>
 </div>
 
 <!-- ===== TAB: OVERVIEW ===== -->
@@ -696,14 +714,93 @@
 
 </div>
 
-<div class="footer">Q-Dashboard v1.6 · /data/.openclaw/workspace/revenue-lab/ · Autonomy: 30% target · MRR: €1M+ target · Content Factory integrated · 2026-03-15</div>
+<!-- ===== TAB: TOOLS ===== -->
+<div id="tab-tools" class="tab-content">
+
+  <div class="section">
+    <div class="section-title">Operational Tools <span class="pill">Clickable launchers for recurring work</span></div>
+    <div class="tools-grid">
+      <div class="tool-card">
+        <div class="tool-head">
+          <div class="tool-icon">📐</div>
+          <div>
+            <div class="tool-name">Diagrams</div>
+            <div class="tool-desc">Swimlane-first draw.io tool for Wickey process maps, agent flows, handoffs, and design diagrams.</div>
+          </div>
+        </div>
+        <div class="tool-meta">
+          <span class="tool-chip">Wickey</span>
+          <span class="tool-chip">draw.io</span>
+          <span class="tool-chip">swimlanes</span>
+        </div>
+        <div class="tool-actions">
+          <a class="tool-btn primary" href="tools/diagrams.html">Open tool</a>
+          <a class="tool-btn" href="https://app.diagrams.net/" target="_blank" rel="noopener noreferrer">Open draw.io ↗</a>
+          <button class="tool-btn" onclick="copyDiagramPrompt()">Copy intake prompt</button>
+        </div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-head">
+          <div class="tool-icon">🧾</div>
+          <div>
+            <div class="tool-name">SOP Wizard</div>
+            <div class="tool-desc">Instant UI wizard to turn messy meeting notes into a usable SOP, owners, triggers, exceptions, and checklist.</div>
+          </div>
+        </div>
+        <div class="tool-meta">
+          <span class="tool-chip">Wizard</span>
+          <span class="tool-chip">SOP</span>
+          <span class="tool-chip">Meeting notes</span>
+        </div>
+        <div class="tool-actions">
+          <a class="tool-btn primary" href="tools/sop-generator.html">Open wizard</a>
+          <button class="tool-btn" onclick="copySopPrompt()">Copy SOP prompt</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">How to use <span class="pill">Keep inputs structured</span></div>
+    <div class="tool-box">
+      <div class="tool-desc">Use the Diagrams tool when you need a process turned into a clean visual fast. Feed it actors, steps, decisions, and exceptions. It will normalize the flow and generate draw.io-ready design output.</div>
+      <ul class="tool-list">
+        <li>Best for: order flows, production steps, approval chains, machine + human handoffs, agent/system maps.</li>
+        <li>Default output: swimlanes, readable IDs, orthogonal connectors, start/end nodes.</li>
+        <li>Use the intake prompt to keep requests consistent and faster to diagram.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">Q-Dashboard v1.7 · /data/.openclaw/workspace/revenue-lab/ · Autonomy: 30% target · MRR: €1M+ target · Tools tab added · 2026-03-17</div>
 
 <script>
-  function showTab(name) {
+  function showTab(name, el) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.getElementById('tab-' + name).classList.add('active');
-    event.target.classList.add('active');
+    if (el) el.classList.add('active');
+  }
+
+  function copyDiagramPrompt() {
+    const prompt = `Diagram request\nGoal:\nLanes:\nStart:\nEnd:\nMain steps:\nDecisions:\nExceptions:\nNotes:\nOutput mode: design`; 
+    navigator.clipboard.writeText(prompt).then(() => {
+      alert('Diagram intake prompt copied.');
+    }).catch(() => {
+      alert(prompt);
+    });
+  }
+
+  function copySopPrompt() {
+    const prompt = `SOP request\nProcess name:\nGoal:\nTrigger:\nOwner:\nInputs:\nSteps:\nDecisions:\nExceptions:\nOutputs:\nQA checks:\nNotes:`;
+    navigator.clipboard.writeText(prompt).then(() => {
+      alert('SOP prompt copied.');
+    }).catch(() => {
+      alert(prompt);
+    });
   }
 
   function setTheme(t) {
