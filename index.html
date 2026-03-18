@@ -638,6 +638,77 @@
     padding: 16px;
   }
 
+  .launcher-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .launcher-card {
+    background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .launcher-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .launcher-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: rgba(124,156,255,.12);
+    border: 1px solid rgba(124,156,255,.18);
+    font-size: 22px;
+    flex: 0 0 auto;
+  }
+
+  .launcher-title {
+    font-size: 18px;
+    font-weight: 820;
+    letter-spacing: -.03em;
+    margin-bottom: 4px;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.04);
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .launcher-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .launcher-actions .btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
   .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -1082,19 +1153,49 @@
     <section class="view" id="view-tools">
       <div class="tools-grid">
         <div class="panel highlight">
-          <div class="section-kicker">Native tools</div>
-          <h3 class="panel-title" style="font-size:28px">Tool surfaces should feel built-in.</h3>
-          <div class="subtext">The goal is not links to separate apps. The goal is task-native surfaces: calendar, memory, docs, sessions, and agent operations from inside the cockpit.</div>
-          <div class="tool-surface" style="margin-top:16px">
-            <div class="panel-title-row"><h4 class="panel-title">Calendar surface</h4><span class="small-pill">v1 concept</span></div>
-            <div class="calendar-grid">
-              <div class="day"><div class="d">Mon</div><div class="event">09:00 — Ops review</div><div class="event ops">15:00 — Factory check</div></div>
-              <div class="day"><div class="d">Tue</div><div class="event">10:30 — Sales block</div></div>
-              <div class="day"><div class="d">Wed</div><div class="event risk">11:00 — Follow-up due</div></div>
-              <div class="day"><div class="d">Thu</div><div class="event">14:00 — Content review</div></div>
-              <div class="day"><div class="d">Fri</div><div class="event ops">08:30 — Weekly metrics</div></div>
-              <div class="day"><div class="d">Sat</div><div class="calendar-sub">Background work</div></div>
-              <div class="day"><div class="d">Sun</div><div class="calendar-sub">Planning / reset</div></div>
+          <div class="section-kicker">Operational tools</div>
+          <h3 class="panel-title" style="font-size:28px">Clickable launchers for recurring work.</h3>
+          <div class="subtext">These belong here. Not buried. The tools section should open actual operating surfaces and provide the intake prompts that make the tools usable fast.</div>
+
+          <div class="launcher-grid">
+            <div class="launcher-card">
+              <div class="launcher-head">
+                <div class="launcher-icon">📐</div>
+                <div>
+                  <div class="launcher-title">Diagrams</div>
+                  <div class="list-meta">Swimlane-first draw.io tool for Wickey process maps, agent flows, handoffs, and design diagrams.</div>
+                </div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">Wickey</span>
+                <span class="tag">draw.io</span>
+                <span class="tag">swimlanes</span>
+              </div>
+              <div class="launcher-actions">
+                <a class="btn primary" href="./tools/diagrams.html">Open tool</a>
+                <a class="btn" href="https://app.diagrams.net/" target="_blank" rel="noopener">Open draw.io ↗</a>
+                <button class="btn" onclick="copyPrompt('diagrams')">Copy intake prompt</button>
+              </div>
+            </div>
+
+            <div class="launcher-card">
+              <div class="launcher-head">
+                <div class="launcher-icon">🧾</div>
+                <div>
+                  <div class="launcher-title">SOP Wizard</div>
+                  <div class="list-meta">Instant UI wizard to turn messy meeting notes into a usable SOP, owners, triggers, exceptions, and checklist.</div>
+                </div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">Wizard</span>
+                <span class="tag">SOP</span>
+                <span class="tag">Meeting notes</span>
+              </div>
+              <div class="launcher-actions">
+                <a class="btn primary" href="./tools/sop-generator.html">Open wizard</a>
+                <button class="btn" onclick="copyPrompt('sop')">Copy SOP prompt</button>
+                <button class="btn" onclick="scrollToHowTo()">How to use</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1109,12 +1210,12 @@
           </div>
         </div>
 
-        <div class="panel soft">
-          <div class="panel-title-row"><h3 class="panel-title">Native interaction rules</h3><span class="small-pill">Product stance</span></div>
+        <div class="panel soft" id="tools-howto">
+          <div class="panel-title-row"><h3 class="panel-title">How to use</h3><span class="small-pill">Fast path</span></div>
           <div class="list">
-            <div class="list-item"><div><div class="row-title">Show state, not just links</div><div class="list-meta">Every tool gets a mini-surface with useful context.</div></div></div>
-            <div class="list-item"><div><div class="row-title">Keep actions local-first</div><div class="list-meta">OpenClaw-native controls beat bouncing into other UIs.</div></div></div>
-            <div class="list-item"><div><div class="row-title">Context follows the tool</div><div class="list-meta">Docs, memory, and jobs should be cross-linked into tool views.</div></div></div>
+            <div class="list-item"><div><div class="row-title">Diagrams</div><div class="list-meta">Use for process maps, swimlanes, operating flows, agent handoffs, and Wickey process work. Start with the copied intake prompt, then refine in the tool.</div></div></div>
+            <div class="list-item"><div><div class="row-title">SOP Wizard</div><div class="list-meta">Paste rough notes from a call or meeting. Convert them into owners, triggers, exceptions, required inputs, and a checklist before they become operational docs.</div></div></div>
+            <div class="list-item"><div><div class="row-title">Product rule</div><div class="list-meta">Every recurring workflow should either have a launcher, a prompt, or a native surface. If it does not, it stays expensive.</div></div></div>
           </div>
         </div>
       </div>
@@ -1259,6 +1360,26 @@
     views.forEach(view => view.classList.toggle('active', view.id === `view-${name}`));
     const active = navButtons.find(btn => btn.dataset.view === name);
     pageTitle.textContent = active ? active.innerText.replace(/\s+\S+$/, '').trim() || name : name;
+  }
+
+  const prompts = {
+    diagrams: `Design a swimlane-first operational diagram. Include lanes, owners, triggers, inputs, outputs, edge cases, and handoffs. Keep it implementation-ready for Wickey-style process mapping and agent workflows.`,
+    sop: `Turn these rough meeting notes into an SOP. Extract: objective, owner, trigger, required inputs, main steps, decision points, exceptions, failure modes, approvals needed, and final checklist.`
+  };
+
+  function copyPrompt(kind) {
+    const text = prompts[kind];
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Prompt copied.');
+    }).catch(() => {
+      alert(text);
+    });
+  }
+
+  function scrollToHowTo() {
+    const block = document.getElementById('tools-howto');
+    if (block) block.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   navButtons.forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
