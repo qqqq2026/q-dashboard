@@ -3,51 +3,197 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Q-Dashboard · Diagrams Tool</title>
+<title>Q Mission Control · Diagrams Surface</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0d0f14; color: #e2e8f0; font-family: 'Inter', 'Segoe UI', sans-serif; padding: 32px; }
-  .wrap { max-width: 1100px; margin: 0 auto; }
-  .top { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:24px; }
-  .title { display:flex; align-items:center; gap:14px; }
-  .icon { width:52px; height:52px; border-radius:14px; background:#1e2736; display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
-  h1 { font-size:1.5rem; font-weight:800; letter-spacing:-0.03em; }
-  .sub { color:#64748b; font-size:0.8rem; margin-top:4px; }
-  .actions { display:flex; gap:10px; flex-wrap:wrap; }
-  .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:9px; border:1px solid #1e2736; background:#161b26; color:#e2e8f0; text-decoration:none; font-weight:700; font-size:0.78rem; cursor:pointer; }
-  .btn.primary { background:#818cf8; border-color:#818cf8; color:#fff; }
-  .grid { display:grid; grid-template-columns: 1.2fr 0.8fr; gap:16px; }
-  .card { background:#161b26; border:1px solid #1e2736; border-radius:14px; padding:18px; }
-  .card h2 { font-size:0.84rem; text-transform:uppercase; letter-spacing:0.08em; color:#94a3b8; margin-bottom:12px; }
-  .lead { color:#cbd5e1; line-height:1.6; font-size:0.9rem; }
-  .list { padding-left:18px; color:#94a3b8; line-height:1.8; font-size:0.82rem; }
-  textarea, pre { width:100%; background:#0d0f14; border:1px solid #1e2736; color:#e2e8f0; border-radius:10px; padding:14px; font-size:0.8rem; }
-  textarea { min-height: 270px; resize: vertical; }
-  pre { overflow:auto; line-height:1.6; white-space:pre-wrap; }
-  .chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
-  .chip { display:inline-block; border-radius:999px; padding:4px 9px; font-size:0.64rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; background:#0f172a; color:#93c5fd; border:1px solid #1e3a8a; }
-  .section-gap { margin-top:16px; }
+  :root {
+    --bg: #05070f;
+    --panel: rgba(16, 21, 34, 0.92);
+    --panel-soft: rgba(12, 17, 28, 0.9);
+    --panel-highlight: rgba(24, 32, 53, 0.92);
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(143,166,255,0.35);
+    --text: #f4f6ff;
+    --muted: #8f9cc4;
+    --brand: #8fa6ff;
+    --accent: #3fe9cb;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(65% 90% at 90% 0%, rgba(143, 166, 255, 0.14), transparent 55%),
+      radial-gradient(80% 90% at 0% 90%, rgba(63, 233, 203, 0.12), transparent 65%),
+      linear-gradient(135deg, #05070f, #0b1527 70%);
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  a { color: inherit; }
+
+  .shell {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    gap: 24px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .title-block {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .badge {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, rgba(143,166,255,0.35), rgba(63,233,203,0.18));
+    border: 1px solid var(--border-strong);
+    font-size: 1.9rem;
+    box-shadow: 0 20px 45px rgba(5,8,16,0.6);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 30px;
+    letter-spacing: -0.04em;
+  }
+
+  .subtext {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .btn {
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(7, 11, 21, 0.7);
+    color: var(--text);
+    border-radius: 999px;
+    padding: 11px 18px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform .18s ease, border-color .18s ease;
+  }
+
+  .btn:hover { transform: translateY(-1px); border-color: rgba(255,255,255,0.25); }
+
+  .btn.primary {
+    background: linear-gradient(120deg, var(--brand), var(--accent));
+    border-color: transparent;
+    color: #05070f;
+    box-shadow: 0 10px 30px rgba(63,233,203,0.25);
+  }
+
+  .surface {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 24px 60px rgba(2,4,10,0.55);
+  }
+
+  .surface.highlight { border-color: var(--border-strong); background: var(--panel-highlight); }
+
+  .kicker {
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    margin: 0 0 10px;
+    font-size: 1.1rem;
+    letter-spacing: .02em;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 24px;
+  }
+
+  textarea, pre {
+    width: 100%;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(5,8,16,0.75);
+    color: inherit;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9rem;
+    padding: 16px;
+    line-height: 1.6;
+  }
+
+  textarea { min-height: 280px; resize: vertical; }
+  pre { white-space: pre-wrap; overflow: auto; }
+
+  ul { margin: 0; padding-left: 18px; line-height: 1.8; color: var(--muted); font-size: 0.9rem; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .chip {
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.11);
+    padding: 6px 12px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .notes-split { display: grid; gap: 16px; }
+
+  @media (max-width: 1024px) {
+    .grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="top">
-    <div class="title">
-      <div class="icon">📐</div>
+<div class="shell">
+  <header>
+    <div class="title-block">
+      <div class="badge">📐</div>
       <div>
-        <h1>Diagrams Tool</h1>
-        <div class="sub">Wickey process diagrams · swimlanes · draw.io `design` output</div>
+        <h1>Diagrams Surface</h1>
+        <div class="subtext">Process maps, swimlanes, and draw.io design exports live as a native Mission Control tool.</div>
       </div>
     </div>
     <div class="actions">
       <a class="btn" href="../dashboard.html">← Back to dashboard</a>
-      <a class="btn primary" href="https://app.diagrams.net/" target="_blank" rel="noopener noreferrer">Open draw.io ↗</a>
+      <a class="btn" href="https://app.diagrams.net/" target="_blank" rel="noopener">Open draw.io ↗</a>
+      <button class="btn primary" onclick="copyText('intake')">Copy intake prompt</button>
     </div>
-  </div>
+  </header>
 
   <div class="grid">
-    <div class="card">
-      <h2>Intake Prompt</h2>
+    <div class="surface highlight">
+      <div class="kicker">intake prompt</div>
+      <h2>Swimlane-first request</h2>
       <textarea id="intake">Diagram request
 Goal:
 Lanes:
@@ -58,39 +204,39 @@ Decisions:
 Exceptions:
 Notes:
 Output mode: design</textarea>
-      <div class="actions section-gap">
-        <button class="btn primary" onclick="copyText('intake')">Copy intake</button>
-      </div>
       <div class="chips">
         <span class="chip">Swimlanes</span>
         <span class="chip">Readable IDs</span>
-        <span class="chip">Orthogonal connectors</span>
+        <span class="chip">Orthogonal edges</span>
         <span class="chip">Wickey standard</span>
       </div>
     </div>
 
-    <div class="card">
-      <h2>Rules</h2>
-      <ul class="list">
-        <li>Use swimlanes by actor, system, machine, or team.</li>
-        <li>Keep boxes short and verb-led.</li>
-        <li>Use diamonds only for real branching decisions.</li>
-        <li>Show handoffs explicitly.</li>
-        <li>Default output is draw.io-ready `design` XML.</li>
-      </ul>
-    </div>
-  </div>
+    <div class="notes-split">
+      <div class="surface">
+        <div class="kicker">operating rules</div>
+        <h2>What keeps diagrams usable</h2>
+        <ul>
+          <li>Lane = owner, system, or machine. Make the labels obvious.</li>
+          <li>Every box is verb-led and short. Decisions get diamonds only when there is a branch.</li>
+          <li>Show handoffs explicitly. If two teams touch the work, the line crosses lanes.</li>
+          <li>Default export is draw.io `design` XML with orthogonal connectors.</li>
+        </ul>
+      </div>
 
-  <div class="card section-gap">
-    <h2>Design Format Notes</h2>
-    <pre id="design-notes">- Root: mxfile > diagram > mxGraphModel > root
-- Per lane: strip-*, body-*, label-*
+      <div class="surface">
+        <div class="kicker">format reference</div>
+        <h2>Design XML spine</h2>
+        <pre id="design-notes">- Root: mxfile > diagram > mxGraphModel > root
+- Lanes: strip-*, body-*, label-*
 - Nodes: start, end, step-*, decision-*, note-*
 - Edges: edge-start, edge-approve-yes, edge-end
-- Connector style: orthogonalEdgeStyle + endArrow=block
-- Layout: title, lanes, labels, start/end, steps, edges, notes</pre>
-    <div class="actions section-gap">
-      <button class="btn" onclick="copyText('design-notes')">Copy format notes</button>
+- Style: orthogonalEdgeStyle + endArrow=block
+- Layout order: title → lanes → steps → connectors → notes</pre>
+        <div class="actions">
+          <button class="btn" onclick="copyText('design-notes')">Copy format notes</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -98,8 +244,9 @@ Output mode: design</textarea>
 <script>
 function copyText(id) {
   const el = document.getElementById(id);
-  const text = el.value || el.textContent;
-  navigator.clipboard.writeText(text).then(() => alert('Copied.'));
+  if (!el) return;
+  const value = el.value || el.textContent;
+  navigator.clipboard.writeText(value).then(() => alert('Copied to clipboard.'));
 }
 </script>
 </body>

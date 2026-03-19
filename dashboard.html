@@ -1,884 +1,1983 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Q-Dashboard</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Q Mission Control</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0d0f14; color: #e2e8f0; font-family: 'Inter', 'Segoe UI', sans-serif; padding: 28px; min-height: 100vh; }
+  :root {
+    --bg: #05070f;
+    --bg-alt: #070b16;
+    --panel: rgba(16, 21, 34, 0.92);
+    --panel-soft: rgba(12, 17, 28, 0.9);
+    --panel-highlight: rgba(24, 32, 53, 0.9);
+    --line: rgba(117, 140, 186, 0.18);
+    --line-strong: rgba(124, 156, 255, 0.35);
+    --text: #f4f6ff;
+    --muted: #8f9cc4;
+    --soft: #5c688d;
+    --brand: #8fa6ff;
+    --brand-2: #3fe9cb;
+    --green: #28d4a6;
+    --yellow: #ffd266;
+    --orange: #ff9b5c;
+    --red: #ff7b87;
+    --blue: #6fb6ff;
+    --purple: #b198ff;
+    --shadow: 0 30px 80px rgba(2, 4, 10, 0.64);
+  }
 
-  /* Theme */
-  body.light { background: #f8fafc; color: #1e293b; }
-  body.light .stat, body.light .table-wrap, body.light .card, body.light .budget-policy { background: #fff; border-color: #e2e8f0; }
-  body.light .stat-label, body.light .muted, body.light .notes, body.light .date { color: #64748b; }
-  body.light .stat-value, body.light h1, body.light .task-title { color: #1e293b; }
-  body.light .section-title { color: #475569; }
-  body.light .tab { color: #64748b; }
-  body.light .tab.active { background: #fff; border-color: #e2e8f0; color: #1e293b; }
-  body.light .tab:hover { background: #f1f5f9; }
-  body.light thead th { color: #94a3b8; border-color: #e2e8f0; }
-  body.light tbody tr { border-color: #f8fafc; }
-  body.light tbody tr:hover { background: #f1f5f9; }
-  body.light td { color: #334155; }
-  body.light .tabs { border-color: #e2e8f0; }
-  body.light .entity-section .card { background: #f8fafc; border-color: #e2e8f0; }
-  body.light .card-row { border-color: #f1f5f9; }
-  body.light .card-title { color: #94a3b8; }
-  body.light .budget-policy-title { color: #475569; }
-  body.light .policy-desc { color: #64748b; }
-  body.light .footer { color: #cbd5e1; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background:
+      radial-gradient(60% 120% at 90% 10%, rgba(110, 152, 255, 0.12), transparent 55%),
+      radial-gradient(80% 90% at 10% 90%, rgba(63, 233, 203, 0.1), transparent 60%),
+      linear-gradient(135deg, #05070f, #0b1527 75%);
+    color: var(--text);
+    min-height: 100vh;
+  }
 
-  /* Theme toggle */
-  .theme-toggle { display: flex; gap: 4px; align-items: center; }
-  .theme-btn { font-size: 0.68rem; font-weight: 600; padding: 4px 10px; border-radius: 5px; border: 1px solid #1e2736; background: transparent; color: #475569; cursor: pointer; transition: all 0.15s; }
-  .theme-btn:hover { border-color: #475569; color: #94a3b8; }
-  .theme-btn.active { background: #1e2736; color: #f8fafc; border-color: #334155; }
-  body.light .theme-btn { border-color: #e2e8f0; color: #94a3b8; }
-  body.light .theme-btn:hover { border-color: #94a3b8; color: #475569; }
-  body.light .theme-btn.active { background: #e2e8f0; color: #1e293b; border-color: #cbd5e1; }
+  a { color: inherit; }
 
-  /* Header */
-  .header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }
-  .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-  h1 { font-size: 1.5rem; font-weight: 800; color: #f8fafc; letter-spacing: -0.03em; }
-  .version { font-size: 0.7rem; color: #334155; background: #161b26; border: 1px solid #1e2736; border-radius: 4px; padding: 2px 7px; }
-  .subtitle { font-size: 0.75rem; color: #475569; margin-bottom: 20px; }
+  .app {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+  }
 
-  /* Tabs */
-  .tabs { display: flex; gap: 4px; margin-bottom: 28px; border-bottom: 1px solid #1e2736; padding-bottom: 0; }
-  .tab { padding: 8px 18px; font-size: 0.78rem; font-weight: 600; color: #475569; cursor: pointer; border-radius: 7px 7px 0 0; border: 1px solid transparent; border-bottom: none; transition: all 0.15s; }
-  .tab:hover { color: #94a3b8; background: #161b26; }
-  .tab.active { color: #f8fafc; background: #161b26; border-color: #1e2736; border-bottom-color: #161b26; margin-bottom: -1px; }
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding: 28px 20px 20px;
+    background: rgba(3, 6, 14, 0.85);
+    border-right: 1px solid rgba(255,255,255,0.04);
+    backdrop-filter: blur(26px);
+  }
 
-  /* Tab content */
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
 
-  /* Stats row */
-  .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 32px; }
-  .stat { background: #161b26; border: 1px solid #1e2736; border-radius: 10px; padding: 16px; }
-  .stat-label { font-size: 0.68rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-  .stat-value { font-size: 1.7rem; font-weight: 700; color: #f8fafc; }
-  .stat-sub { font-size: 0.68rem; color: #334155; margin-top: 2px; }
+  .brand-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(130deg, rgba(143,166,255,0.4), rgba(63,233,203,0.18));
+    border: 1px solid rgba(143,166,255,0.5);
+    box-shadow: var(--shadow);
+    font-size: 22px;
+  }
 
-  /* Finance stats */
-  .fin-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 32px; }
+  .brand h1 {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: -.03em;
+  }
 
-  /* Section headers */
-  .section { margin-bottom: 32px; }
-  .section-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .section-title .pill { font-size: 0.65rem; background: #1e2736; color: #64748b; border-radius: 10px; padding: 2px 8px; font-weight: 500; text-transform: none; letter-spacing: 0; }
+  .brand p,
+  .meta-line,
+  .section-kicker,
+  .muted,
+  .nav-group-label,
+  .helper,
+  .subtext,
+  .tree-note,
+  .list-meta,
+  .tiny,
+  .footnote,
+  .calendar-sub,
+  .cost-sub,
+  .agent-sub {
+    color: var(--muted);
+  }
 
-  /* Tables */
-  .table-wrap { background: #0d0f14; border: 1px solid #1e2736; border-radius: 12px; overflow: hidden; }
-  table { width: 100%; border-collapse: collapse; }
-  thead th { text-align: left; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: #334155; padding: 10px 14px; border-bottom: 1px solid #1e2736; }
-  tbody tr { border-bottom: 1px solid #0d0f14; transition: background 0.1s; }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: #161b26; }
-  td { padding: 12px 14px; font-size: 0.81rem; vertical-align: top; }
+  .brand p {
+    margin: 3px 0 0;
+    font-size: 12px;
+  }
 
-  /* Badges */
-  .company-tag { display: inline-block; background: #1e2736; color: #94a3b8; border-radius: 4px; padding: 2px 7px; font-size: 0.68rem; font-weight: 500; }
-  .badge { display: inline-block; border-radius: 5px; padding: 3px 9px; font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-  .s-active    { background: #052e16; color: #4ade80; border: 1px solid #166534; }
-  .s-todo      { background: #1e1b4b; color: #a78bfa; border: 1px solid #3730a3; }
-  .s-paused    { background: #1c1107; color: #fb923c; border: 1px solid #7c2d12; }
-  .s-done      { background: #0c1a2e; color: #38bdf8; border: 1px solid #075985; }
-  .s-killed    { background: #1c0a0a; color: #f87171; border: 1px solid #7f1d1d; }
-  .s-scoping   { background: #1a1207; color: #fbbf24; border: 1px solid #78350f; }
-  .s-proposed  { background: #0f1a2e; color: #60a5fa; border: 1px solid #1d4ed8; }
-  .s-viable    { background: #052e16; color: #4ade80; border: 1px solid #166534; }
-  .s-tbd       { background: #1a1a1a; color: #475569; border: 1px solid #334155; }
+  .command-box {
+    background: linear-gradient(180deg, rgba(143,166,255,0.12), rgba(9,14,29,0.9));
+    border: 1px solid var(--line-strong);
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+  }
 
-  .priority-high   { color: #f87171; font-weight: 600; }
-  .priority-medium { color: #fb923c; }
-  .priority-low    { color: #64748b; }
-  .rev { color: #fbbf24; font-weight: 700; letter-spacing: 0.05em; }
-  .owner { color: #818cf8; font-weight: 700; }
-  .task-title { font-weight: 500; color: #e2e8f0; }
-  .notes { color: #64748b; font-size: 0.73rem; max-width: 260px; line-height: 1.5; }
-  .date { color: #475569; font-size: 0.68rem; }
-  .promo-note { font-size: 0.72rem; color: #334155; font-style: italic; margin-top: 8px; padding: 8px 14px; border-left: 2px solid #1e2736; }
+  .command-box strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
 
-  /* Finance-specific */
-  .num { font-variant-numeric: tabular-nums; }
-  .num-pos { color: #4ade80; font-weight: 600; }
-  .num-neg { color: #f87171; font-weight: 600; }
-  .num-zero { color: #475569; }
-  .num-tbd { color: #334155; font-style: italic; }
-  .budget-bar-wrap { background: #0d0f14; border-radius: 4px; height: 6px; width: 120px; overflow: hidden; margin-top: 4px; }
-  .budget-bar { height: 100%; background: #818cf8; border-radius: 4px; transition: width 0.3s; }
-  .budget-bar.over { background: #f87171; }
-  .alloc-model { display: flex; gap: 8px; align-items: center; font-size: 0.72rem; }
-  .alloc-infra { background: #1e1b4b; color: #a78bfa; border-radius: 4px; padding: 2px 8px; font-weight: 600; }
-  .alloc-mkt   { background: #052e16; color: #4ade80; border-radius: 4px; padding: 2px 8px; font-weight: 600; }
-  .entity-section { margin-bottom: 28px; }
-  .entity-header { font-size: 0.85rem; font-weight: 700; color: #f8fafc; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-  .entity-header .dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; }
-  .entity-header .dot.dormant { background: #334155; }
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-  .card { background: #161b26; border: 1px solid #1e2736; border-radius: 10px; padding: 16px; }
-  .card-title { font-size: 0.66rem; color: #475569; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
-  .card-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; padding: 4px 0; border-bottom: 1px solid #0d0f14; }
-  .card-row:last-child { border-bottom: none; }
-  .card-row .label { color: #64748b; }
-  .divider { height: 1px; background: #1e2736; margin: 24px 0; }
-  .reinvest-tag { display: inline-block; background: #1a1207; color: #fbbf24; border: 1px solid #78350f; border-radius: 4px; padding: 2px 7px; font-size: 0.65rem; font-weight: 600; }
-  .budget-policy { background: #161b26; border: 1px solid #1e2736; border-radius: 10px; padding: 18px; margin-bottom: 28px; }
-  .budget-policy-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8; margin-bottom: 12px; }
-  .policy-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; font-size: 0.8rem; }
-  .policy-pct { font-size: 1.3rem; font-weight: 800; min-width: 52px; }
-  .policy-pct.infra { color: #a78bfa; }
-  .policy-pct.mkt { color: #4ade80; }
-  .policy-desc { color: #64748b; font-size: 0.75rem; }
-  .floor-note { font-size: 0.7rem; color: #fbbf24; background: #1a1207; border: 1px solid #78350f; border-radius: 5px; padding: 6px 12px; margin-top: 10px; display: inline-block; }
+  .command-box .helper {
+    font-size: 12px;
+    line-height: 1.45;
+  }
 
-  .stat-bar-wrap { background: #0d0f14; border-radius: 4px; height: 5px; width: 100%; overflow: hidden; margin-top: 6px; }
-  .stat-bar { height: 100%; border-radius: 4px; transition: width 0.5s; }
-  .stat-bar.red { background: #f87171; }
-  .stat-bar.yellow { background: #fbbf24; }
-  .stat-bar.green { background: #4ade80; }
-  .footer { margin-top: 24px; font-size: 0.66rem; color: #1e2736; text-align: right; }
+  .nav-group-label {
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin: 16px 10px 8px;
+  }
 
-  /* Tools */
-  .tools-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 28px; }
-  .tool-card { background: #161b26; border: 1px solid #1e2736; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
-  .tool-head { display: flex; align-items: center; gap: 12px; }
-  .tool-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #1e2736; font-size: 1.3rem; }
-  .tool-name { font-size: 0.92rem; font-weight: 700; color: #f8fafc; }
-  .tool-desc { color: #64748b; font-size: 0.76rem; line-height: 1.55; }
-  .tool-meta { display: flex; gap: 8px; flex-wrap: wrap; }
-  .tool-chip { display: inline-block; border-radius: 999px; padding: 3px 8px; font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: #0f172a; color: #93c5fd; border: 1px solid #1e3a8a; }
-  .tool-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
-  .tool-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 8px; border: 1px solid #1e2736; background: #0d0f14; color: #e2e8f0; text-decoration: none; font-size: 0.76rem; font-weight: 700; cursor: pointer; }
-  .tool-btn:hover { background: #1e2736; }
-  .tool-btn.primary { background: #818cf8; border-color: #818cf8; color: #fff; }
-  .tool-btn.primary:hover { background: #6366f1; }
-  .tool-box { background: #161b26; border: 1px solid #1e2736; border-radius: 12px; padding: 18px; }
-  .tool-list { margin-top: 10px; padding-left: 18px; color: #94a3b8; font-size: 0.78rem; line-height: 1.7; }
+  .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
 
-  body.light .tool-card, body.light .tool-box { background: #fff; border-color: #e2e8f0; }
-  body.light .tool-icon { background: #f1f5f9; }
-  body.light .tool-name { color: #1e293b; }
-  body.light .tool-btn { background: #fff; border-color: #e2e8f0; color: #1e293b; }
-  body.light .tool-btn:hover { background: #f8fafc; }
-  body.light .tool-btn.primary { background: #818cf8; border-color: #818cf8; color: #fff; }
-  body.light .tool-chip { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+  .nav-btn {
+    width: 100%;
+    border: 1px solid rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.01);
+    color: var(--text);
+    text-align: left;
+    padding: 12px 14px;
+    border-radius: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    transition: border-color .18s ease, background .18s ease;
+    font-weight: 600;
+  }
+
+  .nav-btn:hover {
+    border-color: rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+  }
+
+  .nav-btn.active {
+    background: linear-gradient(140deg, rgba(143,166,255,0.3), rgba(63,233,203,0.18));
+    border-color: var(--line-strong);
+    color: white;
+    box-shadow: 0 12px 30px rgba(6,11,24,0.4);
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .nav-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.04);
+    flex: 0 0 auto;
+  }
+
+  .nav-count {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+    color: var(--muted);
+  }
+
+  .sidebar-footer {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 18px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .mini-card {
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 14px;
+  }
+
+  .mini-card .label {
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .mini-card .value {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+  }
+
+  .main {
+    padding: 32px;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+
+  .page-title {
+    font-size: 34px;
+    font-weight: 860;
+    letter-spacing: -.04em;
+    margin: 0 0 10px;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 13px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .btn {
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(7, 11, 21, 0.7);
+    color: var(--text);
+    border-radius: 999px;
+    padding: 11px 18px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: -.01em;
+    transition: transform .18s ease, background .18s ease, border-color .18s ease;
+  }
+
+  .btn:hover { transform: translateY(-1px); border-color: rgba(255,255,255,0.25); }
+
+  .btn.primary {
+    background: linear-gradient(120deg, #8fa6ff, #3fe9cb);
+    border-color: transparent;
+    color: #02050e;
+    box-shadow: 0 10px 30px rgba(63, 233, 203, 0.25);
+  }
+
+  .btn.ghost {
+    background: transparent;
+    border-color: rgba(255,255,255,0.14);
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .hero-grid,
+  .card-grid,
+  .jobs-grid,
+  .split,
+  .triple,
+  .quad,
+  .vault-grid,
+  .tools-grid,
+  .cost-grid,
+  .factory-grid,
+  .team-grid,
+  .agent-grid {
+    display: grid;
+    gap: 16px;
+  }
+
+  .hero-grid { grid-template-columns: 1.25fr .75fr; margin-bottom: 18px; }
+  .card-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 18px; }
+  .jobs-grid { grid-template-columns: 1.3fr .7fr; margin-bottom: 18px; }
+  .split { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 18px; }
+  .triple { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 18px; }
+  .quad { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 18px; }
+  .vault-grid { grid-template-columns: 310px 1fr; margin-bottom: 18px; }
+  .tools-grid { grid-template-columns: 1.1fr .9fr .9fr; margin-bottom: 18px; }
+  .cost-grid { grid-template-columns: 1.1fr .9fr; margin-bottom: 18px; }
+  .factory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 18px; }
+  .team-grid { grid-template-columns: 1fr 1fr; margin-bottom: 18px; }
+  .agent-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 18px; }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+  }
+
+  .panel.soft {
+    background: var(--panel-soft);
+  }
+
+  .panel.highlight {
+    background: var(--panel-highlight);
+    border-color: var(--line-strong);
+  }
+
+  .panel-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .panel-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+  }
+
+  .section-kicker {
+    margin: 0 0 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .14em;
+  }
+
+  .headline {
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -.06em;
+    margin: 8px 0 12px;
+    font-weight: 900;
+  }
+
+  .subtext {
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 60ch;
+  }
+
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+  .metric {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .metric .label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    margin-bottom: 8px;
+  }
+
+  .metric .value {
+    font-size: 30px;
+    font-weight: 850;
+    letter-spacing: -.04em;
+    margin-bottom: 4px;
+  }
+
+  .metric .tiny { font-size: 12px; }
+
+  .bar,
+  .mini-bar,
+  .stack-bar {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+  }
+
+  .bar { height: 10px; margin-top: 10px; }
+  .mini-bar { height: 8px; }
+  .stack-bar { height: 12px; display: flex; }
+
+  .fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--brand), #99aeff);
+  }
+
+  .fill.green { background: linear-gradient(90deg, #1fbf85, #4ade80); }
+  .fill.yellow { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+  .fill.red { background: linear-gradient(90deg, #ef4444, #f87171); }
+  .fill.blue { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+  .fill.purple { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+
+  .stack-seg { height: 100%; }
+  .stack-seg.infra { background: var(--purple); }
+  .stack-seg.models { background: var(--brand); }
+  .stack-seg.ops { background: var(--green); }
+  .stack-seg.mkt { background: var(--yellow); }
+
+  .status-pill,
+  .small-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+
+  .status-pill {
+    padding: 8px 12px;
+    font-size: 12px;
+    border: 1px solid transparent;
+  }
+
+  .small-pill {
+    padding: 5px 9px;
+    font-size: 11px;
+    border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.04);
+    color: var(--muted);
+  }
+
+  .ok { color: var(--green); background: rgba(52,211,153,.1); border-color: rgba(52,211,153,.25); }
+  .warn { color: var(--yellow); background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.25); }
+  .risk { color: var(--red); background: rgba(248,113,113,.1); border-color: rgba(248,113,113,.24); }
+  .info { color: var(--blue); background: rgba(96,165,250,.1); border-color: rgba(96,165,250,.22); }
+  .violet { color: var(--purple); background: rgba(167,139,250,.1); border-color: rgba(167,139,250,.24); }
+
+  .list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .list-item,
+  .job-row,
+  .agent-row,
+  .cost-row,
+  .tool-row,
+  .calendar-row,
+  .vault-item,
+  .doc-row,
+  .team-row,
+  .factory-row,
+  .signal-row {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+
+  .list-item:last-child,
+  .job-row:last-child,
+  .agent-row:last-child,
+  .cost-row:last-child,
+  .tool-row:last-child,
+  .calendar-row:last-child,
+  .vault-item:last-child,
+  .doc-row:last-child,
+  .team-row:last-child,
+  .factory-row:last-child,
+  .signal-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .row-title,
+  .job-title,
+  .agent-name,
+  .doc-title,
+  .tool-name,
+  .factory-name,
+  .team-name {
+    font-weight: 760;
+    letter-spacing: -.02em;
+  }
+
+  .job-title { margin-bottom: 8px; }
+  .job-meta,
+  .agent-meta,
+  .doc-meta,
+  .calendar-sub,
+  .cost-sub,
+  .team-meta { font-size: 12px; color: var(--muted); }
+
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+  .focus-box {
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(124,156,255,.22);
+    background: linear-gradient(180deg, rgba(124,156,255,.08), rgba(124,156,255,.03));
+  }
+
+  .focus-title {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 850;
+    letter-spacing: -.03em;
+  }
+
+  .focus-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .focus-stat {
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 14px;
+    padding: 12px;
+  }
+
+  .focus-stat .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .14em; }
+  .focus-stat .v { margin-top: 8px; font-size: 20px; font-weight: 820; letter-spacing: -.03em; }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .kpi {
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 14px;
+    padding: 14px;
+  }
+
+  .kpi .l { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .kpi .v { margin-top: 10px; font-size: 26px; font-weight: 850; letter-spacing: -.04em; }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .table th,
+  .table td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    vertical-align: top;
+  }
+
+  .table tr:last-child td { border-bottom: none; }
+  .table th {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .14em;
+    font-weight: 700;
+  }
+
+  .table td { font-size: 14px; }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .tree {
+    display: grid;
+    gap: 10px;
+  }
+
+  .tree-group {
+    border: 1px solid rgba(255,255,255,.05);
+    background: rgba(255,255,255,.02);
+    border-radius: 14px;
+    padding: 12px;
+  }
+
+  .tree-group strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+  }
+
+  .tree-group ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 8px;
+  }
+
+  .tree-group li {
+    font-size: 13px;
+    color: var(--muted);
+    padding-left: 12px;
+    position: relative;
+  }
+
+  .tree-group li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--brand);
+  }
+
+  .tool-surface {
+    border: 1px solid rgba(63,233,203,0.22);
+    background: linear-gradient(160deg, rgba(63,233,203,0.12), rgba(10,18,30,0.95));
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+  }
+
+  .launcher-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .launcher-card {
+    background: rgba(8,12,24,0.85);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 22px;
+    padding: 22px;
+    box-shadow: 0 18px 40px rgba(4,7,18,0.55);
+  }
+
+  .launcher-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .launcher-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(140deg, rgba(143,166,255,0.35), rgba(63,233,203,0.2));
+    border: 1px solid rgba(143,166,255,0.4);
+    font-size: 24px;
+    flex: 0 0 auto;
+  }
+
+  .launcher-title {
+    font-size: 18px;
+    font-weight: 820;
+    letter-spacing: -.03em;
+    margin-bottom: 4px;
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: .04em;
+  }
+
+  .launcher-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .launcher-actions .btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .day {
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 14px;
+    min-height: 112px;
+    padding: 10px;
+  }
+
+  .day .d {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .event {
+    background: rgba(124,156,255,.12);
+    border: 1px solid rgba(124,156,255,.2);
+    color: #dce5ff;
+    border-radius: 10px;
+    padding: 7px 8px;
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+
+  .event.ops { background: rgba(80,227,194,.1); border-color: rgba(80,227,194,.18); color: #d9fff8; }
+  .event.risk { background: rgba(248,113,113,.1); border-color: rgba(248,113,113,.18); color: #ffe0e0; }
+
+  .footer-note {
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--soft);
+  }
+
+  @media (max-width: 1280px) {
+    .card-grid, .quad, .agent-grid, .factory-grid, .triple { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hero-grid, .jobs-grid, .split, .vault-grid, .cost-grid, .team-grid, .tools-grid { grid-template-columns: 1fr; }
+    .calendar-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 980px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar {
+      position: relative;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--line);
+    }
+    .sidebar-footer { position: static; margin-top: 18px; }
+  }
+
+  @media (max-width: 720px) {
+    .main { padding: 16px; }
+    .sidebar { padding: 16px; }
+    .card-grid, .quad, .agent-grid, .factory-grid, .triple, .focus-grid, .calendar-grid, .kpi-grid { grid-template-columns: 1fr; }
+    .page-title { font-size: 26px; }
+    .headline { font-size: 34px; }
+    .table { display: block; overflow-x: auto; }
+  }
 </style>
 </head>
 <body>
-
-<div class="header-row">
-  <div class="header">
-    <h1>🧭 Q-Dashboard</h1>
-    <span class="version">v1.7</span>
-  </div>
-  <div class="theme-toggle">
-    <button class="theme-btn" onclick="setTheme('system')" id="btn-system">System</button>
-    <button class="theme-btn" onclick="setTheme('dark')" id="btn-dark">⚫ Dark</button>
-    <button class="theme-btn active" onclick="setTheme('light')" id="btn-light">⚪ Light</button>
-  </div>
-</div>
-<p class="subtitle">Last updated: 2026-03-17 · Maintained by Q · Autonomy target: 30% · MRR target: €1M+</p>
-
-<!-- Tab Nav -->
-<div class="tabs">
-  <div class="tab active" onclick="showTab('overview', this)">📋 Overview</div>
-  <div class="tab" onclick="showTab('finance', this)">💶 Finance</div>
-  <div class="tab" onclick="showTab('revenue-lab', this)">🧪 Revenue Lab</div>
-  <div class="tab" onclick="showTab('tools', this)">🧰 Tools</div>
-</div>
-
-<!-- ===== TAB: OVERVIEW ===== -->
-<div id="tab-overview" class="tab-content active">
-
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-label">Autonomy Level</div>
-      <div class="stat-value" id="autonomy-level" style="color:#fbbf24">8%</div>
-      <div class="stat-sub">target: 30%</div>
-      <div class="stat-bar-wrap"><div class="stat-bar yellow" id="autonomy-bar" style="width:27%"></div></div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Autonomy Utilization</div>
-      <div class="stat-value" id="autonomy-util" style="color:#818cf8">5%</div>
-      <div class="stat-sub">hours/24h autonomous</div>
-      <div class="stat-bar-wrap"><div class="stat-bar red" id="util-bar" style="width:5%"></div></div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Portfolio Tasks</div>
-      <div class="stat-value">12</div>
-      <div class="stat-sub">across all companies</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Active</div>
-      <div class="stat-value" style="color:#4ade80">2</div>
-      <div class="stat-sub">in progress</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Revenue Lab</div>
-      <div class="stat-value" style="color:#fbbf24">3</div>
-      <div class="stat-sub">experiments proposed</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Portfolio MRR</div>
-      <div class="stat-value" style="color:#f87171">€0</div>
-      <div class="stat-sub">target: €1M+</div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Portfolio Tasks <span class="pill">12 items</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th><th>Task</th><th>Company</th><th>Status</th><th>Priority</th><th>Rev</th><th>Owner</th><th>Notes</th><th>Updated</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td><td class="task-title">Navexela landing stack + GTM assets</td>
-            <td><span class="company-tag">Navexela</span></td>
-            <td><span class="badge s-todo">Todo</span></td>
-            <td class="priority-high">High</td><td class="rev">€€€</td><td class="owner">Q</td>
-            <td class="notes">Landing page, lead gen, CRM sheet. Needs D. to confirm positioning.</td>
-            <td class="date">2026-03-12</td>
-          </tr>
-          <tr>
-            <td>2</td><td class="task-title">DID Services sales activation</td>
-            <td><span class="company-tag">DID Services</span></td>
-            <td><span class="badge s-todo">Todo</span></td>
-            <td class="priority-high">High</td><td class="rev">€€€</td><td class="owner">Q</td>
-            <td class="notes">Identify leads, outreach templates, pipeline setup.</td>
-            <td class="date">2026-03-12</td>
-          </tr>
-          <tr>
-            <td>3</td><td class="task-title">Voltenum sales activation</td>
-            <td><span class="company-tag">Voltenum</span></td>
-            <td><span class="badge s-todo">Todo</span></td>
-            <td class="priority-high">High</td><td class="rev">€€€</td><td class="owner">Q</td>
-            <td class="notes">Odoo CRM active. Define offer, ICP, outreach sequence.</td>
-            <td class="date">2026-03-12</td>
-          </tr>
-          <tr>
-            <td>4</td><td class="task-title">Wickey PM automation</td>
-            <td><span class="company-tag">Wickey</span></td>
-            <td><span class="badge s-todo">Todo</span></td>
-            <td class="priority-medium">Medium</td><td class="rev">€€</td><td class="owner">Q</td>
-            <td class="notes">Document + automate recurring PM workflows.</td>
-            <td class="date">2026-03-12</td>
-          </tr>
-          <tr>
-            <td>5</td><td class="task-title">Nightly restic backups</td>
-            <td><span class="company-tag">Ops</span></td>
-            <td><span class="badge s-todo">Todo</span></td>
-            <td class="priority-medium">Medium</td><td class="rev">—</td><td class="owner">Q</td>
-            <td class="notes">Configure + document restore steps.</td>
-            <td class="date">2026-03-12</td>
-          </tr>
-          <tr>
-            <td>6</td><td class="task-title">Q-Dashboard build</td>
-            <td><span class="company-tag">Portfolio</span></td>
-            <td><span class="badge s-active">Active</span></td>
-            <td class="priority-high">High</td><td class="rev">€€</td><td class="owner">Q</td>
-            <td class="notes">Revenue targets, pipelines, autonomy KPIs. v1.5: autonomy level + utilization metrics added.</td>
-            <td class="date">2026-03-15</td>
-          </tr>
-          <tr>
-            <td>11</td><td class="task-title">Rompelberg follow-up (Voltenum)</td>
-            <td><span class="company-tag">Voltenum</span></td>
-            <td><span class="badge s-todo">Parked</span></td>
-            <td class="priority-high">High</td><td class="rev">€€€</td><td class="owner">D./Q</td>
-            <td class="notes">Follow up on this week’s Rompelberg customer conversation. Not attached to a formal project yet. Next: confirm CSV data delivery + next meeting + proposal/rapport timeline.</td>
-            <td class="date">2026-03-12</td>
-          </tr>
-          <tr>
-            <td>12</td><td class="task-title">Odoo API integration (Voltenum)</td>
-            <td><span class="company-tag">Voltenum</span></td>
-            <td><span class="badge s-todo">Parked</span></td>
-            <td class="priority-medium">Medium</td><td class="rev">€€</td><td class="owner">Q</td>
-            <td class="notes">Estimate: 1–2h for lead creation from landing → Odoo CRM once URL + API key exist. 0.5–1 day for content queue + approval. 1–3 days if Social Marketing posting is included (depends on module + permissions). Parked pending decision + credentials.</td>
-            <td class="date">2026-03-12</td>
-          </tr>
-          <tr>
-            <td>10</td><td class="task-title">Obsidian vault semantic search</td>
-            <td><span class="company-tag">Ops</span></td>
-            <td><span class="badge s-todo">Parked</span></td>
-            <td class="priority-high">High</td><td class="rev">€€</td><td class="owner">Q</td>
-            <td class="notes">Index 2,800+ vault notes with OpenAI embeddings + SQLite vector store. Nightly rebuild at 3am. Needs: Mac + vault path. Unlocks full second-brain access for Q across all sessions.</td>
-            <td class="date">2026-03-12</td>
-          </tr>
-          <tr>
-            <td>9</td><td class="task-title">WhatsApp channel link</td>
-            <td><span class="company-tag">Ops</span></td>
-            <td><span class="badge s-todo">Parked</span></td>
-            <td class="priority-medium">Medium</td><td class="rev">—</td><td class="owner">Q</td>
-            <td class="notes">Needs Mac + phone. Run: openclaw channels login --channel whatsapp → scan QR in WhatsApp Linked Devices. Rule: delegates only — Q does not live in WhatsApp.</td>
-            <td class="date">2026-03-12</td>
-          </tr>
-          <tr>
-            <td>8</td><td class="task-title">Coolify setup on VPS</td>
-            <td><span class="company-tag">Ops</span></td>
-            <td><span class="badge s-todo">Parked</span></td>
-            <td class="priority-medium">Medium</td><td class="rev">—</td><td class="owner">Q</td>
-            <td class="notes">Self-hosted PaaS for GPM-e stack. Needs: open ports 80+443 in Hostinger hPanel → Q installs. Domain gpm-e.com TBD. Q has SSH + will have Coolify API access. Ops rules: monitoring/logs = do freely; destructive actions = ask first; migrations = plan → approve → execute.</td>
-            <td class="date">2026-03-12</td>
-          </tr>
-          <tr>
-            <td>7</td><td class="task-title">Grachten Holding — Revenue Lab entity setup</td>
-            <td><span class="company-tag" style="background:#1a1207;color:#fbbf24;">Grachten</span></td>
-            <td><span class="badge s-active">Active</span></td>
-            <td class="priority-high">High</td><td class="rev">€€€€</td><td class="owner">Q</td>
-            <td class="notes">Holding vehicle for all Revenue Lab projects. Viable POCs move here.</td>
-            <td class="date">2026-03-12</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-</div>
-
-<!-- ===== TAB: FINANCE ===== -->
-<div id="tab-finance" class="tab-content">
-
-  <!-- Portfolio Totals -->
-  <div class="fin-stats">
-    <div class="stat">
-      <div class="stat-label">Portfolio MRR</div>
-      <div class="stat-value num-zero">€0</div>
-      <div class="stat-sub">target: €1M+</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Total OpEx / mo</div>
-      <div class="stat-value num-zero">€0</div>
-      <div class="stat-sub">recurring costs</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Total CapEx</div>
-      <div class="stat-value num-zero">€0</div>
-      <div class="stat-sub">one-time builds</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Net Margin</div>
-      <div class="stat-value num-zero">—</div>
-      <div class="stat-sub">revenue - costs</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Infra Budget Used</div>
-      <div class="stat-value num-zero">€0</div>
-      <div class="stat-sub">5% floor: €100/mo</div>
-    </div>
-  </div>
-
-  <!-- Budget Policy -->
-  <div class="budget-policy">
-    <div class="budget-policy-title">📐 Group Budget Allocation Policy</div>
-    <div class="policy-row">
-      <div class="policy-pct infra">5%</div>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-badge">🧭</div>
       <div>
-        <div style="color:#a78bfa;font-weight:600;font-size:0.8rem;">Infrastructure &amp; Agent CapEx/OpEx</div>
-        <div class="policy-desc">Q agents, tokens, APIs, hosting, automation builds. Reinvested to compound autonomy. Shared cost allocated pro-rata by entity revenue share.</div>
+        <h1>Q Mission Control</h1>
+        <p>Operator cockpit for D.'s portfolio</p>
       </div>
     </div>
-    <div class="policy-row">
-      <div class="policy-pct mkt">95%</div>
+
+    <div class="command-box">
+      <strong>Current mandate</strong>
+      <div class="helper">Increase revenue. Save CEO time. Remove manual work. Keep the operating picture visible.</div>
+    </div>
+
+    <div class="nav-group-label">Control Plane</div>
+    <nav class="nav" id="nav">
+      <button class="nav-btn active" data-view="overview"><span class="nav-left"><span class="nav-icon">◉</span><span>Overview</span></span><span class="nav-count">Live</span></button>
+      <button class="nav-btn" data-view="jobs"><span class="nav-left"><span class="nav-icon">▣</span><span>Jobs</span></span><span class="nav-count">12</span></button>
+      <button class="nav-btn" data-view="agents"><span class="nav-left"><span class="nav-icon">◌</span><span>Agents</span></span><span class="nav-count">8</span></button>
+      <button class="nav-btn" data-view="team"><span class="nav-left"><span class="nav-icon">◎</span><span>Team</span></span><span class="nav-count">6</span></button>
+      <button class="nav-btn" data-view="factories"><span class="nav-left"><span class="nav-icon">▤</span><span>Factories</span></span><span class="nav-count">4</span></button>
+      <button class="nav-btn" data-view="content-factory"><span class="nav-left"><span class="nav-icon">🏭</span><span>Content Factory</span></span><span class="nav-count">New</span></button>
+      <button class="nav-btn" data-view="ideas"><span class="nav-left"><span class="nav-icon">💡</span><span>Brain Dumps</span></span><span class="nav-count">8</span></button>
+      <button class="nav-btn" data-view="tools"><span class="nav-left"><span class="nav-icon">⌘</span><span>Tools</span></span><span class="nav-count">Native</span></button>
+      <button class="nav-btn" data-view="memory"><span class="nav-left"><span class="nav-icon">◈</span><span>Memory</span></span><span class="nav-count">Vault</span></button>
+      <button class="nav-btn" data-view="docs"><span class="nav-left"><span class="nav-icon">☰</span><span>Docs</span></span><span class="nav-count">Ops</span></button>
+      <button class="nav-btn" data-view="costs"><span class="nav-left"><span class="nav-icon">€</span><span>Costs</span></span><span class="nav-count">Tracked</span></button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="mini-card">
+        <div class="label">Task Focus</div>
+        <div class="value">Revenue activation</div>
+        <div class="helper">Navexela, DID, Voltenum</div>
+      </div>
+      <div class="mini-card">
+        <div class="label">Operator Load</div>
+        <div class="value">72%</div>
+        <div class="mini-bar"><div class="fill yellow" style="width:72%"></div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
       <div>
-        <div style="color:#4ade80;font-weight:600;font-size:0.8rem;">Marketing &amp; Distribution</div>
-        <div class="policy-desc">Paid ads, outreach tooling, content tokens, virality, lead gen. Per-entity. Tracked as frontend (customer-facing) vs backend (tooling).</div>
+        <div class="section-kicker">Native control interface</div>
+        <h2 class="page-title" id="page-title">Overview</h2>
+        <div class="meta-row">
+          <span class="chip">Last updated: 2026-03-18</span>
+          <span class="chip">Maintained by Q</span>
+          <span class="chip">Autonomy target: 30%</span>
+          <span class="chip">Portfolio target: €1M+ MRR</span>
+        </div>
       </div>
-    </div>
-    <div class="floor-note">⚠️ CFO Override — Infrastructure floor: €100/mo minimum regardless of revenue. Prevents zero-budget lockout at early stage. Adjust upward as MRR scales.</div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Per-Entity Finance -->
-
-  <!-- NAVEXELA -->
-  <div class="entity-section">
-    <div class="entity-header"><div class="dot dormant"></div> Navexela UK <span class="badge s-todo">Pre-revenue</span></div>
-    <div class="two-col">
-      <div class="card">
-        <div class="card-title">💰 Revenue</div>
-        <div class="card-row"><span class="label">MRR</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">One-off</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Pipeline</span><span class="num-tbd">TBD</span></div>
-        <div class="card-row"><span class="label">Target MRR</span><span class="num-tbd">TBD</span></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📊 Costs</div>
-        <div class="card-row"><span class="label">CapEx (builds)</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">OpEx/mo (infra)</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Frontend mkt</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Backend tooling</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Net margin</span><span class="num-zero">—</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- VOLTENUM -->
-  <div class="entity-section">
-    <div class="entity-header"><div class="dot dormant"></div> Voltenum <span class="badge s-todo">Pre-revenue</span></div>
-    <div class="two-col">
-      <div class="card">
-        <div class="card-title">💰 Revenue</div>
-        <div class="card-row"><span class="label">MRR</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">One-off</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Pipeline</span><span class="num-tbd">TBD</span></div>
-        <div class="card-row"><span class="label">Target MRR</span><span class="num-tbd">TBD</span></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📊 Costs</div>
-        <div class="card-row"><span class="label">CapEx (builds)</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">OpEx/mo — Odoo</span><span class="num-tbd">TBD</span></div>
-        <div class="card-row"><span class="label">Frontend mkt</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Backend tooling</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Net margin</span><span class="num-zero">—</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DID SERVICES -->
-  <div class="entity-section">
-    <div class="entity-header"><div class="dot dormant"></div> DID Services <span class="badge s-todo">Pre-revenue</span></div>
-    <div class="two-col">
-      <div class="card">
-        <div class="card-title">💰 Revenue</div>
-        <div class="card-row"><span class="label">MRR</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">One-off</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Pipeline</span><span class="num-tbd">TBD</span></div>
-        <div class="card-row"><span class="label">Target MRR</span><span class="num-tbd">TBD</span></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📊 Costs</div>
-        <div class="card-row"><span class="label">CapEx (builds)</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">OpEx/mo (infra)</span><span class="num-tbd">TBD</span></div>
-        <div class="card-row"><span class="label">Frontend mkt</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Backend tooling</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Net margin</span><span class="num-zero">—</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- WICKEY -->
-  <div class="entity-section">
-    <div class="entity-header"><div class="dot dormant"></div> Wickey Consulting <span class="badge s-todo">Pre-revenue tracked</span></div>
-    <div class="two-col">
-      <div class="card">
-        <div class="card-title">💰 Revenue</div>
-        <div class="card-row"><span class="label">MRR</span><span class="num-tbd">TBD</span></div>
-        <div class="card-row"><span class="label">One-off</span><span class="num-tbd">TBD</span></div>
-        <div class="card-row"><span class="label">Pipeline</span><span class="num-tbd">TBD</span></div>
-        <div class="card-row"><span class="label">Target MRR</span><span class="num-tbd">TBD</span></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📊 Costs</div>
-        <div class="card-row"><span class="label">CapEx (builds)</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">OpEx/mo</span><span class="num-tbd">TBD</span></div>
-        <div class="card-row"><span class="label">Frontend mkt</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Backend tooling</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Net margin</span><span class="num-tbd">TBD</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- GRACHTEN HOLDING / REVENUE LAB -->
-  <div class="entity-section">
-    <div class="entity-header"><div class="dot"></div> Grachten Holding (Revenue Lab) <span class="badge s-active">Active</span></div>
-    <div class="two-col">
-      <div class="card">
-        <div class="card-title">💰 Revenue</div>
-        <div class="card-row"><span class="label">MRR</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">One-off</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Pipeline (RL-002–004)</span><span class="num-tbd">Proposed</span></div>
-        <div class="card-row"><span class="label">Target MRR</span><span class="num-tbd">TBD after POC</span></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📊 Costs</div>
-        <div class="card-row"><span class="label">CapEx (builds)</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">OpEx/mo</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Frontend mkt</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Backend tooling</span><span class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Net margin</span><span class="num-zero">—</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Intercompany Allocation -->
-  <div class="section">
-    <div class="section-title">🔁 Intercompany Allocation — Q Infrastructure <span class="pill">Shared costs split pro-rata by revenue</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Entity</th><th>Revenue Share</th><th>Q Infra Allocation</th><th>Notes</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Navexela UK</td><td class="num-tbd">TBD</td><td class="num-tbd">TBD</td><td class="notes">Equal split until revenue data available</td></tr>
-          <tr><td>Voltenum</td><td class="num-tbd">TBD</td><td class="num-tbd">TBD</td><td class="notes">Odoo costs are standalone; only Q agent time shared</td></tr>
-          <tr><td>DID Services</td><td class="num-tbd">TBD</td><td class="num-tbd">TBD</td><td class="notes">DID infra costs are standalone</td></tr>
-          <tr><td>Wickey Consulting</td><td class="num-tbd">TBD</td><td class="num-tbd">TBD</td><td class="notes">—</td></tr>
-          <tr><td>Grachten / Rev Lab</td><td class="num-tbd">TBD</td><td class="num-tbd">TBD</td><td class="notes">—</td></tr>
-          <tr style="border-top:1px solid #1e2736;">
-            <td><strong>Total Q Infra</strong></td>
-            <td>100%</td>
-            <td class="num-tbd">Floor: €100/mo</td>
-            <td class="notes">Scales to 5% of group revenue above floor</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Reinvestment Log -->
-  <div class="section">
-    <div class="section-title">♻️ Reinvestment Log — Q / Agent Upgrades <span class="pill">CapEx for autonomy</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Date</th><th>Item</th><th>Cost</th><th>Type</th><th>ROI Rationale</th><th>Outcome</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="date">2026-03-12</td>
-            <td class="task-title">Q-Dashboard v1.1</td>
-            <td class="num-zero">€0</td>
-            <td><span class="reinvest-tag">CapEx</span></td>
-            <td class="notes">CEO-level visibility across all entities. Reduces manual reporting time.</td>
-            <td class="notes">Built ✅</td>
-          </tr>
-          <tr>
-            <td class="date">2026-03-15</td>
-            <td class="task-title">Q-Dashboard v1.5 — Autonomy metrics</td>
-            <td class="num-zero">€0</td>
-            <td><span class="reinvest-tag">CapEx</span></td>
-            <td class="notes">Autonomy Level % + Utilization %. Track and compound Q's autonomous output. Targets: 30% level, 30% utilization (7.2h/day).</td>
-            <td class="notes">Built ✅</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="promo-note">💡 Every infrastructure spend logged here with ROI rationale. Cumulative reinvestment tracked against time saved and revenue unlocked.</p>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Content Factory Costs -->
-  <div class="section">
-    <div class="section-title">📺 Content Factory — Cost & Revenue Tracker <span class="pill">synced from Content Factory OS</span></div>
-
-    <div class="fin-stats" style="grid-template-columns:repeat(4,1fr)">
-      <div class="stat">
-        <div class="stat-label">Total Posts</div>
-        <div class="stat-value" id="cf-posts" style="color:var(--accent)">0</div>
-        <div class="stat-sub">published live</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Total Spend</div>
-        <div class="stat-value" id="cf-spend" class="num-neg">€0.00</div>
-        <div class="stat-sub">all-in cost</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Affiliate Revenue</div>
-        <div class="stat-value" id="cf-revenue" style="color:var(--green)">€0.00</div>
-        <div class="stat-sub">from affiliate clicks</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Net P&L</div>
-        <div class="stat-value" id="cf-pnl">—</div>
-        <div class="stat-sub" id="cf-pnl-sub">awaiting data</div>
+      <div class="actions">
+        <a class="btn primary" href="#">Open Operator View</a>
+        <a class="btn" href="./tools/diagrams.html">Tool Surface</a>
       </div>
     </div>
 
-    <div class="two-col" style="margin-top:0">
-      <div class="card">
-        <div class="card-title">📊 Cost Breakdown</div>
-        <div class="card-row"><span class="label">Hosting</span><span id="cf-hosting" class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">API (AI)</span><span id="cf-api" class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Tools</span><span id="cf-tools" class="num-zero">€0</span></div>
-        <div class="card-row"><span class="label">Ad Spend</span><span id="cf-ads" class="num-zero">€0</span></div>
-      </div>
-      <div class="card">
-        <div class="card-title">📈 By Platform</div>
-        <div class="card-row"><span class="label">Facebook Reels</span><span id="cf-reels">0 posts · €0</span></div>
-        <div class="card-row"><span class="label">Facebook Carousel</span><span id="cf-carousel">0 posts · €0</span></div>
-        <div class="card-row"><span class="label">Facebook Video</span><span id="cf-video">0 posts · €0</span></div>
-        <div class="card-row"><span class="label">Cost / Post</span><span id="cf-cpp" style="color:var(--accent);font-weight:600">€0.00</span></div>
-      </div>
-    </div>
-
-    <p class="promo-note" style="margin-top:4px"><a href="content-factory/" style="color:var(--accent)">→ Open Content Factory OS</a> for approval workflow, scheduling, and performance tracking per post.</p>
-  </div>
-
-</div>
-
-<!-- ===== TAB: REVENUE LAB ===== -->
-<div id="tab-revenue-lab" class="tab-content">
-
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-label">Proposed</div>
-      <div class="stat-value" style="color:#60a5fa">3</div>
-      <div class="stat-sub">awaiting green light</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Active POC</div>
-      <div class="stat-value" style="color:#fbbf24">0</div>
-      <div class="stat-sub">in testing</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Promoted</div>
-      <div class="stat-value" style="color:#38bdf8">0</div>
-      <div class="stat-sub">POC → portfolio</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Fastest to Cash</div>
-      <div class="stat-value" style="color:#4ade80;font-size:1rem;padding-top:8px">RL-003</div>
-      <div class="stat-sub">1–2 weeks</div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">🧪 Experiment Pipeline <span class="pill">Standalone entities — no shared infra</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>ID</th><th>Experiment</th><th>Stage</th><th>Price Point</th><th>Margin</th><th>Time to Cash</th><th>Upfront Budget</th><th>Turning Point</th><th>Why Strong</th><th>Next Action</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="date">RL-002</td>
-            <td class="task-title">AI Voice Receptionist</td>
-            <td><span class="badge s-proposed">Proposed</span></td>
-            <td>€99–299/mo</td>
-            <td class="num-pos">85–90%</td>
-            <td>2–3 wks</td>
-            <td style="color:#fbbf24;font-weight:600">€300–600</td>
-            <td class="notes">First paying SMB client = break-even. ~3 clients = profitable.</td>
-            <td class="notes">D. owns DID infra — no cold start. SMB demand proven.</td>
-            <td class="notes">Awaiting D. green light</td>
-          </tr>
-          <tr>
-            <td class="date">RL-003</td>
-            <td class="task-title" style="color:#4ade80">⚡ Productized AI Automation Agency</td>
-            <td><span class="badge s-proposed">Proposed</span></td>
-            <td>€500–1,500/mo</td>
-            <td class="num-pos">90%+</td>
-            <td style="color:#4ade80;font-weight:700">1–2 wks</td>
-            <td style="color:#4ade80;font-weight:600">€100–200</td>
-            <td class="notes">First retainer signed = profitable immediately. No build cost.</td>
-            <td class="notes">Zero product build. Q delivers. Warm pipeline from consulting network.</td>
-            <td class="notes">Awaiting D. green light</td>
-          </tr>
-          <tr>
-            <td class="date">RL-004</td>
-            <td class="task-title">Niche AI SaaS Micro-tool</td>
-            <td><span class="badge s-proposed">Proposed</span></td>
-            <td>€29–99/mo</td>
-            <td class="num-pos">95%+</td>
-            <td>3–4 wks</td>
-            <td style="color:#fbbf24;font-weight:600">€300–500</td>
-            <td class="notes">~10–15 paying users = covers infra + tokens. ~50 = self-sustaining.</td>
-            <td class="notes">Compounds over time, low churn, no sales calls at scale.</td>
-            <td class="notes">D. to pick vertical/niche</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">📐 Isolation Rules <span class="pill">Each experiment = own entity, own marketing, own everything</span></div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Rule</th><th>Detail</th></tr>
-        </thead>
-        <tbody>
-          <tr><td class="task-title">Own Legal Entity</td><td class="notes">Each promoted experiment operates under its own company or Grachten subsidiary. No cross-liability.</td></tr>
-          <tr><td class="task-title">Own Brand + Domain</td><td class="notes">Separate brand identity, domain, email, and social presence per experiment.</td></tr>
-          <tr><td class="task-title">Own Marketing Stack</td><td class="notes">Separate ad accounts, landing pages, email sequences, CRM pipeline. No cross-contamination.</td></tr>
-          <tr><td class="task-title">Own Revenue Stream</td><td class="notes">Revenue tracked independently. No revenue pooling until holding-level rollup.</td></tr>
-          <tr><td class="task-title">Shared Infra — Ask First</td><td class="notes">Q infrastructure (APIs, agents) is shared but allocated. Only flag interdependency when operationally relevant.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <p class="promo-note">💡 Viable experiments are promoted to the Finance tab as live entities under Grachten Holding.</p>
-
-</div>
-
-<!-- ===== TAB: TOOLS ===== -->
-<div id="tab-tools" class="tab-content">
-
-  <div class="section">
-    <div class="section-title">Operational Tools <span class="pill">Clickable launchers for recurring work</span></div>
-    <div class="tools-grid">
-      <div class="tool-card">
-        <div class="tool-head">
-          <div class="tool-icon">📐</div>
-          <div>
-            <div class="tool-name">Diagrams</div>
-            <div class="tool-desc">Swimlane-first draw.io tool for Wickey process maps, agent flows, handoffs, and design diagrams.</div>
+    <section class="view active" id="view-overview">
+      <div class="hero-grid">
+        <div class="panel highlight">
+          <div class="section-kicker">Mission status</div>
+          <div class="headline">Run the portfolio like a control room.</div>
+          <div class="subtext">This dashboard is no longer a passive report. It is the native surface for seeing active jobs, focused agents, factory throughput, memory state, tools, docs, and spend — in one place.</div>
+          <div class="hero-actions">
+            <span class="status-pill ok">● Stable enough to operate</span>
+            <span class="status-pill warn">▲ Autonomy still under target</span>
+            <span class="status-pill info">▣ Dashboard v2 structure live</span>
           </div>
         </div>
-        <div class="tool-meta">
-          <span class="tool-chip">Wickey</span>
-          <span class="tool-chip">draw.io</span>
-          <span class="tool-chip">swimlanes</span>
-        </div>
-        <div class="tool-actions">
-          <a class="tool-btn primary" href="tools/diagrams.html">Open tool</a>
-          <a class="tool-btn" href="https://app.diagrams.net/" target="_blank" rel="noopener noreferrer">Open draw.io ↗</a>
-          <button class="tool-btn" onclick="copyDiagramPrompt()">Copy intake prompt</button>
-        </div>
-      </div>
 
-      <div class="tool-card">
-        <div class="tool-head">
-          <div class="tool-icon">🧾</div>
-          <div>
-            <div class="tool-name">SOP Wizard</div>
-            <div class="tool-desc">Instant UI wizard to turn messy meeting notes into a usable SOP, owners, triggers, exceptions, and checklist.</div>
+        <div class="panel soft">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Control summary</h3>
+            <span class="small-pill">Shift snapshot</span>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi">
+              <div class="l">Active jobs</div>
+              <div class="v">4</div>
+            </div>
+            <div class="kpi">
+              <div class="l">Blocked</div>
+              <div class="v" style="color:var(--yellow)">2</div>
+            </div>
+            <div class="kpi">
+              <div class="l">Agents running</div>
+              <div class="v" style="color:var(--brand)">5</div>
+            </div>
+            <div class="kpi">
+              <div class="l">This week spend</div>
+              <div class="v">€2.50</div>
+            </div>
           </div>
         </div>
-        <div class="tool-meta">
-          <span class="tool-chip">Wizard</span>
-          <span class="tool-chip">SOP</span>
-          <span class="tool-chip">Meeting notes</span>
+      </div>
+
+      <div class="card-grid">
+        <div class="metric">
+          <div class="label">Autonomy level</div>
+          <div class="value" style="color:var(--yellow)">8%</div>
+          <div class="tiny">Target 30%. Still human-heavy.</div>
+          <div class="bar"><div class="fill yellow" style="width:27%"></div></div>
         </div>
-        <div class="tool-actions">
-          <a class="tool-btn primary" href="tools/sop-generator.html">Open wizard</a>
-          <button class="tool-btn" onclick="copySopPrompt()">Copy SOP prompt</button>
+        <div class="metric">
+          <div class="label">Focus score</div>
+          <div class="value" style="color:var(--brand)">71</div>
+          <div class="tiny">Most effort concentrated in three revenue tracks.</div>
+          <div class="bar"><div class="fill blue" style="width:71%"></div></div>
+        </div>
+        <div class="metric">
+          <div class="label">Job freshness</div>
+          <div class="value" style="color:var(--green)">83%</div>
+          <div class="tiny">Most live jobs updated inside the last 48h.</div>
+          <div class="bar"><div class="fill green" style="width:83%"></div></div>
+        </div>
+        <div class="metric">
+          <div class="label">Model burn</div>
+          <div class="value" style="color:var(--purple)">€0.36</div>
+          <div class="tiny">Today. Healthy, but still invisible in chat alone.</div>
+          <div class="bar"><div class="fill purple" style="width:36%"></div></div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <div class="section">
-    <div class="section-title">How to use <span class="pill">Keep inputs structured</span></div>
-    <div class="tool-box">
-      <div class="tool-desc">Use the Diagrams tool when you need a process turned into a clean visual fast. Feed it actors, steps, decisions, and exceptions. It will normalize the flow and generate draw.io-ready design output.</div>
-      <ul class="tool-list">
-        <li>Best for: order flows, production steps, approval chains, machine + human handoffs, agent/system maps.</li>
-        <li>Default output: swimlanes, readable IDs, orthogonal connectors, start/end nodes.</li>
-        <li>Use the intake prompt to keep requests consistent and faster to diagram.</li>
-      </ul>
-    </div>
-  </div>
+      <div class="jobs-grid">
+        <div class="panel">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Priority jobs</h3>
+            <span class="small-pill">Status bars</span>
+          </div>
+          <div class="list">
+            <div class="job-row">
+              <div style="flex:1">
+                <div class="job-title">Navexela landing stack + GTM assets</div>
+                <div class="job-meta">Factory: Revenue Activation · Owner: Q · Next block: positioning confirmation from D.</div>
+                <div class="bar"><div class="fill blue" style="width:58%"></div></div>
+              </div>
+              <span class="status-pill warn">58%</span>
+            </div>
+            <div class="job-row">
+              <div style="flex:1">
+                <div class="job-title">DID Services sales activation</div>
+                <div class="job-meta">Factory: Revenue Activation · Owner: Q · Lead sourcing and outreach system design.</div>
+                <div class="bar"><div class="fill yellow" style="width:34%"></div></div>
+              </div>
+              <span class="status-pill warn">34%</span>
+            </div>
+            <div class="job-row">
+              <div style="flex:1">
+                <div class="job-title">Mission Control redesign</div>
+                <div class="job-meta">Factory: Internal Ops · Owner: Builder / Q · This static cockpit replaces tab-reporting.</div>
+                <div class="bar"><div class="fill green" style="width:92%"></div></div>
+              </div>
+              <span class="status-pill ok">92%</span>
+            </div>
+            <div class="job-row">
+              <div style="flex:1">
+                <div class="job-title">WhatsApp channel decision</div>
+                <div class="job-meta">Factory: Channels · Owner: Q · Parked until real number path chosen.</div>
+                <div class="bar"><div class="fill red" style="width:12%"></div></div>
+              </div>
+              <span class="status-pill risk">12%</span>
+            </div>
+          </div>
+        </div>
 
+        <div class="panel soft">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Current focus</h3>
+            <span class="small-pill">Operator view</span>
+          </div>
+          <div class="focus-box">
+            <div class="section-kicker">Main objective</div>
+            <h4 class="focus-title">Revenue first. Tooling second.</h4>
+            <div class="subtext">The dashboard exists to reduce switching cost, surface blockers, and keep the factories aligned. If it does not improve throughput, it is decoration.</div>
+            <div class="focus-grid">
+              <div class="focus-stat"><div class="k">Top factory</div><div class="v">Revenue</div></div>
+              <div class="focus-stat"><div class="k">Most loaded agent</div><div class="v">Q</div></div>
+              <div class="focus-stat"><div class="k">Biggest risk</div><div class="v">Context drift</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="panel">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Agent activity</h3>
+            <span class="small-pill">Who is doing what</span>
+          </div>
+          <div class="list">
+            <div class="agent-row"><div><div class="agent-name">Q</div><div class="agent-sub">Running main operating loop, memory coordination, dashboard direction</div></div><span class="status-pill ok">Live</span></div>
+            <div class="agent-row"><div><div class="agent-name">Builder</div><div class="agent-sub">Mission-control UI build and structural redesign work</div></div><span class="status-pill info">Build</span></div>
+            <div class="agent-row"><div><div class="agent-name">Factory QC</div><div class="agent-sub">Checks outputs before they are promoted to production use</div></div><span class="status-pill violet">Queued</span></div>
+            <div class="agent-row"><div><div class="agent-name">Research Scout</div><div class="agent-sub">Pulls external intel, competitors, tooling options, and references</div></div><span class="status-pill warn">Idle</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Cost composition</h3>
+            <span class="small-pill">This week</span>
+          </div>
+          <div class="stack-bar" style="margin-bottom:12px">
+            <div class="stack-seg models" style="width:44%"></div>
+            <div class="stack-seg infra" style="width:26%"></div>
+            <div class="stack-seg ops" style="width:18%"></div>
+            <div class="stack-seg mkt" style="width:12%"></div>
+          </div>
+          <div class="list">
+            <div class="cost-row"><div><div class="row-title">Models</div><div class="cost-sub">Chat + reasoning spend across sessions</div></div><strong>€1.10</strong></div>
+            <div class="cost-row"><div><div class="row-title">Infra</div><div class="cost-sub">Hosting, browser, storage, background ops</div></div><strong>€0.65</strong></div>
+            <div class="cost-row"><div><div class="row-title">Ops experiments</div><div class="cost-sub">Prototype overhead, drafts, temporary tooling</div></div><strong>€0.45</strong></div>
+            <div class="cost-row"><div><div class="row-title">Marketing tooling</div><div class="cost-sub">Content and distribution support</div></div><strong>€0.30</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-jobs">
+      <div class="split">
+        <div class="panel highlight">
+          <div class="section-kicker">Jobs</div>
+          <h3 class="panel-title" style="font-size:28px">Operational pipeline with visible state.</h3>
+          <div class="subtext">This section is for work status, freshness, blockers, and next actions. Not vague project lists. Actual execution.</div>
+        </div>
+        <div class="panel soft">
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+              <tbody>
+                <tr><td>Open jobs</td><td><strong>12</strong></td></tr>
+                <tr><td>Active now</td><td><strong style="color:var(--green)">4</strong></td></tr>
+                <tr><td>Blocked</td><td><strong style="color:var(--yellow)">2</strong></td></tr>
+                <tr><td>Need D. decision</td><td><strong style="color:var(--red)">3</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title-row">
+          <h3 class="panel-title">Job board</h3>
+          <span class="small-pill">Focus by throughput</span>
+        </div>
+        <table class="table">
+          <thead>
+            <tr><th>Job</th><th>Factory</th><th>Status</th><th>Progress</th><th>Owner</th><th>Next move</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Navexela landing stack + GTM assets</strong><div class="job-meta">Revenue leverage high</div></td>
+              <td>Revenue Activation</td>
+              <td><span class="status-pill warn">Waiting on positioning</span></td>
+              <td><div class="mini-bar"><div class="fill blue" style="width:58%"></div></div></td>
+              <td>Q</td>
+              <td>Confirm offer framing, then ship assets</td>
+            </tr>
+            <tr>
+              <td><strong>DID Services sales activation</strong><div class="job-meta">Pipeline + outreach system</div></td>
+              <td>Revenue Activation</td>
+              <td><span class="status-pill info">In design</span></td>
+              <td><div class="mini-bar"><div class="fill yellow" style="width:34%"></div></div></td>
+              <td>Q</td>
+              <td>Build lead list + scripts</td>
+            </tr>
+            <tr>
+              <td><strong>Mission Control dashboard</strong><div class="job-meta">Native operator UI</div></td>
+              <td>Internal Ops</td>
+              <td><span class="status-pill ok">Shipping</span></td>
+              <td><div class="mini-bar"><div class="fill green" style="width:92%"></div></div></td>
+              <td>Builder / Q</td>
+              <td>Connect to live data sources in v2</td>
+            </tr>
+            <tr>
+              <td><strong>WhatsApp channel path</strong><div class="job-meta">Channel strategy, not yet setup</div></td>
+              <td>Channels</td>
+              <td><span class="status-pill risk">Parked</span></td>
+              <td><div class="mini-bar"><div class="fill red" style="width:12%"></div></div></td>
+              <td>Q</td>
+              <td>Decide number strategy</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="view" id="view-agents">
+      <div class="agent-grid">
+        <div class="panel"><div class="panel-title-row"><h3 class="panel-title">Q</h3><span class="status-pill ok">Primary</span></div><div class="agent-sub">Distributed automation strategist. Main operator. Owns mission control, memory, task routing, and CEO support.</div><div class="bar"><div class="fill blue" style="width:84%"></div></div><div class="tiny" style="margin-top:8px">Load 84% · Factory: Ops / Revenue</div></div>
+        <div class="panel"><div class="panel-title-row"><h3 class="panel-title">Builder</h3><span class="status-pill info">Execution</span></div><div class="agent-sub">Builds UI, systems, and control surfaces. Focused on shipping operator-grade interfaces and internal tools.</div><div class="bar"><div class="fill green" style="width:67%"></div></div><div class="tiny" style="margin-top:8px">Load 67% · Factory: Internal Ops</div></div>
+        <div class="panel"><div class="panel-title-row"><h3 class="panel-title">Scout</h3><span class="status-pill warn">On standby</span></div><div class="agent-sub">External intel, reference collection, competitor review, and options research when needed.</div><div class="bar"><div class="fill yellow" style="width:22%"></div></div><div class="tiny" style="margin-top:8px">Load 22% · Factory: Research</div></div>
+      </div>
+
+      <div class="split">
+        <div class="panel">
+          <div class="panel-title-row"><h3 class="panel-title">Active work by agent</h3><span class="small-pill">Focus tracking</span></div>
+          <div class="list">
+            <div class="agent-row"><div><div class="agent-name">Q</div><div class="agent-sub">Steering portfolio priorities, maintaining memory, routing tool usage</div></div><span class="small-pill">Overview / Costs</span></div>
+            <div class="agent-row"><div><div class="agent-name">Builder</div><div class="agent-sub">Rebuilding dashboard IA with sidebar, jobs, team, factories, tools, vault sections</div></div><span class="small-pill">UI / Mission Control</span></div>
+            <div class="agent-row"><div><div class="agent-name">Factory QC</div><div class="agent-sub">Output review layer before promotion into live company operations</div></div><span class="small-pill">QC</span></div>
+          </div>
+        </div>
+
+        <div class="panel soft">
+          <div class="panel-title-row"><h3 class="panel-title">Agent policy</h3><span class="small-pill">Operating rules</span></div>
+          <div class="list">
+            <div class="list-item"><div><div class="row-title">Cheapest capable model first</div><div class="list-meta">Haiku / Sonnet / Opus routing principle stays intact.</div></div></div>
+            <div class="list-item"><div><div class="row-title">No silent external actions</div><div class="list-meta">Outbound and destructive steps still require approval.</div></div></div>
+            <div class="list-item"><div><div class="row-title">Memory is written, not imagined</div><div class="list-meta">Important operational facts go into files, not vibes.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-team">
+      <div class="team-grid">
+        <div class="panel highlight">
+          <div class="section-kicker">Team</div>
+          <h3 class="panel-title" style="font-size:28px">Humans and agents on one board.</h3>
+          <div class="subtext">This is not a people directory. It is the coordination layer: ownership, current work, load, handoffs, and where things are stuck.</div>
+        </div>
+        <div class="panel soft">
+          <div class="panel-title-row"><h3 class="panel-title">Capacity snapshot</h3><span class="small-pill">Weighted load</span></div>
+          <div class="list">
+            <div class="team-row"><div><div class="team-name">D.</div><div class="team-meta">CEO decisions only</div></div><strong>23%</strong></div>
+            <div class="team-row"><div><div class="team-name">Q</div><div class="team-meta">Main operator</div></div><strong>72%</strong></div>
+            <div class="team-row"><div><div class="team-name">Builder</div><div class="team-meta">Build capacity</div></div><strong>67%</strong></div>
+            <div class="team-row"><div><div class="team-name">Scout</div><div class="team-meta">Research reserve</div></div><strong>22%</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title-row"><h3 class="panel-title">Ownership map</h3><span class="small-pill">Factories + handoffs</span></div>
+        <table class="table">
+          <thead><tr><th>Member</th><th>Role</th><th>Primary factory</th><th>Working on</th><th>Needs</th></tr></thead>
+          <tbody>
+            <tr><td><strong>D.</strong></td><td>CEO / decision maker</td><td>All</td><td>Offer positioning, leverage decisions, approvals</td><td>Clean brief, not noise</td></tr>
+            <tr><td><strong>Q</strong></td><td>Operator / command center</td><td>Revenue + Ops</td><td>Portfolio orchestration and task routing</td><td>Low-friction visibility</td></tr>
+            <tr><td><strong>Builder</strong></td><td>Product builder</td><td>Internal Ops</td><td>Mission control UI and native control surfaces</td><td>Live session + cost data in v2</td></tr>
+            <tr><td><strong>Scout</strong></td><td>Research agent</td><td>Research</td><td>Tooling, competitive intel, references</td><td>Specific briefs</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="view" id="view-factories">
+      <div class="factory-grid">
+        <div class="panel"><div class="panel-title-row"><h3 class="panel-title">Revenue Activation</h3><span class="status-pill ok">Core</span></div><div class="subtext">Sales systems, landing pages, pipelines, outreach sequences, offer packaging.</div><div class="list" style="margin-top:14px"><div class="factory-row"><div><div class="factory-name">Agents</div><div class="list-meta">Q, Scout</div></div></div><div class="factory-row"><div><div class="factory-name">Live jobs</div><div class="list-meta">Navexela, DID, Voltenum</div></div></div></div></div>
+        <div class="panel"><div class="panel-title-row"><h3 class="panel-title">Internal Ops</h3><span class="status-pill info">Build</span></div><div class="subtext">Mission control, reporting surfaces, memory systems, channel ops, automation structure.</div><div class="list" style="margin-top:14px"><div class="factory-row"><div><div class="factory-name">Agents</div><div class="list-meta">Q, Builder</div></div></div><div class="factory-row"><div><div class="factory-name">Live jobs</div><div class="list-meta">Dashboard, memory, status visibility</div></div></div></div></div>
+        <div class="panel"><div class="panel-title-row"><h3 class="panel-title">Research</h3><span class="status-pill warn">Elastic</span></div><div class="subtext">External scanning, vendor evaluation, benchmarks, market intelligence, risk review.</div><div class="list" style="margin-top:14px"><div class="factory-row"><div><div class="factory-name">Agents</div><div class="list-meta">Scout</div></div></div><div class="factory-row"><div><div class="factory-name">Live jobs</div><div class="list-meta">Skill review, tooling scan</div></div></div></div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title-row"><h3 class="panel-title">Factory throughput board</h3><span class="small-pill">What agents are working in</span></div>
+        <table class="table">
+          <thead><tr><th>Factory</th><th>Primary output</th><th>Agents</th><th>Queue</th><th>Health</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Revenue Activation</strong></td><td>Leads, pages, messaging, pipeline</td><td>Q, Scout</td><td>5 jobs</td><td><span class="status-pill ok">Healthy</span></td></tr>
+            <tr><td><strong>Internal Ops</strong></td><td>Dashboards, memory, process control</td><td>Q, Builder</td><td>4 jobs</td><td><span class="status-pill warn">Needs live data</span></td></tr>
+            <tr><td><strong>Channels</strong></td><td>Messaging surfaces and routing</td><td>Q</td><td>1 job</td><td><span class="status-pill risk">Blocked</span></td></tr>
+            <tr><td><strong>Research</strong></td><td>Benchmarks and options</td><td>Scout</td><td>2 jobs</td><td><span class="status-pill info">Ready</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="view" id="view-content-factory">
+      <div class="hero-grid">
+        <div class="panel highlight">
+          <div class="section-kicker">Content Factory OS</div>
+          <h3 class="panel-title" style="font-size:28px">From signal to LinkedIn post — with human gates.</h3>
+          <div class="subtext">WhatsApp/Email → Curation → Transformation → LinkedIn. Human approval at every step until trust is earned. Visual progress, clear gates, evolving autonomy.</div>
+          <div class="hero-actions">
+            <span class="status-pill ok">● Phase 1: LinkedIn only</span>
+            <span class="status-pill warn">▲ Human-gated curation</span>
+            <span class="status-pill info">▣ 4-hour scan cycle</span>
+          </div>
+        </div>
+
+        <div class="panel soft">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Factory Health</h3>
+            <span class="small-pill">Live metrics</span>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi">
+              <div class="l">Inbox items</div>
+              <div class="v" style="color:var(--brand)">0</div>
+            </div>
+            <div class="kpi">
+              <div class="l">Pending approval</div>
+              <div class="v" style="color:var(--yellow)">0</div>
+            </div>
+            <div class="kpi">
+              <div class="l">Published (this week)</div>
+              <div class="v" style="color:var(--green)">0</div>
+            </div>
+            <div class="kpi">
+              <div class="l">Autonomy level</div>
+              <div class="v" style="color:var(--red)">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pipeline Visualization -->
+      <div class="panel" style="margin-bottom:18px">
+        <div class="panel-title-row">
+          <h3 class="panel-title">Pipeline: Signal → Post</h3>
+          <span class="small-pill">5 stages, 2 human gates</span>
+        </div>
+        
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:20px 0">
+          <!-- Stage 1: Ingest -->
+          <div style="background:rgba(143,166,255,0.08);border:1px solid rgba(143,166,255,0.2);border-radius:16px;padding:16px;position:relative">
+            <div style="font-size:24px;margin-bottom:8px">📥</div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:4px">INGEST</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:12px">WhatsApp number polls every 4h</div>
+            <div class="status-pill ok" style="font-size:11px">● Automated</div>
+            <div style="position:absolute;right:-18px;top:50%;transform:translateY(-50%);color:var(--soft)">→</div>
+          </div>
+          
+          <!-- Stage 2: Curate -->
+          <div style="background:rgba(255,210,102,0.08);border:1px solid rgba(255,210,102,0.25);border-radius:16px;padding:16px;position:relative">
+            <div style="font-size:24px;margin-bottom:8px">👁️</div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:4px">CURATE</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Q presents items, D. approves</div>
+            <div class="status-pill warn" style="font-size:11px">▲ Human gate</div>
+            <div style="position:absolute;right:-18px;top:50%;transform:translateY(-50%);color:var(--soft)">→</div>
+          </div>
+          
+          <!-- Stage 3: Transform -->
+          <div style="background:rgba(111,182,255,0.08);border:1px solid rgba(111,182,255,0.2);border-radius:16px;padding:16px;position:relative">
+            <div style="font-size:24px;margin-bottom:8px">⚡</div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:4px">TRANSFORM</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Rewrite for LinkedIn voice</div>
+            <div class="status-pill ok" style="font-size:11px">● Automated (Groq)</div>
+            <div style="position:absolute;right:-18px;top:50%;transform:translateY(-50%);color:var(--soft)">→</div>
+          </div>
+          
+          <!-- Stage 4: Enrich -->
+          <div style="background:rgba(177,152,255,0.08);border:1px solid rgba(177,152,255,0.2);border-radius:16px;padding:16px;position:relative">
+            <div style="font-size:24px;margin-bottom:8px">✨</div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:4px">ENRICH</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Hashtags, formatting, polish</div>
+            <div class="status-pill ok" style="font-size:11px">● Automated</div>
+            <div style="position:absolute;right:-18px;top:50%;transform:translateY(-50%);color:var(--soft)">→</div>
+          </div>
+          
+          <!-- Stage 5: Publish -->
+          <div style="background:rgba(40,212,166,0.08);border:1px solid rgba(40,212,166,0.25);border-radius:16px;padding:16px">
+            <div style="font-size:24px;margin-bottom:8px">🚀</div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:4px">PUBLISH</div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:12px">LinkedIn (manual or API)</div>
+            <div class="status-pill warn" style="font-size:11px">▲ Human gate (Phase 1)</div>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div style="display:flex;gap:20px;font-size:12px;color:var(--muted);margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05)">
+          <span><span style="color:var(--green)">●</span> Automated</span>
+          <span><span style="color:var(--yellow)">▲</span> Human gate</span>
+          <span><span style="color:var(--red)">■</span> Not started</span>
+          <span><span style="color:var(--brand)">⋯</span> In progress</span>
+        </div>
+      </div>
+
+      <!-- Build Progress & Timeline -->
+      <div class="jobs-grid">
+        <div class="panel">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Build Progress</h3>
+            <span class="small-pill">What's being built now</span>
+          </div>
+          <div class="list">
+            <div class="job-row">
+              <div style="flex:1">
+                <div class="job-title">WhatsApp number setup</div>
+                <div class="job-meta">Assign number → Add to channels → Configure polling</div>
+                <div class="bar"><div class="fill red" style="width:10%"></div></div>
+              </div>
+              <span class="status-pill risk">Blocked</span>
+            </div>
+            <div class="job-row">
+              <div style="flex:1">
+                <div class="job-title">Ingestion pipeline (n8n)</div>
+                <div class="job-meta">WhatsApp API → Local storage → JSON files</div>
+                <div class="bar"><div class="fill red" style="width:5%"></div></div>
+              </div>
+              <span class="status-pill risk">Waiting</span>
+            </div>
+            <div class="job-row">
+              <div style="flex:1">
+                <div class="job-title">Curation interface</div>
+                <div class="job-meta">4h scan → Discord DM → Yes/No/Edit responses</div>
+                <div class="bar"><div class="fill red" style="width:0%"></div></div>
+              </div>
+              <span class="status-pill risk">Not started</span>
+            </div>
+            <div class="job-row">
+              <div style="flex:1">
+                <div class="job-title">Content transformation (Groq)</div>
+                <div class="job-meta">Raw → LinkedIn voice → Hook/Insight/CTA structure</div>
+                <div class="bar"><div class="fill yellow" style="width:30%"></div></div>
+              </div>
+              <span class="status-pill warn">Research done</span>
+            </div>
+            <div class="job-row">
+              <div style="flex:1">
+                <div class="job-title">LinkedIn API integration</div>
+                <div class="job-meta">OAuth setup → Post endpoint → Error handling</div>
+                <div class="bar"><div class="fill yellow" style="width:40%"></div></div>
+              </div>
+              <span class="status-pill warn">API docs ready</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel soft">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Timeline & Gates</h3>
+            <span class="small-pill">Road to autonomy</span>
+          </div>
+          
+          <div style="margin:16px 0">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.05)">
+              <div style="width:40px;height:40px;border-radius:12px;background:rgba(255,210,102,0.15);display:grid;place-items:center;font-size:18px">1</div>
+              <div style="flex:1">
+                <div style="font-weight:700">Phase 1: Human-Gated (Now)</div>
+                <div style="font-size:12px;color:var(--muted)">Every item approved. Manual copy-paste to LinkedIn.</div>
+              </div>
+              <span class="status-pill warn">Current</span>
+            </div>
+            
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.05)">
+              <div style="width:40px;height:40px;border-radius:12px;background:rgba(111,182,255,0.15);display:grid;place-items:center;font-size:18px">2</div>
+              <div style="flex:1">
+                <div style="font-weight:700">Phase 1.5: Semi-Auto</div>
+                <div style="font-size:12px;color:var(--muted)">Auto-post approved items. Still human curation.</div>
+              </div>
+              <span class="status-pill info">~Week 2</span>
+            </div>
+            
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.05)">
+              <div style="width:40px;height:40px;border-radius:12px;background:rgba(177,152,255,0.15);display:grid;place-items:center;font-size:18px">3</div>
+              <div style="flex:1">
+                <div style="font-weight:700">Phase 2: Add Instagram + Facebook</div>
+                <div style="font-size:12px;color:var(--muted)">Same workflow, multi-platform output.</div>
+              </div>
+              <span class="status-pill violet">~Week 4</span>
+            </div>
+            
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.05)">
+              <div style="width:40px;height:40px;border-radius:12px;background:rgba(40,212,166,0.15);display:grid;place-items:center;font-size:18px">4</div>
+              <div style="flex:1">
+                <div style="font-weight:700">Phase 3: Daily Digest</div>
+                <div style="font-size:12px;color:var(--muted)">Batch approval once/day vs per-item.</div>
+              </div>
+              <span class="status-pill violet">~Week 6</span>
+            </div>
+            
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:40px;height:40px;border-radius:12px;background:rgba(143,166,255,0.15);display:grid;place-items:center;font-size:18px">5</div>
+              <div style="flex:1">
+                <div style="font-weight:700">Phase 4: Predictive Curation</div>
+                <div style="font-size:12px;color:var(--muted)">Q pre-scores items. Only flags uncertain ones.</div>
+              </div>
+              <span class="status-pill violet">~Month 2</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Research Artifacts & Next Actions -->
+      <div class="split">
+        <div class="panel">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Research Artifacts</h3>
+            <span class="small-pill">Knowledge base</span>
+          </div>
+          <div class="list">
+            <div class="doc-row">
+              <div>
+                <div class="doc-title">Architecture</div>
+                <div class="doc-meta">Pipeline design, gates, data flow, directory structure</div>
+              </div>
+              <a href="../content-factory/ARCHITECTURE.md" class="btn" style="padding:6px 12px;font-size:12px">View</a>
+            </div>
+            <div class="doc-row">
+              <div>
+                <div class="doc-title">API Research</div>
+                <div class="doc-meta">LinkedIn, Instagram, Facebook, TikTok, WhatsApp analysis</div>
+              </div>
+              <a href="../content-factory/RESEARCH.md" class="btn" style="padding:6px 12px;font-size:12px">View</a>
+            </div>
+            <div class="doc-row">
+              <div>
+                <div class="doc-title">Voice Calibration</div>
+                <div class="doc-meta">D.'s LinkedIn style guide (to be built)</div>
+              </div>
+              <span class="status-pill risk">Pending</span>
+            </div>
+            <div class="doc-row">
+              <div>
+                <div class="doc-title">Published Posts Log</div>
+                <div class="doc-meta">What went live, engagement, learnings</div>
+              </div>
+              <span class="status-pill risk">Empty</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel highlight">
+          <div class="section-kicker">Next Actions</div>
+          <h3 class="panel-title" style="font-size:20px;margin-bottom:12px">What unblocks this factory?</h3>
+          <div class="list">
+            <div class="list-item">
+              <div>
+                <div class="row-title">1. Assign WhatsApp number</div>
+                <div class="list-meta">Google Voice, new SIM, or spare number. This is the intake channel.</div>
+              </div>
+            </div>
+            <div class="list-item">
+              <div>
+                <div class="row-title">2. Add number to 2-3 high-signal channels</div>
+                <div class="list-meta">WhatsApp groups/channels where valuable content appears regularly.</div>
+              </div>
+            </div>
+            <div class="list-item">
+              <div>
+                <div class="row-title">3. Choose approval channel</div>
+                <div class="list-meta">Discord DM, Signal, or other. Where Q sends curation requests.</div>
+              </div>
+            </div>
+            <div class="list-item">
+              <div>
+                <div class="row-title">4. First test cycle</div>
+                <div class="list-meta">Scan → Present → Approve → Transform → Review. Calibrate voice.</div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1)">
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px">ESTIMATED TIME TO FIRST POST</div>
+            <div style="font-size:32px;font-weight:800;letter-spacing:-.04em">2-3 days</div>
+            <div style="font-size:12px;color:var(--soft)">After WhatsApp number is assigned</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-ideas">
+      <div class="hero-grid">
+        <div class="panel highlight">
+          <div class="section-kicker">Brain Dumps</div>
+          <h3 class="panel-title" style="font-size:28px">Raw ideas. Unfiltered. Unresearched.</h3>
+          <div class="subtext">Every concept that surfaced during ops. Some will die. Some will become factories. Hard cutoff: Brain Dump → Researched → Factory (or killed).</div>
+          <div class="hero-actions">
+            <span class="status-pill warn">● 2 Brain Dumps</span>
+            <span class="status-pill ok">▲ 4 Researched</span>
+            <span class="status-pill info">▣ 2 Factories</span>
+          </div>
+        </div>
+
+        <div class="panel soft">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Idea Flow</h3>
+            <span class="small-pill">Hard cutoff between stages</span>
+          </div>
+          <div class="list">
+            <div class="list-item">
+              <div>
+                <div class="row-title">1. Brain Dump</div>
+                <div class="list-meta">Raw capture. No filter. Just the idea.</div>
+              </div>
+            </div>
+            <div class="list-item">
+              <div>
+                <div class="row-title">2. Brain Dump Researched</div>
+                <div class="list-meta">Quick scan. Cost, complexity, market check. Stays here until decision.</div>
+              </div>
+            </div>
+            <div class="list-item">
+              <div>
+                <div class="row-title">3. Decision</div>
+                <div class="list-meta">Build → Factory, Park → Archive, or Kill.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 1: Raw Brain Dumps (Unresearched) -->
+      <div class="panel" style="margin-bottom:18px">
+        <div class="panel-title-row">
+          <h3 class="panel-title">🟡 Brain Dumps (Raw)</h3>
+          <span class="small-pill">Just ideas. No research yet.</span>
+        </div>
+
+        <div class="list">
+          <!-- Idea 1: Agent Team Console -->
+          <div class="job-row" style="padding:18px 0">
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                <span style="font-size:20px">🤖</span>
+                <span class="job-title">Agent Team Console</span>
+                <span class="status-pill warn">Dump only</span>
+              </div>
+              <div class="job-meta">Visual management of multiple AI agents. Load balancing. Task routing. Cost tracking per agent.</div>
+              <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--soft)">
+                <span>📅 2026-03-10</span>
+                <span>⏱️ Research: None</span>
+                <span>💰 Cost: Unknown</span>
+                <span>💡 Note: Overlaps with Mission Control?</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Idea 2: WhatsApp Business API Hub -->
+          <div class="job-row" style="padding:18px 0;border-top:1px solid rgba(255,255,255,0.05)">
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                <span style="font-size:20px">💬</span>
+                <span class="job-title">WhatsApp Business API Hub</span>
+                <span class="status-pill warn">Dump only</span>
+              </div>
+              <div class="job-meta">Central WhatsApp number for all companies. Auto-routing. CRM integration. Broadcast messages.</div>
+              <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--soft)">
+                <span>📅 2026-03-17</span>
+                <span>⏱️ Research: None</span>
+                <span>💰 Cost: Unknown</span>
+                <span>🚫 Blocked: Waiting for number decision</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 2: Brain Dumps Researched -->
+      <div class="panel" style="margin-bottom:18px;border-color:var(--green)">
+        <div class="panel-title-row">
+          <h3 class="panel-title">🟢 Brain Dumps Researched</h3>
+          <span class="small-pill">Scanned. Costed. Ready for decision.</span>
+        </div>
+
+        <div class="list">
+          <!-- Idea 1: Content Factory -->
+          <div class="job-row" style="padding:18px 0">
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                <span style="font-size:20px">🏭</span>
+                <span class="job-title">Content Factory OS</span>
+                <span class="status-pill info">→ Moving to Factory</span>
+              </div>
+              <div class="job-meta">WhatsApp/Email → AI curation → LinkedIn/Instagram/Facebook/TikTok. Human-gated automation for social media.</div>
+              <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--soft)">
+                <span>📅 2026-03-19</span>
+                <span>⏱️ Research: Done</span>
+                <span>💰 Cost: ~$10/mo</span>
+                <span>🔗 <a href="../content-factory/ARCHITECTURE.md" style="color:var(--brand)">Architecture</a></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Idea 2: Voice-to-Email Service -->
+          <div class="job-row" style="padding:18px 0;border-top:1px solid rgba(255,255,255,0.05)">
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                <span style="font-size:20px">🎙️</span>
+                <span class="job-title">Voice-to-Email Micro-SaaS</span>
+                <span class="status-pill warn">Decision needed</span>
+              </div>
+              <div class="job-meta">Voice note → AI writes professional email → Add logo/PDF → Send. Multi-language. Gap in market: no simple tool exists with attachments.</div>
+              <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--soft)">
+                <span>📅 2026-03-19</span>
+                <span>⏱️ Research: Done</span>
+                <span>💰 Cost: ~$0.02/email @ $5/mo pricing</span>
+                <span>💡 Gap: No simple tool exists</span>
+              </div>
+              <div style="margin-top:12px;padding:12px;background:rgba(255,210,102,0.05);border-radius:10px;border-left:3px solid var(--yellow)">
+                <div style="font-size:12px;color:var(--muted)">🤔 DECISION: Build MVP (2 days), test 10 users @ $5/mo, or park?</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Idea 3: AI Email Assistant -->
+          <div class="job-row" style="padding:18px 0;border-top:1px solid rgba(255,255,255,0.05)">
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                <span style="font-size:20px">✉️</span>
+                <span class="job-title">AI Email Assistant (Navexela/DID/Voltenum)</span>
+                <span class="status-pill info">Parked</span>
+              </div>
+              <div class="job-meta">Auto-respond to inquiries. Draft proposals. Follow-up sequences. Company-specific knowledge base.</div>
+              <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--soft)">
+                <span>📅 2026-03-15</span>
+                <span>⏱️ Research: Partial</span>
+                <span>💰 Cost: ~$50/mo per company</span>
+                <span>🚫 Blocked: Needs company data</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Idea 4: Meeting Output Engine -->
+          <div class="job-row" style="padding:18px 0;border-top:1px solid rgba(255,255,255,0.05)">
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                <span style="font-size:20px">📝</span>
+                <span class="job-title">Meeting Output Engine</span>
+                <span class="status-pill info">Parked</span>
+              </div>
+              <div class="job-meta">Recording → Transcript → Summary → Action items → SOP → Assigned tasks. Full pipeline.</div>
+              <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--soft)">
+                <span>📅 2026-03-12</span>
+                <span>⏱️ Research: Partial</span>
+                <span>💰 Cost: ~$20/mo</span>
+                <span>🔗 <a href="./meeting-output-engine-v1-ui.md" style="color:var(--brand)">Draft spec exists</a></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Idea 5: Revenue Lab Dashboard -->
+          <div class="job-row" style="padding:18px 0;border-top:1px solid rgba(255,255,255,0.05)">
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                <span style="font-size:20px">📊</span>
+                <span class="job-title">Revenue Lab Dashboard v2</span>
+                <span class="status-pill info">→ Moving to Factory</span>
+              </div>
+              <div class="job-meta">Real-time portfolio view. MRR tracking. Company health. Decision logs. This dashboard.</div>
+              <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--soft)">
+                <span>📅 2026-03-18</span>
+                <span>⏱️ Status: Shipping</span>
+                <span>💰 Cost: Free (GitHub Pages)</span>
+                <span>🔗 <a href="./" style="color:var(--brand)">Live now</a></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Idea 6: LLM Cost Router -->
+          <div class="job-row" style="padding:18px 0;border-top:1px solid rgba(255,255,255,0.05)">
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+                <span style="font-size:20px">⚡</span>
+                <span class="job-title">LLM Cost Router</span>
+                <span class="status-pill ok">Live</span>
+              </div>
+              <div class="job-meta">Automatic model selection based on task. Haiku for simple, Opus for complex. Cost optimization.</div>
+              <div style="display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--soft)">
+                <span>📅 2026-03-12</span>
+                <span>⏱️ Status: Running</span>
+                <span>💰 Savings: ~40% vs default routing</span>
+                <span>🔗 <a href="../scripts/llm-router.py" style="color:var(--brand)">Script</a></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Add Section -->
+      <div class="split">
+        <div class="panel soft">
+          <div class="panel-title-row">
+            <h3 class="panel-title">Idea Categories</h3>
+            <span class="small-pill">By type</span>
+          </div>
+          <div class="kpi-grid">
+            <div class="kpi">
+              <div class="l">Automation</div>
+              <div class="v" style="color:var(--brand)">4</div>
+            </div>
+            <div class="kpi">
+              <div class="l">Products/SaaS</div>
+              <div class="v" style="color:var(--yellow)">2</div>
+            </div>
+            <div class="kpi">
+              <div class="l">Internal Tools</div>
+              <div class="v" style="color:var(--green)">2</div>
+            </div>
+            <div class="kpi">
+              <div class="l">Total Active</div>
+              <div class="v">8</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel highlight">
+          <div class="section-kicker">Add new dump</div>
+          <h3 class="panel-title" style="font-size:20px;margin-bottom:12px">Capture raw thought</h3>
+          <div class="subtext" style="margin-bottom:16px">Voice note, text, or link. I'll transcribe, categorize, and add to this list for later triage.</div>
+          <div class="actions">
+            <button class="btn primary">Record voice note</button>
+            <button class="btn">Text dump</button>
+            <button class="btn">Paste link</button>
+          </div>
+          <div class="footer-note" style="margin-top:16px">Or: Send WhatsApp voice note to Q's number. Auto-captured here.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-tools">
+        <div class="panel highlight">
+          <div class="section-kicker">Operational tools</div>
+          <h3 class="panel-title" style="font-size:28px">Clickable launchers for recurring work.</h3>
+          <div class="subtext">These belong here. Not buried. The tools section should open actual operating surfaces and provide the intake prompts that make the tools usable fast.</div>
+
+          <div class="launcher-grid">
+            <div class="launcher-card">
+              <div class="launcher-head">
+                <div class="launcher-icon">📐</div>
+                <div>
+                  <div class="launcher-title">Diagrams</div>
+                  <div class="list-meta">Swimlane-first draw.io tool for Wickey process maps, agent flows, handoffs, and design diagrams.</div>
+                </div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">Wickey</span>
+                <span class="tag">draw.io</span>
+                <span class="tag">swimlanes</span>
+              </div>
+              <div class="launcher-actions">
+                <a class="btn primary" href="./tools/diagrams.html">Open tool</a>
+                <a class="btn" href="https://app.diagrams.net/" target="_blank" rel="noopener">Open draw.io ↗</a>
+                <button class="btn" onclick="copyPrompt('diagrams')">Copy intake prompt</button>
+              </div>
+            </div>
+
+            <div class="launcher-card">
+              <div class="launcher-head">
+                <div class="launcher-icon">🧾</div>
+                <div>
+                  <div class="launcher-title">SOP Wizard</div>
+                  <div class="list-meta">Instant UI wizard to turn messy meeting notes into a usable SOP, owners, triggers, exceptions, and checklist.</div>
+                </div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">Wizard</span>
+                <span class="tag">SOP</span>
+                <span class="tag">Meeting notes</span>
+              </div>
+              <div class="launcher-actions">
+                <a class="btn primary" href="./tools/sop-generator.html">Open wizard</a>
+                <button class="btn" onclick="copyPrompt('sop')">Copy SOP prompt</button>
+                <button class="btn" onclick="scrollToHowTo()">How to use</button>
+              </div>
+            </div>
+
+            <div class="launcher-card">
+              <div class="launcher-head">
+                <div class="launcher-icon">✉️</div>
+                <div>
+                  <div class="launcher-title">Mail Templates</div>
+                  <div class="list-meta">Beheer email templates per bedrijf (Voltenum, Navexela, DID). Tag-based organisatie, variabelen, PDF export.</div>
+                </div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">Voltenum</span>
+                <span class="tag">Navexela</span>
+                <span class="tag">DID</span>
+                <span class="tag">Templates</span>
+              </div>
+              <div class="launcher-actions">
+                <a class="btn primary" href="./tools/mail-templates/index.html">Open tool</a>
+                <button class="btn" onclick="copyPrompt('mail')">Copy prompt</button>
+              </div>
+            </div>
+
+            <div class="launcher-card">
+              <div class="launcher-head">
+                <div class="launcher-icon">⚡</div>
+                <div>
+                  <div class="launcher-title">Quote Generator</div>
+                  <div class="list-meta">Snelle offertes voor elektrotechnische installaties. Kabels, aansluitingen, laadpalen, groepenkasten — met PDF export.</div>
+                </div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">Voltenum</span>
+                <span class="tag">Offertes</span>
+                <span class="tag">PDF</span>
+              </div>
+              <div class="launcher-actions">
+                <a class="btn primary" href="./tools/quote-generator/index.html">Open tool</a>
+                <button class="btn" onclick="copyPrompt('quote')">Copy prompt</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title-row"><h3 class="panel-title">Tool stack</h3><span class="small-pill">Native modules</span></div>
+          <div class="list">
+            <div class="tool-row"><div><div class="tool-name">Calendar</div><div class="list-meta">Upcoming events, reminders, decision windows, weekly rhythm</div></div><span class="status-pill ok">Priority</span></div>
+            <div class="tool-row"><div><div class="tool-name">Agent Console</div><div class="list-meta">What each agent is doing, load, blockers, last output</div></div><span class="status-pill ok">Priority</span></div>
+            <div class="tool-row"><div><div class="tool-name">Factory Board</div><div class="list-meta">Work grouped by factory with throughput and ownership</div></div><span class="status-pill info">Priority</span></div>
+            <div class="tool-row"><div><div class="tool-name">Docs Vault</div><div class="list-meta">Browseable operating docs and playbooks</div></div><span class="status-pill violet">Needed</span></div>
+          </div>
+        </div>
+
+        <div class="panel soft" id="tools-howto">
+          <div class="panel-title-row"><h3 class="panel-title">How to use</h3><span class="small-pill">Fast path</span></div>
+          <div class="list">
+            <div class="list-item"><div><div class="row-title">Diagrams</div><div class="list-meta">Use for process maps, swimlanes, operating flows, agent handoffs, and Wickey process work. Start with the copied intake prompt, then refine in the tool.</div></div></div>
+            <div class="list-item"><div><div class="row-title">SOP Wizard</div><div class="list-meta">Paste rough notes from a call or meeting. Convert them into owners, triggers, exceptions, required inputs, and a checklist before they become operational docs.</div></div></div>
+            <div class="list-item"><div><div class="row-title">Product rule</div><div class="list-meta">Every recurring workflow should either have a launcher, a prompt, or a native surface. If it does not, it stays expensive.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-memory">
+      <div class="vault-grid">
+        <div class="panel soft">
+          <div class="panel-title-row"><h3 class="panel-title">Vault structure</h3><span class="small-pill">Obsidian-style</span></div>
+          <div class="tree">
+            <div class="tree-group">
+              <strong>memory/</strong>
+              <ul>
+                <li>2026-03-18.md</li>
+                <li>2026-03-17.md</li>
+                <li>heartbeat-state.json</li>
+              </ul>
+            </div>
+            <div class="tree-group">
+              <strong>Long-term</strong>
+              <ul>
+                <li>MEMORY.md</li>
+                <li>operating-principles.md</li>
+                <li>decisions.md</li>
+              </ul>
+            </div>
+            <div class="tree-group">
+              <strong>Linked operating files</strong>
+              <ul>
+                <li>SOUL.md</li>
+                <li>USER.md</li>
+                <li>TOOLS.md</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel highlight">
+          <div class="section-kicker">Memory</div>
+          <h3 class="panel-title" style="font-size:28px">Long-term memory needs a vault, not a dump.</h3>
+          <div class="subtext">The interface should let Q see daily notes, curated memory, linked decisions, and recent changes as a navigable operating graph. This section is the first pass at that structure.</div>
+          <div class="list" style="margin-top:18px">
+            <div class="vault-item"><div><div class="row-title">Pinned memory</div><div class="list-meta">Approval gates, cost routing, D.'s working rules, key operational constraints</div></div><span class="small-pill">Core</span></div>
+            <div class="vault-item"><div><div class="row-title">Recent memory writes</div><div class="list-meta">Gmail setup, WhatsApp parking, dashboard direction, model policy</div></div><span class="small-pill">Recent</span></div>
+            <div class="vault-item"><div><div class="row-title">Linked docs</div><div class="list-meta">Ops notes, tooling, companies, factories, experiments</div></div><span class="small-pill">Backlinks</span></div>
+          </div>
+          <div class="footer-note">Next step: render actual memory file tree + backlink counts from workspace files.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-docs">
+      <div class="split">
+        <div class="panel highlight">
+          <div class="section-kicker">Docs</div>
+          <h3 class="panel-title" style="font-size:28px">Operating docs live beside memory.</h3>
+          <div class="subtext">Docs are not static reference pages. They are execution context: runbooks, policies, project docs, factory instructions, and tool notes — browsable like a vault.</div>
+        </div>
+        <div class="panel soft">
+          <div class="panel-title-row"><h3 class="panel-title">Doc groups</h3><span class="small-pill">Structured like a vault</span></div>
+          <div class="list">
+            <div class="doc-row"><div><div class="doc-title">Agent identity + operating mode</div><div class="doc-meta">SOUL.md, USER.md, IDENTITY.md</div></div><span class="small-pill">Core</span></div>
+            <div class="doc-row"><div><div class="doc-title">Infrastructure & access</div><div class="doc-meta">TOOLS.md, VPS notes, Coolify notes, GitHub state</div></div><span class="small-pill">Ops</span></div>
+            <div class="doc-row"><div><div class="doc-title">Revenue systems</div><div class="doc-meta">Revenue Lab docs, content-factory, company pages</div></div><span class="small-pill">Growth</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title-row"><h3 class="panel-title">Pinned documents</h3><span class="small-pill">Most useful first</span></div>
+        <table class="table">
+          <thead><tr><th>Document</th><th>Use</th><th>Owner</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><strong>SOUL.md</strong></td><td>Persona, tone, operating principles</td><td>Q</td><td><span class="status-pill ok">Live</span></td></tr>
+            <tr><td><strong>TOOLS.md</strong></td><td>Infrastructure, access, VPS/Coolify/GitHub notes</td><td>Q</td><td><span class="status-pill ok">Live</span></td></tr>
+            <tr><td><strong>MEMORY.md</strong></td><td>Curated long-term memory</td><td>Q</td><td><span class="status-pill ok">Live</span></td></tr>
+            <tr><td><strong>revenue-lab/product-os.md</strong></td><td>Revenue operating context</td><td>Q</td><td><span class="status-pill info">Useful</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="view" id="view-costs">
+      <div class="cost-grid">
+        <div class="panel highlight">
+          <div class="section-kicker">Costs</div>
+          <h3 class="panel-title" style="font-size:28px">Spend needs attribution, not vibes.</h3>
+          <div class="subtext">This section breaks cost down by model, factory, and operating category. The goal is to see where tokens and infra are being consumed so the stack can be routed down aggressively.</div>
+          <div class="triple" style="margin-top:16px">
+            <div class="metric"><div class="label">Today</div><div class="value">€0.36</div><div class="tiny">Chat + tools</div></div>
+            <div class="metric"><div class="label">This week</div><div class="value">€2.50</div><div class="tiny">Within target</div></div>
+            <div class="metric"><div class="label">Weekly target</div><div class="value">€5</div><div class="tiny">Current burn healthy</div></div>
+          </div>
+        </div>
+        <div class="panel soft">
+          <div class="panel-title-row"><h3 class="panel-title">Model routing</h3><span class="small-pill">Desired split</span></div>
+          <div class="list">
+            <div class="cost-row"><div><div class="row-title">Haiku</div><div class="cost-sub">Heartbeats, simple checks, cheap routing</div></div><strong>40%</strong></div>
+            <div class="cost-row"><div><div class="row-title">Sonnet</div><div class="cost-sub">Default drafting and standard work</div></div><strong>35%</strong></div>
+            <div class="cost-row"><div><div class="row-title">Opus</div><div class="cost-sub">Planning, coding, hard reasoning</div></div><strong>20%</strong></div>
+            <div class="cost-row"><div><div class="row-title">Local / free</div><div class="cost-sub">Embeddings, simple transforms, overflow tasks</div></div><strong>5%</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="split">
+        <div class="panel">
+          <div class="panel-title-row"><h3 class="panel-title">Factory spend</h3><span class="small-pill">Attribution</span></div>
+          <table class="table">
+            <thead><tr><th>Factory</th><th>Spend</th><th>Share</th><th>Comment</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Revenue Activation</strong></td><td>€1.02</td><td>41%</td><td>Good. Revenue-facing work should dominate.</td></tr>
+              <tr><td><strong>Internal Ops</strong></td><td>€0.88</td><td>35%</td><td>High but justified during dashboard build phase.</td></tr>
+              <tr><td><strong>Research</strong></td><td>€0.34</td><td>14%</td><td>Keep bounded.</td></tr>
+              <tr><td><strong>Channels</strong></td><td>€0.26</td><td>10%</td><td>Mostly evaluation and setup analysis.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title-row"><h3 class="panel-title">Cost principles</h3><span class="small-pill">Non-negotiables</span></div>
+          <div class="list">
+            <div class="list-item"><div><div class="row-title">Measure by workflow</div><div class="list-meta">Need spend by job, agent, factory, and model — not one global blob.</div></div></div>
+            <div class="list-item"><div><div class="row-title">Premium models earn their keep</div><div class="list-meta">Opus goes to coding and planning, not filler.</div></div></div>
+            <div class="list-item"><div><div class="row-title">Control internal overhead</div><div class="list-meta">Internal ops is useful only if it compounds throughput.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">Q Mission Control v2 · Left-sidebar native cockpit · Jobs / Agents / Team / Factories / Tools / Memory / Docs / Costs</div>
+  </main>
 </div>
-
-<div class="footer">Q-Dashboard v1.7 · /data/.openclaw/workspace/revenue-lab/ · Autonomy: 30% target · MRR: €1M+ target · Tools tab added · 2026-03-17</div>
 
 <script>
-  function showTab(name, el) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-' + name).classList.add('active');
-    if (el) el.classList.add('active');
+  const navButtons = Array.from(document.querySelectorAll('.nav-btn'));
+  const views = Array.from(document.querySelectorAll('.view'));
+  const pageTitle = document.getElementById('page-title');
+
+  function setView(name) {
+    navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === name));
+    views.forEach(view => view.classList.toggle('active', view.id === `view-${name}`));
+    const active = navButtons.find(btn => btn.dataset.view === name);
+    pageTitle.textContent = active ? active.innerText.replace(/\s+\S+$/, '').trim() || name : name;
   }
 
-  function copyDiagramPrompt() {
-    const prompt = `Diagram request\nGoal:\nLanes:\nStart:\nEnd:\nMain steps:\nDecisions:\nExceptions:\nNotes:\nOutput mode: design`; 
-    navigator.clipboard.writeText(prompt).then(() => {
-      alert('Diagram intake prompt copied.');
+  const prompts = {
+    diagrams: `Design a swimlane-first operational diagram. Include lanes, owners, triggers, inputs, outputs, edge cases, and handoffs. Keep it implementation-ready for Wickey-style process mapping and agent workflows.`,
+    sop: `Turn these rough meeting notes into an SOP. Extract: objective, owner, trigger, required inputs, main steps, decision points, exceptions, failure modes, approvals needed, and final checklist.`,
+    mail: `Maak een professionele email template voor [bedrijf]. Onderwerp: [onderwerp]. Doel: [doelgroep]. Toon: [formeel/informeel]. Variabelen: {{klant_naam}}, {{bedrijf}}, {{datum}}.`,
+    quote: `Genereer een offerte voor elektrotechnische installatie. Klant: [naam]. Project: [beschrijving]. Items: [kabels/aansluitingen/laadpalen/etc]. Bedrijf: Voltenum/Navexela/DID. Levertijd: [x weken]. Geldigheid: [x dagen].`
+  };
+
+  function copyPrompt(kind) {
+    const text = prompts[kind];
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Prompt copied.');
     }).catch(() => {
-      alert(prompt);
+      alert(text);
     });
   }
 
-  function copySopPrompt() {
-    const prompt = `SOP request\nProcess name:\nGoal:\nTrigger:\nOwner:\nInputs:\nSteps:\nDecisions:\nExceptions:\nOutputs:\nQA checks:\nNotes:`;
-    navigator.clipboard.writeText(prompt).then(() => {
-      alert('SOP prompt copied.');
-    }).catch(() => {
-      alert(prompt);
-    });
+  function scrollToHowTo() {
+    const block = document.getElementById('tools-howto');
+    if (block) block.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function setTheme(t) {
-    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-' + t).classList.add('active');
-    if (t === 'dark') {
-      document.body.classList.remove('light');
-    } else if (t === 'light') {
-      document.body.classList.add('light');
-    } else {
-      // system
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.body.classList.toggle('light', !prefersDark);
-    }
-    localStorage.setItem('q-theme', t);
-  }
-
-  // Restore on load
-  const saved = localStorage.getItem('q-theme') || 'dark';
-  setTheme(saved);
-
-  // Load Content Factory data into Finance tab
-  fetch('content-factory/data.json')
-    .then(r => r.json())
-    .then(d => {
-      const s = d.summary;
-      document.getElementById('cf-posts').textContent = s.totalPosts;
-      document.getElementById('cf-spend').textContent = '€' + s.totalCost.toFixed(2);
-      document.getElementById('cf-revenue').textContent = '€' + s.totalRevenue.toFixed(2);
-      const pnl = s.netPnL;
-      document.getElementById('cf-pnl').textContent = (pnl >= 0 ? '+' : '') + '€' + pnl.toFixed(2);
-      document.getElementById('cf-pnl').style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
-      document.getElementById('cf-pnl-sub').textContent = pnl >= 0 ? 'profitable' : 'building phase';
-
-      const ct = d.byCostType;
-      document.getElementById('cf-hosting').textContent = '€' + (ct.hosting||0).toFixed(2);
-      document.getElementById('cf-api').textContent = '€' + (ct.api_ai||0).toFixed(2);
-      document.getElementById('cf-tools').textContent = '€' + (ct.tools||0).toFixed(2);
-      document.getElementById('cf-ads').textContent = '€' + (ct.ad_spend||0).toFixed(2);
-
-      const bp = d.byPlatform;
-      const fmt = (k) => { const v = bp[k] || {posts:0,cost:0}; return v.posts + ' posts · €' + v.cost.toFixed(2); };
-      document.getElementById('cf-reels').textContent = fmt('facebook_reels');
-      document.getElementById('cf-carousel').textContent = fmt('facebook_carousel');
-      document.getElementById('cf-video').textContent = fmt('facebook_video');
-      document.getElementById('cf-cpp').textContent = '€' + (s.totalPosts > 0 ? (s.totalCost/s.totalPosts).toFixed(2) : '0.00');
-    })
-    .catch(() => { /* Content Factory data not available */ });
-
-  // Password protection
-  (function() {
-    const PASS = 'Grachten2026';
-    const KEY = 'q-auth';
-    if (localStorage.getItem(KEY) !== PASS) {
-      document.body.innerHTML = `
-        <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0d0f14;font-family:'Inter',sans-serif;">
-          <div style="background:#161b26;border:1px solid #1e2736;border-radius:14px;padding:40px 36px;text-align:center;max-width:320px;width:90%;">
-            <div style="font-size:2rem;margin-bottom:12px;">🧭</div>
-            <div style="font-size:1.1rem;font-weight:800;color:#f8fafc;margin-bottom:6px;">Q-Dashboard</div>
-            <div style="font-size:0.75rem;color:#475569;margin-bottom:24px;">Grachten Holding · Private</div>
-            <input id="pw" type="password" placeholder="Password" autofocus
-              style="width:100%;background:#0d0f14;border:1px solid #1e2736;color:#f8fafc;padding:11px 14px;border-radius:8px;font-size:0.9rem;outline:none;margin-bottom:12px;text-align:center;"
-              onkeydown="if(event.key==='Enter')checkPw()">
-            <button onclick="checkPw()"
-              style="width:100%;background:#818cf8;color:#fff;font-weight:700;padding:12px;border-radius:8px;border:none;cursor:pointer;font-size:0.9rem;">
-              Enter →
-            </button>
-            <div id="pw-err" style="color:#f87171;font-size:0.72rem;margin-top:10px;display:none;">Incorrect password.</div>
-          </div>
-        </div>`;
-      window.checkPw = function() {
-        const v = document.getElementById('pw').value;
-        if (v === PASS) { localStorage.setItem(KEY, PASS); location.reload(); }
-        else { document.getElementById('pw-err').style.display='block'; }
-      };
-    }
-  })();
+  navButtons.forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
 </script>
-
 </body>
 </html>

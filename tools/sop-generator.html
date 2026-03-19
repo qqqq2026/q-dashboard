@@ -3,42 +3,151 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Q-Dashboard · SOP Wizard</title>
+<title>Q Mission Control · SOP Wizard</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0d0f14; color: #e2e8f0; font-family: 'Inter', 'Segoe UI', sans-serif; padding: 32px; }
-  .wrap { max-width: 1320px; margin: 0 auto; }
-  .top { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:24px; }
-  .title { display:flex; align-items:center; gap:14px; }
-  .icon { width:52px; height:52px; border-radius:14px; background:#1e2736; display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
-  h1 { font-size:1.5rem; font-weight:800; letter-spacing:-0.03em; }
-  .sub { color:#64748b; font-size:0.8rem; margin-top:4px; }
-  .actions { display:flex; gap:10px; flex-wrap:wrap; }
-  .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:9px; border:1px solid #1e2736; background:#161b26; color:#e2e8f0; text-decoration:none; font-weight:700; font-size:0.78rem; cursor:pointer; }
-  .btn.primary { background:#818cf8; border-color:#818cf8; color:#fff; }
-  .grid { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
-  .card { background:#161b26; border:1px solid #1e2736; border-radius:14px; padding:18px; }
-  .card h2 { font-size:0.84rem; text-transform:uppercase; letter-spacing:0.08em; color:#94a3b8; margin-bottom:14px; }
-  .field { margin-bottom:14px; }
-  label { display:block; font-size:0.72rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:7px; }
-  input, textarea { width:100%; background:#0d0f14; border:1px solid #1e2736; color:#e2e8f0; border-radius:10px; padding:12px 14px; font-size:0.84rem; }
-  textarea { min-height: 84px; resize: vertical; }
-  .output { min-height: 860px; white-space: pre-wrap; line-height: 1.6; font-size: 0.82rem; overflow:auto; }
-  .step-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-  .tiny { font-size:0.7rem; color:#64748b; margin-top:4px; line-height: 1.5; }
-  .import-grid { display:grid; grid-template-columns: 1.1fr 0.9fr; gap:16px; margin-bottom:16px; }
-  .status { margin-top:10px; font-size:0.75rem; color:#4ade80; }
+  :root {
+    --bg: #05070f;
+    --panel: rgba(16, 21, 34, 0.92);
+    --panel-soft: rgba(12, 17, 28, 0.9);
+    --panel-highlight: rgba(24, 32, 53, 0.92);
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(143,166,255,0.35);
+    --text: #f4f6ff;
+    --muted: #8f9cc4;
+    --brand: #8fa6ff;
+    --accent: #3fe9cb;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(65% 90% at 90% 0%, rgba(143, 166, 255, 0.14), transparent 55%),
+      radial-gradient(80% 90% at 0% 90%, rgba(63, 233, 203, 0.12), transparent 65%),
+      linear-gradient(135deg, #05070f, #0b1527 70%);
+    min-height: 100vh;
+    padding: 40px 24px;
+  }
+
+  a { color: inherit; }
+
+  .shell { max-width: 1320px; margin: 0 auto; display: grid; gap: 28px; }
+
+  header { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; }
+
+  .title-block { display: flex; gap: 16px; align-items: center; }
+
+  .badge {
+    width: 60px; height: 60px; border-radius: 18px; display: grid; place-items: center;
+    background: linear-gradient(135deg, rgba(143,166,255,0.35), rgba(63,233,203,0.18));
+    border: 1px solid var(--border-strong); font-size: 2rem; box-shadow: 0 20px 45px rgba(5,8,16,0.6);
+  }
+
+  h1 { margin: 0; font-size: 32px; letter-spacing: -0.04em; }
+  .subtext { margin-top: 6px; color: var(--muted); font-size: 0.95rem; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .btn {
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(7, 11, 21, 0.7);
+    color: var(--text);
+    border-radius: 999px;
+    padding: 11px 18px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform .18s ease, border-color .18s ease;
+  }
+
+  .btn:hover { transform: translateY(-1px); border-color: rgba(255,255,255,0.25); }
+
+  .btn.primary {
+    background: linear-gradient(120deg, var(--brand), var(--accent));
+    border-color: transparent;
+    color: #05070f;
+    box-shadow: 0 10px 30px rgba(63,233,203,0.25);
+  }
+
+  .surface {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 24px 60px rgba(2,4,10,0.55);
+  }
+
+  .surface.highlight { border-color: var(--border-strong); background: var(--panel-highlight); }
+
+  .kicker { text-transform: uppercase; letter-spacing: .12em; font-size: 0.78rem; color: var(--muted); margin-bottom: 8px; }
+  h2 { margin: 0 0 10px; font-size: 1.1rem; letter-spacing: .02em; }
+
+  .grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 24px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+
+  input, textarea {
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(5,8,16,0.75);
+    color: inherit;
+    font-size: 0.9rem;
+    padding: 12px 14px;
+    font-family: inherit;
+  }
+
+  textarea { min-height: 90px; resize: vertical; }
+  textarea.long { min-height: 220px; }
+
+  .output {
+    background: rgba(5,8,16,0.75);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 18px;
+    min-height: 860px;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 0.88rem;
+    overflow: auto;
+  }
+
+  .tiny { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+  ul { margin: 0; padding-left: 20px; line-height: 1.7; color: var(--muted); }
+
+  .import-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 24px; }
+
+  input[type="file"] {
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px dashed rgba(255,255,255,0.2);
+    background: transparent;
+    color: var(--muted);
+  }
+
+  .status { margin-top: 10px; font-size: 0.8rem; color: #3fe9cb; }
+
+  @media (max-width: 1100px) {
+    .grid, .import-grid { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-<div class="wrap">
-  <div class="top">
-    <div class="title">
-      <div class="icon">🧾</div>
+<div class="shell">
+  <header>
+    <div class="title-block">
+      <div class="badge">🧾</div>
       <div>
         <h1>SOP Wizard</h1>
-        <div class="sub">Turn an approved draw.io diagram into a clean SOP, text download, PDF, or share link</div>
+        <div class="subtext">Import an approved diagram, structure the SOP, then ship it as text, PDF, or a share link.</div>
       </div>
     </div>
     <div class="actions">
@@ -49,66 +158,89 @@
       <button class="btn" onclick="downloadPDF()">Download PDF</button>
       <button class="btn" onclick="copyShareLink()">Copy share link</button>
     </div>
-  </div>
+  </header>
 
   <div class="import-grid">
-    <div class="card">
-      <h2>Approved Diagram Import</h2>
-      <div class="field">
-        <label for="drawioXml">Draw.io XML</label>
-        <textarea id="drawioXml" placeholder="Paste approved .drawio / .mxfile XML here"></textarea>
-        <div class="tiny">The parser uses only diagram text, connections, and lane/layer layout. Ordering preference: edge flow first, then left-to-right, then top-down.</div>
-      </div>
-      <div class="actions">
-        <input type="file" id="drawioFile" accept=".drawio,.xml,.txt" onchange="loadDrawioFile(event)" style="max-width:280px; padding:8px 10px;">
+    <div class="surface highlight">
+      <div class="kicker">approved diagram import</div>
+      <h2>Paste draw.io XML</h2>
+      <textarea id="drawioXml" class="long" placeholder="Paste approved .drawio / .mxfile XML here"></textarea>
+      <div class="tiny">The parser uses diagram text, connections, and lanes. Ordering logic mirrors the dashboard: edge flow → left-to-right → top-down.</div>
+      <div class="actions" style="margin-top:14px; flex-wrap:wrap;">
+        <input type="file" id="drawioFile" accept=".drawio,.xml,.txt" onchange="loadDrawioFile(event)">
         <button class="btn primary" onclick="importDrawio()">Import approved diagram</button>
       </div>
       <div id="importStatus" class="status"></div>
     </div>
 
-    <div class="card">
-      <h2>High-quality SOP shape</h2>
-      <div class="tiny">Pattern informed by common SOP guidance: step-by-step consistency, clear ownership, inputs, exceptions, outputs, and quality checks. This aligns with guidance from Smartsheet on step-by-step consistency and TechTarget on clear roles, risks, and troubleshooting; Process Street examples also emphasize explicit approvals and checkpoints.</div>
-      <div class="tiny" style="margin-top:12px;">Output sections:</div>
-      <div class="tiny" style="margin-top:8px;">
-        • Purpose / outcome<br>
-        • Trigger and scope<br>
-        • Roles / lanes<br>
-        • Inputs / preconditions<br>
-        • Procedure steps<br>
-        • Decisions and branches<br>
-        • Exceptions / troubleshooting<br>
-        • Outputs / end state<br>
-        • Quality checks / approvals<br>
-        • Source diagram trace
-      </div>
+    <div class="surface">
+      <div class="kicker">output spine</div>
+      <h2>What a production SOP covers</h2>
+      <ul>
+        <li>Purpose, trigger, lanes, owners, and frequency.</li>
+        <li>Inputs, ordered steps, and real decision points.</li>
+        <li>Exceptions, troubleshooting, approvals, and quality checks.</li>
+        <li>Traceability back to the approved diagram.</li>
+      </ul>
+      <div class="tiny" style="margin-top:12px;">Referenced from Smartsheet, TechTarget, and Process Street patterns for consistent handoffs.</div>
     </div>
   </div>
 
   <div class="grid">
-    <div class="card">
-      <h2>Wizard Input</h2>
+    <div class="surface">
+      <div class="kicker">wizard input</div>
+      <h2>Shape the SOP</h2>
+      <label for="processName">Process name</label>
+      <input id="processName" placeholder="Example: Wickey order release to picking">
 
-      <div class="field"><label for="processName">Process name</label><input id="processName" placeholder="Example: Wickey order release to picking"></div>
-      <div class="step-grid">
-        <div class="field"><label for="goal">Goal / outcome</label><input id="goal" placeholder="What this process achieves"></div>
-        <div class="field"><label for="trigger">Trigger</label><input id="trigger" placeholder="What starts the process"></div>
+      <div class="two-col">
+        <div>
+          <label for="goal">Goal / outcome</label>
+          <input id="goal" placeholder="What this process achieves">
+        </div>
+        <div>
+          <label for="trigger">Trigger</label>
+          <input id="trigger" placeholder="What starts the process">
+        </div>
       </div>
-      <div class="step-grid">
-        <div class="field"><label for="owner">Primary owner / roles</label><input id="owner" placeholder="Primary owner/team"></div>
-        <div class="field"><label for="frequency">Frequency</label><input id="frequency" placeholder="Per order / daily / weekly"></div>
+
+      <div class="two-col">
+        <div>
+          <label for="owner">Primary owner / roles</label>
+          <input id="owner" placeholder="Primary owner/team">
+        </div>
+        <div>
+          <label for="frequency">Frequency</label>
+          <input id="frequency" placeholder="Per order / daily / weekly">
+        </div>
       </div>
-      <div class="field"><label for="inputs">Inputs / preconditions</label><textarea id="inputs" placeholder="One per line"></textarea></div>
-      <div class="field"><label for="steps">Procedure steps</label><textarea id="steps" placeholder="One step per line. Keep them action-led."></textarea><div class="tiny">Imported from approved diagram or edited manually.</div></div>
-      <div class="field"><label for="decisions">Decisions / branches</label><textarea id="decisions" placeholder="Example: If stock missing -> manual exception"></textarea></div>
-      <div class="field"><label for="exceptions">Exceptions / troubleshooting</label><textarea id="exceptions" placeholder="What breaks, stalls, or needs escalation?"></textarea></div>
-      <div class="field"><label for="outputs">Outputs / end state</label><textarea id="outputs" placeholder="What is produced at the end?"></textarea></div>
-      <div class="field"><label for="qa">Quality checks / approvals</label><textarea id="qa" placeholder="Checks before handoff or completion"></textarea></div>
-      <div class="field"><label for="notes">Context / source notes</label><textarea id="notes" placeholder="Imported notes or meeting context"></textarea></div>
+
+      <label for="inputs">Inputs / preconditions</label>
+      <textarea id="inputs" placeholder="One per line"></textarea>
+
+      <label for="steps">Procedure steps</label>
+      <textarea id="steps" class="long" placeholder="One step per line. Keep them action-led."></textarea>
+      <div class="tiny">Steps import from the diagram but can be edited here.</div>
+
+      <label for="decisions">Decisions / branches</label>
+      <textarea id="decisions" placeholder="Example: If stock missing → manual exception"></textarea>
+
+      <label for="exceptions">Exceptions / troubleshooting</label>
+      <textarea id="exceptions" placeholder="What breaks, stalls, or needs escalation?"></textarea>
+
+      <label for="outputs">Outputs / end state</label>
+      <textarea id="outputs" placeholder="What is produced at the end?"></textarea>
+
+      <label for="qa">Quality checks / approvals</label>
+      <textarea id="qa" placeholder="Checks before handoff or completion"></textarea>
+
+      <label for="notes">Context / source notes</label>
+      <textarea id="notes" placeholder="Imported notes or meeting context"></textarea>
     </div>
 
-    <div class="card">
-      <h2>Generated SOP</h2>
+    <div class="surface">
+      <div class="kicker">generated sop</div>
+      <h2>Operator-ready output</h2>
       <div id="output" class="output"># SOP: Untitled
 
 Import an approved draw.io XML file or fill the wizard manually, then click Generate SOP.
@@ -116,7 +248,7 @@ Import an approved draw.io XML file or fill the wizard manually, then click Gene
 Downloads available:
 - TXT
 - PDF
-- share link with embedded text payload</div>
+- Share link with embedded payload</div>
     </div>
   </div>
 </div>
@@ -246,7 +378,6 @@ function importDrawio() {
     const startNode = byId.start;
     const endNode = byId.end;
 
-    const orderRank = (node) => `${String(Math.round(node.geo.x)).padStart(6,'0')}-${String(Math.round(node.geo.y)).padStart(6,'0')}`;
     const sortFlow = (ids) => ids
       .map(id => byId[id])
       .filter(Boolean)
@@ -347,51 +478,7 @@ function buildSOPText() {
   const outputs = lines('outputs');
   const qa = lines('qa');
 
-  return `# SOP: ${processName}
-
-## 1. Purpose / Outcome
-${goal}
-
-## 2. Trigger / Scope
-${trigger}
-
-## 3. Roles / Ownership
-${owner}
-
-## 4. Frequency
-${frequency}
-
-## 5. Inputs / Preconditions
-${bulletize(inputs)}
-
-## 6. Procedure
-${numbered(steps)}
-
-## 7. Decisions / Branches
-${bulletize(decisions)}
-
-## 8. Exceptions / Troubleshooting
-${bulletize(exceptions)}
-
-## 9. Outputs / End State
-${bulletize(outputs)}
-
-## 10. Quality Checks / Approvals
-${bulletize(qa)}
-
-## 11. Source / Notes
-${notes || 'None captured.'}
-
-## 12. Trace From Diagram
-Ordering logic: edge flow first, then left-to-right, then top-down.
-Primary trigger: ${trigger}
-End state: ${outputs[0] || 'TBD'}
-Main steps:
-${numbered(steps)}
-Decisions:
-${bulletize(decisions)}
-Exceptions:
-${bulletize(exceptions)}`;
+  return `# SOP: ${processName}\n\n## 1. Purpose / Outcome\n${goal}\n\n## 2. Trigger / Scope\n${trigger}\n\n## 3. Roles / Ownership\n${owner}\n\n## 4. Frequency\n${frequency}\n\n## 5. Inputs / Preconditions\n${bulletize(inputs)}\n\n## 6. Procedure\n${numbered(steps)}\n\n## 7. Decisions / Branches\n${bulletize(decisions)}\n\n## 8. Exceptions / Troubleshooting\n${bulletize(exceptions)}\n\n## 9. Outputs / End State\n${bulletize(outputs)}\n\n## 10. Quality Checks / Approvals\n${bulletize(qa)}\n\n## 11. Source / Notes\n${notes || 'None captured.'}\n\n## 12. Trace From Diagram\nOrdering logic: edge flow first, then left-to-right, then top-down.\nPrimary trigger: ${trigger}\nEnd state: ${outputs[0] || 'TBD'}\nMain steps:\n${numbered(steps)}\nDecisions:\n${bulletize(decisions)}\nExceptions:\n${bulletize(exceptions)}`;
 }
 
 function generateSOP() {
@@ -427,11 +514,11 @@ async function downloadPDF() {
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
   const margin = 42;
   const pageWidth = doc.internal.pageSize.getWidth() - margin * 2;
-  const lines = doc.splitTextToSize(text, pageWidth);
+  const linesArr = doc.splitTextToSize(text, pageWidth);
   let y = margin;
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(11);
-  lines.forEach(line => {
+  linesArr.forEach(line => {
     if (y > 800) {
       doc.addPage();
       y = margin;

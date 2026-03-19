@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Q Mission Control · Overview</title>
+<title>Q Mission Control · Team</title>
 <style>
   :root {
     --bg: #05070f; --bg-alt: #070b16; --panel: rgba(16, 21, 34, 0.92);
@@ -235,10 +235,10 @@
     </div>
     <div class="nav-group-label">Control Plane</div>
     <nav class="nav">
-      <a href="index.html" class="nav-btn active"><span class="nav-left"><span class="nav-icon">◉</span><span>Overview</span></span><span class="nav-count">Live</span></a>
+      <a href="index.html" class="nav-btn"><span class="nav-left"><span class="nav-icon">◉</span><span>Overview</span></span><span class="nav-count">Live</span></a>
       <a href="jobs.html" class="nav-btn"><span class="nav-left"><span class="nav-icon">▣</span><span>Jobs</span></span><span class="nav-count">12</span></a>
       <a href="agents.html" class="nav-btn"><span class="nav-left"><span class="nav-icon">◌</span><span>Agents</span></span><span class="nav-count">8</span></a>
-      <a href="team.html" class="nav-btn"><span class="nav-left"><span class="nav-icon">◎</span><span>Team</span></span><span class="nav-count">6</span></a>
+      <a href="team.html" class="nav-btn active"><span class="nav-left"><span class="nav-icon">◎</span><span>Team</span></span><span class="nav-count">6</span></a>
       <a href="brain-dump.html" class="nav-btn"><span class="nav-left"><span class="nav-icon">📝</span><span>Brain Dump</span></span><span class="nav-count">Notes</span></a>
       <a href="factories.html" class="nav-btn"><span class="nav-left"><span class="nav-icon">▤</span><span>Factories</span></span><span class="nav-count">4</span></a>
       <a href="content-factory.html" class="nav-btn"><span class="nav-left"><span class="nav-icon">🏭</span><span>Content Factory</span></span><span class="nav-count">New</span></a>
@@ -266,12 +266,12 @@
     <div class="breadcrumb">
       <a href="./">Home</a>
       <span>/</span>
-      <span class="breadcrumb-current">Overview</span>
+      <span class="breadcrumb-current">Team</span>
     </div>
     <div class="topbar">
       <div>
         <div class="section-kicker">Native control interface</div>
-        <h2 class="page-title">Overview</h2>
+        <h2 class="page-title">Team</h2>
         <div class="meta-row">
           <span class="chip">Last updated: 2026-03-19</span>
           <span class="chip">Maintained by Q</span>
@@ -280,196 +280,44 @@
         </div>
       </div>
       <div class="actions">
-        <button class="btn" id="refresh-btn" onclick="refreshData()" title="Refresh data">↻</button>
+      <button class="btn" onclick="location.reload()" title="Refresh page">↻</button>
+      <a class="btn" href="./">← Back to Overview</a>
+
         <a class="btn primary" href="#">Open Operator View</a>
       </div>
     </div>
 
-    <div class="hero-grid">
+    <div class="team-grid">
       <div class="panel highlight">
-        <div class="section-kicker">Mission status</div>
-        <div class="headline">Run the portfolio like a control room.</div>
-        <div class="subtext">This dashboard is the native surface for seeing active jobs, focused agents, factory throughput, memory state, tools, docs, and spend — in one place.</div>
-        <div class="hero-actions">
-          <span class="status-pill ok">● Stable enough to operate</span>
-          <span class="status-pill warn">▲ Autonomy still under target</span>
-          <span class="status-pill info">▣ Multi-page structure live</span>
-        </div>
+        <div class="section-kicker">Team</div>
+        <h3 class="panel-title" style="font-size:28px">Humans and agents on one board.</h3>
+        <div class="subtext">This is not a people directory. It is the coordination layer: ownership, current work, load, handoffs, and where things are stuck.</div>
       </div>
       <div class="panel soft">
-        <div class="panel-title-row">
-          <h3 class="panel-title">Control summary</h3>
-          <span class="small-pill">Shift snapshot</span>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><div class="l">Active jobs</div><div class="v">4</div></div>
-          <div class="kpi"><div class="l">Blocked</div><div class="v" style="color:var(--yellow)">2</div></div>
-          <div class="kpi"><div class="l">Agents running</div><div class="v" style="color:var(--brand)">5</div></div>
-          <div class="kpi"><div class="l">This week spend</div><div class="v">€2.50</div></div>
+        <div class="panel-title-row"><h3 class="panel-title">Capacity snapshot</h3><span class="small-pill">Weighted load</span></div>
+        <div class="list">
+          <div class="team-row"><div><div class="team-name">D.</div><div class="team-meta">CEO decisions only</div></div><strong>23%</strong></div>
+          <div class="team-row"><div><div class="team-name">Q</div><div class="team-meta">Main operator</div></div><strong>72%</strong></div>
+          <div class="team-row"><div><div class="team-name">Builder</div><div class="team-meta">Build capacity</div></div><strong>67%</strong></div>
+          <div class="team-row"><div><div class="team-name">Scout</div><div class="team-meta">Research reserve</div></div><strong>22%</strong></div>
         </div>
       </div>
     </div>
-    <div class="card-grid">
-      <div class="metric">
-        <div class="label">Autonomy level</div>
-        <div class="value" style="color:var(--yellow)">8%</div>
-        <div class="tiny">Target 30%. Still human-heavy.</div>
-        <div class="bar"><div class="fill yellow" style="width:27%"></div></div>
-      </div>
-      <div class="metric">
-        <div class="label">Focus score</div>
-        <div class="value" style="color:var(--brand)">71</div>
-        <div class="tiny">Most effort concentrated in three revenue tracks.</div>
-        <div class="bar"><div class="fill blue" style="width:71%"></div></div>
-      </div>
-      <div class="metric">
-        <div class="label">Job freshness</div>
-        <div class="value" style="color:var(--green)">83%</div>
-        <div class="tiny">Most live jobs updated inside the last 48h.</div>
-        <div class="bar"><div class="fill green" style="width:83%"></div></div>
-      </div>
-      <div class="metric">
-        <div class="label">Model burn</div>
-        <div class="value" style="color:var(--purple)">€0.36</div>
-        <div class="tiny">Today. Healthy, but still invisible in chat alone.</div>
-        <div class="bar"><div class="fill purple" style="width:36%"></div></div>
-      </div>
-    </div>
-    <div class="jobs-grid">
-      <div class="panel">
-        <div class="panel-title-row">
-          <h3 class="panel-title">Priority jobs</h3>
-          <a href="jobs.html" class="small-pill">View all →</a>
-        </div>
-        <div class="list">
-          <div class="job-row">
-            <div style="flex:1">
-              <div class="job-title">Navexela landing stack + GTM assets</div>
-              <div class="job-meta">Factory: Revenue Activation · Owner: Q · Next block: positioning confirmation from D.</div>
-              <div class="bar"><div class="fill blue" style="width:58%"></div></div>
-            </div>
-            <span class="status-pill warn">58%</span>
-          </div>
-          <div class="job-row">
-            <div style="flex:1">
-              <div class="job-title">DID Services sales activation</div>
-              <div class="job-meta">Factory: Revenue Activation · Owner: Q · Lead sourcing and outreach system design.</div>
-              <div class="bar"><div class="fill yellow" style="width:34%"></div></div>
-            </div>
-            <span class="status-pill warn">34%</span>
-          </div>
-          <div class="job-row">
-            <div style="flex:1">
-              <div class="job-title">Mission Control redesign</div>
-              <div class="job-meta">Factory: Internal Ops · Owner: Builder / Q · Multi-page navigation now live.</div>
-              <div class="bar"><div class="fill green" style="width:95%"></div></div>
-            </div>
-            <span class="status-pill ok">95%</span>
-          </div>
-        </div>
-      </div>
-      <div class="panel soft">
-        <div class="panel-title-row">
-          <h3 class="panel-title">Current focus</h3>
-          <span class="small-pill">Operator view</span>
-        </div>
-        <div class="focus-box">
-          <div class="section-kicker">Main objective</div>
-          <h4 class="focus-title">Revenue first. Tooling second.</h4>
-          <div class="subtext">The dashboard exists to reduce switching cost, surface blockers, and keep the factories aligned.</div>
-          <div class="focus-grid">
-            <div class="focus-stat"><div class="k">Top factory</div><div class="v">Revenue</div></div>
-            <div class="focus-stat"><div class="k">Most loaded agent</div><div class="v">Q</div></div>
-            <div class="focus-stat"><div class="k">Biggest risk</div><div class="v">Context drift</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="split">
-      <div class="panel">
-        <div class="panel-title-row">
-          <h3 class="panel-title">Agent activity</h3>
-          <a href="agents.html" class="small-pill">View all →</a>
-        </div>
-        <div class="list">
-          <div class="agent-row"><div><div class="agent-name">Q</div><div class="agent-sub">Running main operating loop, memory coordination, dashboard direction</div></div><span class="status-pill ok">Live</span></div>
-          <div class="agent-row"><div><div class="agent-name">Builder</div><div class="agent-sub">Mission-control UI build and structural redesign work</div></div><span class="status-pill info">Build</span></div>
-          <div class="agent-row"><div><div class="agent-name">Factory QC</div><div class="agent-sub">Checks outputs before they are promoted to production use</div></div><span class="status-pill violet">Queued</span></div>
-          <div class="agent-row"><div><div class="agent-name">Research Scout</div><div class="agent-sub">Pulls external intel, competitors, tooling options, and references</div></div><span class="status-pill warn">Idle</span></div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-title-row">
-          <h3 class="panel-title">Cost composition</h3>
-          <a href="costs.html" class="small-pill">View details →</a>
-        </div>
-        <div class="stack-bar" style="margin-bottom:12px">
-          <div class="stack-seg models" style="width:44%"></div>
-          <div class="stack-seg infra" style="width:26%"></div>
-          <div class="stack-seg ops" style="width:18%"></div>
-          <div class="stack-seg mkt" style="width:12%"></div>
-        </div>
-        <div class="list">
-          <div class="cost-row"><div><div class="row-title">Models</div><div class="cost-sub">Chat + reasoning spend across sessions</div></div><strong>€1.10</strong></div>
-          <div class="cost-row"><div><div class="row-title">Infra</div><div class="cost-sub">Hosting, browser, storage, background ops</div></div><strong>€0.65</strong></div>
-          <div class="cost-row"><div><div class="row-title">Ops experiments</div><div class="cost-sub">Prototype overhead, drafts, temporary tooling</div></div><strong>€0.45</strong></div>
-          <div class="cost-row"><div><div class="row-title">Marketing tooling</div><div class="cost-sub">Content and distribution support</div></div><strong>€0.30</strong></div>
-        </div>
-      </div>
+    <div class="panel">
+      <div class="panel-title-row"><h3 class="panel-title">Ownership map</h3><span class="small-pill">Factories + handoffs</span></div>
+      <table class="table">
+        <thead><tr><th>Member</th><th>Role</th><th>Primary factory</th><th>Working on</th><th>Needs</th></tr></thead>
+        <tbody>
+          <tr><td><strong>D.</strong></td><td>CEO / decision maker</td><td>All</td><td>Offer positioning, leverage decisions, approvals</td><td>Clean brief, not noise</td></tr>
+          <tr><td><strong>Q</strong></td><td>Operator / command center</td><td>Revenue + Ops</td><td>Portfolio orchestration and task routing</td><td>Low-friction visibility</td></tr>
+          <tr><td><strong>Builder</strong></td><td>Product builder</td><td>Internal Ops</td><td>Mission control UI and native control surfaces</td><td>Live session + cost data in v2</td></tr>
+          <tr><td><strong>Scout</strong></td><td>Research agent</td><td>Research</td><td>Tooling, competitive intel, references</td><td>Specific briefs</td></tr>
+        </tbody>
+      </table>
     </div>
 
-    <div class="footer-note">Q Mission Control v2 · Multi-page navigation · <span id="last-updated">Last updated: 2026-03-19</span></div>
+    <div class="footer-note">Q Mission Control v2 · Multi-page navigation · Last generated: 2026-03-19</div>
   </main>
 </div>
-
-<script>
-// Refresh button functionality
-const DATA_URL = './data/mission-control.json';
-
-function formatTime(date) {
-  return new Date(date).toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
-}
-
-async function refreshData() {
-  const btn = document.getElementById('refresh-btn');
-  if (btn) {
-    btn.style.opacity = '0.5';
-    btn.textContent = '⟳';
-  }
-  
-  try {
-    const response = await fetch(DATA_URL + '?t=' + Date.now());
-    if (!response.ok) throw new Error('Failed to fetch');
-    const data = await response.json();
-    updateDashboard(data);
-    document.getElementById('last-updated').textContent = 'Last updated: ' + formatTime(new Date());
-  } catch (e) {
-    console.log('Data refresh failed:', e);
-    document.getElementById('last-updated').textContent = 'Update failed - ' + formatTime(new Date());
-  }
-  
-  if (btn) {
-    btn.style.opacity = '1';
-    btn.textContent = '↻';
-  }
-}
-
-function updateDashboard(data) {
-  if (data.jobs) {
-    const activeEl = document.querySelector('[data-metric="active-jobs"]');
-    const blockedEl = document.querySelector('[data-metric="blocked-jobs"]');
-    if (activeEl) activeEl.textContent = data.jobs.active;
-    if (blockedEl) blockedEl.textContent = data.jobs.blocked;
-  }
-  
-  if (data.costs) {
-    const costEl = document.querySelector('[data-metric="today-cost"]');
-    if (costEl) costEl.textContent = '€' + data.costs.today.toFixed(2);
-  }
-}
-
-// Initial load
-refreshData();
-</script>
 </body>
 </html>

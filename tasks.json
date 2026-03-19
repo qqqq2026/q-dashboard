@@ -1,0 +1,106 @@
+{
+  "lastUpdated": "2026-03-12",
+  "dashboard": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Navexela landing stack + GTM assets",
+        "company": "Navexela",
+        "status": "todo",
+        "priority": "high",
+        "owner": "Q",
+        "revPotential": "€€€",
+        "notes": "Landing page, lead gen, CRM sheet. Needs D. to confirm positioning.",
+        "created": "2026-03-12",
+        "updated": "2026-03-12"
+      },
+      {
+        "id": 2,
+        "title": "DID Services sales activation",
+        "company": "DID Services",
+        "status": "todo",
+        "priority": "high",
+        "owner": "Q",
+        "revPotential": "€€€",
+        "notes": "Identify leads, outreach templates, pipeline setup.",
+        "created": "2026-03-12",
+        "updated": "2026-03-12"
+      },
+      {
+        "id": 3,
+        "title": "Voltenum sales activation",
+        "company": "Voltenum",
+        "status": "todo",
+        "priority": "high",
+        "owner": "Q",
+        "revPotential": "€€€",
+        "notes": "Identify leads, outreach templates, pipeline setup.",
+        "created": "2026-03-12",
+        "updated": "2026-03-12"
+      },
+      {
+        "id": 4,
+        "title": "Wickey PM automation",
+        "company": "Wickey",
+        "status": "todo",
+        "priority": "medium",
+        "owner": "Q",
+        "revPotential": "€€",
+        "notes": "Document + automate recurring PM workflows.",
+        "created": "2026-03-12",
+        "updated": "2026-03-12"
+      },
+      {
+        "id": 5,
+        "title": "Nightly restic backups",
+        "company": "Ops",
+        "status": "todo",
+        "priority": "medium",
+        "owner": "Q",
+        "revPotential": "—",
+        "notes": "Configure + document restore steps.",
+        "created": "2026-03-12",
+        "updated": "2026-03-12"
+      },
+      {
+        "id": 6,
+        "title": "Q-Dashboard build",
+        "company": "Portfolio",
+        "status": "active",
+        "priority": "high",
+        "owner": "Q",
+        "revPotential": "€€",
+        "notes": "Revenue targets, pipelines, autonomy KPIs. This dashboard.",
+        "created": "2026-03-12",
+        "updated": "2026-03-12"
+      },
+      {
+        "id": 7,
+        "title": "Grachten Holding — Revenue Lab entity setup",
+        "company": "Grachten Holding",
+        "status": "active",
+        "priority": "high",
+        "owner": "Q",
+        "revPotential": "€€€€",
+        "notes": "Holding vehicle for all Revenue Lab projects. Viable POCs move here. RL-002, RL-003, RL-004 in pipeline.",
+        "created": "2026-03-12",
+        "updated": "2026-03-12"
+      }
+    ]
+  },
+  "revenuelab": {
+    "description": "POC-stage experiments Q investigates, tests and runs autonomously. Viable projects earn a spot on the Q-Dashboard.",
+    "experiments": [
+      {
+        "id": "rl-001",
+        "title": "Revenue Lab — Startup Scope",
+        "stage": "scoping",
+        "owner": "Q",
+        "hypothesis": "Identify and test startup-adjacent revenue experiments autonomously. Each topic is investigated, POC'd, and either promoted to Q-Dashboard or killed.",
+        "nextAction": "Define first batch of experiment topics with D.",
+        "created": "2026-03-12",
+        "updated": "2026-03-12"
+      }
+    ]
+  }
+}

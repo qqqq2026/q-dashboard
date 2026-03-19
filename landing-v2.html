@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Netcongestie oplossen met batterijopslag | Voltenum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --teal: #0A5E5C;
+    --teal-dark: #084a48;
+    --teal-light: #0d7a78;
+    --orange: #D4622B;
+    --orange-dark: #b8521f;
+    --bg: #ffffff;
+    --bg-alt: #F5F3F0;
+    --bg-dark: #0A3D3C;
+    --text: #1A1A1A;
+    --muted: #666666;
+    --border: #e0ddd9;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Poppins', 'Segoe UI', sans-serif; line-height: 1.6; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; width: 100%;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100; padding: 14px 60px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .nav-logo img { height: 36px; }
+  .nav-cta {
+    background: var(--orange); color: #fff;
+    font-weight: 700; font-size: 0.82rem;
+    padding: 10px 22px; border-radius: 5px;
+    text-decoration: none; transition: background 0.15s;
+  }
+  .nav-cta:hover { background: var(--orange-dark); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg-dark) 0%, #0f524f 60%, #0a3a38 100%);
+    display: flex; align-items: center;
+    padding: 120px 60px 80px;
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 45%;
+    background: rgba(255,255,255,0.03);
+  }
+  .hero-inner { max-width: 1100px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(212,98,43,0.2); border: 1px solid rgba(212,98,43,0.4);
+    color: #f09070; font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 5px 14px; border-radius: 4px; margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 900; color: #fff;
+    line-height: 1.1; letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .hero h1 em { color: #f09060; font-style: normal; }
+  .hero p { font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 32px; line-height: 1.8; max-width: 460px; }
+  .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--orange); color: #fff;
+    font-weight: 700; font-size: 0.9rem;
+    padding: 14px 28px; border-radius: 5px;
+    text-decoration: none; transition: all 0.15s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--orange-dark); transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent; color: #fff;
+    font-weight: 600; font-size: 0.9rem;
+    padding: 14px 28px; border-radius: 5px;
+    text-decoration: none; border: 1px solid rgba(255,255,255,0.3);
+    transition: all 0.15s; display: inline-block;
+  }
+  .btn-secondary:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
+  .hero-sub { font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-top: 16px; }
+
+  /* HERO IMAGE */
+  .hero-image { position: relative; }
+  .hero-image img { width: 100%; border-radius: 12px; box-shadow: 0 30px 80px rgba(0,0,0,0.4); }
+  .hero-stat-card {
+    position: absolute; bottom: -20px; left: -20px;
+    background: #fff; border-radius: 10px;
+    padding: 14px 18px; box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    min-width: 160px;
+  }
+  .hero-stat-val { font-size: 1.6rem; font-weight: 800; color: var(--teal); line-height: 1; }
+  .hero-stat-label { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+
+  /* TRUST BAR */
+  .trust {
+    background: var(--bg-alt);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 60px;
+    display: flex; justify-content: center; gap: 52px; flex-wrap: wrap;
+  }
+  .trust-item { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; color: var(--muted); }
+  .trust-item strong { color: var(--text); font-weight: 700; }
+  .trust-dot { width: 6px; height: 6px; background: var(--orange); border-radius: 50%; }
+
+  /* SECTIONS */
+  .section { padding: 80px 60px; max-width: 1100px; margin: 0 auto; }
+  .section-full { padding: 80px 60px; }
+  .section-full .inner { max-width: 1100px; margin: 0 auto; }
+
+  .label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--orange); margin-bottom: 10px; }
+  h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); font-weight: 800; color: var(--text); letter-spacing: -0.02em; margin-bottom: 14px; line-height: 1.2; }
+  h2 em { color: var(--teal); font-style: normal; }
+  .lead { font-size: 1rem; color: var(--muted); max-width: 580px; margin-bottom: 44px; line-height: 1.8; }
+
+  /* PROBLEM CARDS */
+  .pain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .pain-card {
+    background: var(--bg-alt); border: 1px solid var(--border);
+    border-radius: 10px; padding: 28px;
+    border-top: 3px solid var(--orange);
+  }
+  .pain-num { font-size: 2rem; font-weight: 900; color: var(--border); line-height: 1; margin-bottom: 12px; }
+  .pain-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .pain-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.7; }
+
+  /* SOLUTION */
+  .solution-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .solution-img { border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.12); }
+  .solution-img img { width: 100%; display: block; }
+  .solution-points { list-style: none; }
+  .solution-points li { display: flex; gap: 14px; margin-bottom: 20px; }
+  .check-circle {
+    width: 22px; height: 22px; background: var(--teal); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.65rem; flex-shrink: 0; margin-top: 2px;
+    font-weight: 700;
+  }
+  .solution-points strong { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .solution-points span { font-size: 0.78rem; color: var(--muted); }
+
+  /* METRICS BOX */
+  .metrics-box {
+    background: var(--bg-dark); border-radius: 12px; padding: 28px;
+    margin-top: 28px; color: #fff;
+  }
+  .metrics-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 16px; }
+  .metric-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.82rem; }
+  .metric-row:last-child { border-bottom: none; }
+  .metric-label { color: rgba(255,255,255,0.5); }
+  .metric-val { font-weight: 700; color: #fff; }
+  .metric-val.green { color: #4ade80; }
+  .metric-val.red { color: #f87171; }
+  .metric-val.orange { color: #fb923c; }
+
+  /* PRODUCTS */
+  .products-bg { background: var(--bg-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .product-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .product-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.1); transform: translateY(-3px); }
+  .product-img { height: 200px; overflow: hidden; background: var(--bg-alt); }
+  .product-img img { width: 100%; height: 100%; object-fit: cover; }
+  .product-body { padding: 20px; }
+  .product-tag {
+    display: inline-block; background: rgba(10,94,92,0.1); color: var(--teal);
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; padding: 3px 9px; border-radius: 4px; margin-bottom: 10px;
+  }
+  .product-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .product-card p { font-size: 0.78rem; color: var(--muted); line-height: 1.7; }
+
+  /* PROCESS */
+  .process-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .process-step { text-align: center; padding: 24px 16px; }
+  .process-num {
+    width: 48px; height: 48px; background: var(--teal); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 800; font-size: 1.1rem;
+    margin: 0 auto 16px;
+  }
+  .process-step h3 { font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .process-step p { font-size: 0.75rem; color: var(--muted); line-height: 1.6; }
+  .process-arrow { display: flex; align-items: center; justify-content: center; color: var(--border); font-size: 1.5rem; padding-top: 24px; }
+
+  /* CTA SECTION */
+  .cta-bg {
+    background: linear-gradient(135deg, var(--bg-dark) 0%, #0f524f 100%);
+    padding: 80px 60px;
+  }
+  .cta-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+  .cta-text h2 { color: #fff; margin-bottom: 14px; }
+  .cta-text p { color: rgba(255,255,255,0.65); font-size: 0.95rem; margin-bottom: 24px; }
+  .cta-bullets { list-style: none; }
+  .cta-bullets li { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 10px; font-size: 0.82rem; color: rgba(255,255,255,0.7); }
+  .cta-bullets li::before { content: '✓'; color: #4ade80; font-weight: 700; flex-shrink: 0; }
+
+  /* FORM */
+  .form-card { background: #fff; border-radius: 12px; padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+  .form-card h3 { font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+  .form-card .form-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 22px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { font-size: 0.7rem; font-weight: 600; color: var(--text); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 6px; }
+  .form-group input, .form-group select {
+    width: 100%; border: 1px solid var(--border);
+    color: var(--text); padding: 11px 14px;
+    border-radius: 6px; font-size: 0.85rem;
+    font-family: 'Poppins', sans-serif;
+    outline: none; transition: border-color 0.15s; background: #fff;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--teal); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-submit {
+    width: 100%; background: var(--orange); color: #fff;
+    font-weight: 700; font-size: 0.95rem; padding: 14px;
+    border-radius: 6px; border: none; cursor: pointer;
+    margin-top: 6px; transition: background 0.15s;
+    font-family: 'Poppins', sans-serif;
+  }
+  .form-submit:hover { background: var(--orange-dark); }
+  .form-privacy { font-size: 0.65rem; color: #aaa; margin-top: 10px; text-align: center; }
+
+  /* FOOTER */
+  footer {
+    background: var(--bg-dark); color: rgba(255,255,255,0.4);
+    padding: 28px 60px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.72rem;
+  }
+  footer img { height: 28px; opacity: 0.6; filter: brightness(10); }
+
+  @media (max-width: 768px) {
+    nav { padding: 14px 20px; }
+    .hero { padding: 100px 20px 60px; }
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-image { display: none; }
+    .trust { padding: 16px 20px; gap: 16px; }
+    .section, .section-full { padding: 60px 20px; }
+    .pain-grid, .product-grid, .process-grid { grid-template-columns: 1fr; }
+    .solution-grid, .cta-inner { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .cta-bg { padding: 60px 20px; }
+    footer { padding: 20px; flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <img src="https://www.voltenum.nl/web/image/website/2/logo/Voltenum%20B.V.?unique=949f29b" alt="Voltenum">
+  </div>
+  <a href="#analyse" class="nav-cta">Gratis analyse →</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">⚡ Energieopslag · Limburg & Nederland</div>
+      <h1>Netcongestie?<br><em>Maak ruimte</em><br>met batterijopslag.</h1>
+      <p>Uw transportvermogen zit vol, maar uw ambities niet. Met onze batterijoplossingen haalt u meer uit uw bestaande aansluiting — zonder netverzwaring, zonder jaren wachten.</p>
+      <div class="hero-btns">
+        <a href="#analyse" class="btn-primary">Gratis energie-analyse →</a>
+        <a href="#oplossing" class="btn-secondary">Hoe werkt het?</a>
+      </div>
+      <div class="hero-sub">✓ Advieskosten worden verrekend bij aankoop &nbsp;·&nbsp; ✓ Reactie binnen 24 uur</div>
+    </div>
+    <div class="hero-image">
+      <img src="https://www.voltenum.nl/web/image/6523-11eb9797/Kast%20Igor.jpeg" alt="Voltenum batterijinstallatie">
+      <div class="hero-stat-card">
+        <div class="hero-stat-val">85%</div>
+        <div class="hero-stat-label">piekverbruik gereduceerd</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRUST BAR -->
+<div class="trust">
+  <div class="trust-item"><div class="trust-dot"></div><span>⭐ <strong>5.0</strong> Google reviews</span></div>
+  <div class="trust-item"><div class="trust-dot"></div><span>Specialist in <strong>energieopslag</strong> sinds 2023</span></div>
+  <div class="trust-item"><div class="trust-dot"></div><span><strong>B2B & B2C</strong> oplossingen op maat</span></div>
+  <div class="trust-item"><div class="trust-dot"></div><span>Gevestigd in <strong>Limburg</strong></span></div>
+  <div class="trust-item"><div class="trust-dot"></div><span><strong>Voltenum Connect</strong> EMS inbegrepen</span></div>
+</div>
+
+<!-- PROBLEM -->
+<div class="section">
+  <div class="label">Het probleem</div>
+  <h2>Herkenbaar?<br><em>U bent niet de enige.</em></h2>
+  <p class="lead">Netcongestie remt groei in heel Nederland. Of u nu zonnepanelen wil plaatsen, laadpalen wil installeren of uw energierekening wil verlagen — de wachtrij bij de netbeheerder staat u in de weg.</p>
+  <div class="pain-grid">
+    <div class="pain-card">
+      <div class="pain-num">01</div>
+      <h3>Transportvermogen vol</h3>
+      <p>Uw aansluiting is groot genoeg, maar de netbeheerder kan uw piek niet leveren of afnemen. Elke uitbreiding geblokkeerd.</p>
+    </div>
+    <div class="pain-card">
+      <div class="pain-num">02</div>
+      <h3>Jaren wachten op verzwaring</h3>
+      <p>Een nieuwe transportaansluiting kan 3–7 jaar duren. Ondertussen loopt u omzet, subsidie en groei mis.</p>
+    </div>
+    <div class="pain-card">
+      <div class="pain-num">03</div>
+      <h3>Hoge piek- en energiekosten</h3>
+      <p>Uw energierekening wordt gedomineerd door pieken. Met de juiste batterij betaalt u elke maand significant minder.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SOLUTION -->
+<div id="oplossing" style="background: var(--bg-alt); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="section">
+    <div class="solution-grid">
+      <div>
+        <div class="label">De oplossing</div>
+        <h2>Batterijopslag:<br><em>uw eigen energiebuffer.</em></h2>
+        <p class="lead" style="margin-bottom:28px;">Een slimme Voltenum batterijoplossing geeft u volledige controle. Pieken afvlakken, opwek opslaan, laadpalen voeden — allemaal binnen uw bestaande aansluiting.</p>
+        <ul class="solution-points">
+          <li>
+            <div class="check-circle">✓</div>
+            <div><strong>Piekafvlakking (peak shaving)</strong><span>Blijf altijd onder uw transportlimiet. Automatisch, 24/7 via Voltenum Connect.</span></div>
+          </li>
+          <li>
+            <div class="check-circle">✓</div>
+            <div><strong>Zonne-energie volledig benutten</strong><span>Opwek opslaan ondanks feed-in restricties. Uw energie, uw opslag.</span></div>
+          </li>
+          <li>
+            <div class="check-circle">✓</div>
+            <div><strong>Laadpalen zonder netverzwaring</strong><span>Slim laden op basis van beschikbaar vermogen. Geen extra aansluitkosten.</span></div>
+          </li>
+          <li>
+            <div class="check-circle">✓</div>
+            <div><strong>Live inzicht via Voltenum Connect</strong><span>Real-time monitoring en automatische optimalisatie via ons eigen EMS-systeem.</span></div>
+          </li>
+        </ul>
+        <div class="metrics-box">
+          <div class="metrics-title">Voorbeeld situatie — bedrijfspand</div>
+          <div class="metric-row"><span class="metric-label">Aansluitvermogen</span><span class="metric-val">245 kW (3×350A)</span></div>
+          <div class="metric-row"><span class="metric-label">Transportlimiet netbeheerder</span><span class="metric-val">34 kW</span></div>
+          <div class="metric-row"><span class="metric-label">Piek zonder batterij</span><span class="metric-val red">68 kW ⚠</span></div>
+          <div class="metric-row"><span class="metric-label">Piek mét Voltenum batterij</span><span class="metric-val green">32 kW ✓</span></div>
+          <div class="metric-row"><span class="metric-label">Geschatte besparing</span><span class="metric-val orange">~€800/maand</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="solution-img">
+          <img src="https://www.voltenum.nl/web/image/6516-14bb1b6e/ai%20insights.webp" alt="Voltenum Connect dashboard">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTS -->
+<div class="products-bg">
+  <div class="section">
+    <div class="label">Onze producten</div>
+    <h2>Kwaliteit die<br><em>levert wat het belooft.</em></h2>
+    <p class="lead">Van residentieel tot grootschalig industrieel — wij configureren de optimale oplossing voor uw situatie.</p>
+    <div class="product-grid">
+      <div class="product-card">
+        <div class="product-img">
+          <img src="https://www.voltenum.nl/web/image/6307-d290258a/Productfoto%201.webp" alt="PowerRack">
+        </div>
+        <div class="product-body">
+          <div class="product-tag">Residentieel & zakelijk</div>
+          <h3>PowerRack Batterij</h3>
+          <p>5 kWh modules, modulair uitbreidbaar tot 100 kWh. Stil, compact en volledig geïntegreerd met Voltenum Connect EMS.</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">
+          <img src="https://www.voltenum.nl/web/image/6288-3399a273/Productfoto%2013.png" alt="MEO Behuizing">
+        </div>
+        <div class="product-body">
+          <div class="product-tag">Zakelijk</div>
+          <h3>MEO Behuizing</h3>
+          <p>Onze eigen ontwikkelde buitenbehuizing. 60 of 100 kWh, modulair, weerbestendig en beschikbaar in verschillende kleuren.</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-img">
+          <img src="https://www.voltenum.nl/web/image/6881-16bdc7bd/Productfoto%205.webp" alt="BESS Container">
+        </div>
+        <div class="product-body">
+          <div class="product-tag">Industrieel</div>
+          <h3>BESS Container</h3>
+          <p>Grootschalige energieopslag voor bedrijven en coöperaties. Op maat geconfigureerd, plug & play installatie.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<div class="section">
+  <div class="label">Onze aanpak</div>
+  <h2>Van analyse naar<br><em>installatie in 4 stappen.</em></h2>
+  <p class="lead">Wij ontzorgen u volledig — van eerste gesprek tot werkende installatie.</p>
+  <div class="process-grid">
+    <div class="process-step">
+      <div class="process-num">1</div>
+      <h3>Gratis energie-analyse</h3>
+      <p>Wij brengen uw situatie in kaart. Verbruik, opwek, transportlimiet — alles wordt doorgerekend.</p>
+    </div>
+    <div class="process-step">
+      <div class="process-num">2</div>
+      <h3>Maatwerk advies</h3>
+      <p>U ontvangt een helder rapport met de optimale batterijgrootte en verwachte terugverdientijd.</p>
+    </div>
+    <div class="process-step">
+      <div class="process-num">3</div>
+      <h3>Offerte & planning</h3>
+      <p>Onze gecertificeerde installateurpartner maakt de definitieve offerte en installatiedatum.</p>
+    </div>
+    <div class="process-step">
+      <div class="process-num">4</div>
+      <h3>Installatie & Connect</h3>
+      <p>Vakkundige installatie + activatie van Voltenum Connect. Vanaf dag 1 volledig inzicht.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CTA / FORM -->
+<div id="analyse" class="cta-bg">
+  <div class="cta-inner">
+    <div class="cta-text">
+      <div class="label" style="color:#f09070">Gratis starten</div>
+      <h2>Klaar om uw netcongestie<br>op te lossen?</h2>
+      <p>Plan uw gratis energie-analyse. Wij brengen uw situatie volledig in kaart en presenteren de optimale oplossing — vrijblijvend.</p>
+      <ul class="cta-bullets">
+        <li>Advieskosten worden verrekend bij aankoop</li>
+        <li>Reactie binnen 24 uur gegarandeerd</li>
+        <li>Op locatie in heel Limburg en Nederland</li>
+        <li>Gecertificeerde installateurpartners</li>
+        <li>5 sterren klanttevredenheid op Google</li>
+      </ul>
+    </div>
+    <div class="form-card">
+      <h3>Gratis energie-analyse aanvragen</h3>
+      <p class="form-sub">Vul het formulier in — wij nemen binnen 24 uur contact op.</p>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Voornaam</label>
+          <input type="text" placeholder="Jan">
+        </div>
+        <div class="form-group">
+          <label>Achternaam</label>
+          <input type="text" placeholder="Janssen">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Bedrijfsnaam</label>
+        <input type="text" placeholder="Uw bedrijf B.V.">
+      </div>
+      <div class="form-group">
+        <label>E-mailadres</label>
+        <input type="email" placeholder="info@uwbedrijf.nl">
+      </div>
+      <div class="form-group">
+        <label>Telefoonnummer</label>
+        <input type="tel" placeholder="+31 6 00 00 00 00">
+      </div>
+      <div class="form-group">
+        <label>Situatie</label>
+        <select>
+          <option>Netcongestie / transportvermogen probleem</option>
+          <option>Zonnepanelen + batterijopslag</option>
+          <option>Laadpalen installeren</option>
+          <option>Piekafvlakking / energiekosten verlagen</option>
+          <option>BESS / industrieel project</option>
+          <option>Anders</option>
+        </select>
+      </div>
+      <button class="form-submit">Analyse aanvragen →</button>
+      <div class="form-privacy">✓ Kosteloos &nbsp;·&nbsp; ✓ Vrijblijvend &nbsp;·&nbsp; ✓ Geen spam · Privacy gewaarborgd</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <img src="https://www.voltenum.nl/web/image/website/2/logo/Voltenum%20B.V.?unique=949f29b" alt="Voltenum">
+  <div>© 2026 Voltenum B.V. · Jouw partner in energieopslag · voltenum.nl</div>
+</footer>
+
+</body>
+</html>
