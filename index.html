@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q-Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --green: #4ade80; --red: #f87171; --accent: #818cf8; }
+  body { background: #0d0f14; color: #e2e8f0; font-family: 'Inter', 'Segoe UI', sans-serif; padding: 28px; min-height: 100vh; }
+  body.light { background: #f8fafc; color: #1e293b; }
+  .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  h1 { font-size: 1.5rem; font-weight: 800; color: #f8fafc; letter-spacing: -0.03em; }
+  body.light h1 { color: #1e293b; }
+  .version { font-size: 0.7rem; color: #334155; background: #161b26; border: 1px solid #1e2736; border-radius: 4px; padding: 2px 7px; }
+  .subtitle { font-size: 0.75rem; color: #475569; margin-bottom: 20px; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 28px; border-bottom: 1px solid #1e2736; padding-bottom: 0; }
+  .tab { padding: 8px 18px; font-size: 0.78rem; font-weight: 600; color: #475569; cursor: pointer; border-radius: 7px 7px 0 0; border: 1px solid transparent; border-bottom: none; transition: all 0.15s; }
+  .tab:hover { color: #94a3b8; background: #161b26; }
+  .tab.active { color: #f8fafc; background: #161b26; border-color: #1e2736; border-bottom-color: #161b26; margin-bottom: -1px; }
+  body.light .tab.active { color: #1e293b; background: #fff; border-color: #e2e8f0; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 32px; }
+  @media (max-width: 900px) { .stats { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 600px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat { background: #161b26; border: 1px solid #1e2736; border-radius: 10px; padding: 16px; }
+  body.light .stat { background: #fff; border-color: #e2e8f0; }
+  .stat-label { font-size: 0.68rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .stat-value { font-size: 1.7rem; font-weight: 700; color: #f8fafc; }
+  body.light .stat-value { color: #1e293b; }
+  .stat-sub { font-size: 0.68rem; color: #334155; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="header-row">
+  <div style="display: flex; align-items: baseline; gap: 12px;">
+    <h1>🧭 Q-Dashboard</h1>
+    <span class="version">v1.8</span>
+  </div>
+</div>
+<p class="subtitle">Last updated: 2026-03-25 · Autonomy target: 30% · MRR target: €1M+</p>
+
+<div class="stats">
+  <div class="stat">
+    <div class="stat-label">Autonomy Level</div>
+    <div class="stat-value" style="color:#fbbf24">8%</div>
+    <div class="stat-sub">target: 30%</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Portfolio Tasks</div>
+    <div class="stat-value">12</div>
+    <div class="stat-sub">across entities</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Active</div>
+    <div class="stat-value" style="color:#4ade80">2</div>
+    <div class="stat-sub">in progress</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Portfolio MRR</div>
+    <div class="stat-value" style="color:#f87171">€0</div>
+    <div class="stat-sub">target: €1M+</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Proposed Experiments</div>
+    <div class="stat-value" style="color:#60a5fa">3</div>
+    <div class="stat-sub">awaiting green light</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Live POCs</div>
+    <div class="stat-value" style="color:#334155">0</div>
+    <div class="stat-sub">in testing</div>
+  </div>
+</div>
+
+<div class="footer" style="margin-top: 24px; font-size: 0.66rem; color: #475569; text-align: right;">Q-Dashboard v1.8 · 2026-03-25</div>
+</body>
+</html>
